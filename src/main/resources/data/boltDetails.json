@@ -1,0 +1,196 @@
+{"executors": 7, "componentErrors": [], "boltStats": [
+    {
+        "emitted": 180,
+        "windowPretty": "10m 0s",
+        "transferred": 40,
+        "acked": 2811820,
+        "executeLatency": "0.075",
+        "executed": 2811780,
+        "processLatency": "0.001",
+        "window": "600",
+        "failed": 0
+    },
+    {
+        "emitted": 2340,
+        "windowPretty": "3h 0m 0s",
+        "transferred": 960,
+        "acked": 51898860,
+        "executeLatency": "0.083",
+        "executed": 51898860,
+        "processLatency": "0.001",
+        "window": "10800",
+        "failed": 0
+    },
+    {
+        "emitted": 3640,
+        "windowPretty": "1d 0h 0m 0s",
+        "transferred": 1320,
+        "acked": 81255020,
+        "executeLatency": "0.082",
+        "executed": 81255000,
+        "processLatency": "0.001",
+        "window": "86400",
+        "failed": 0
+    },
+    {
+        "emitted": 3640,
+        "windowPretty": "All time",
+        "transferred": 1320,
+        "acked": 81255020,
+        "executeLatency": "0.082",
+        "executed": 81255000,
+        "processLatency": "0.001",
+        "window": ":all-time",
+        "failed": 0
+    }
+], "topologyId": "antibot-2-1411535907", "name": "antibot", "executorStats": [
+    {
+        "workerLogLink": "http:\/\/SH02SVR2581:8000\/log?file=worker-6705.log",
+        "emitted": 580,
+        "port": 6705,
+        "transferred": 180,
+        "host": "SH02SVR2581",
+        "acked": 11681300,
+        "uptime": "4h 57m 59s",
+        "executeLatency": "0.094",
+        "executed": 11681300,
+        "processLatency": "0.002",
+        "capacity": "0.049",
+        "id": "[23-23]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR4273:8000\/log?file=worker-6700.log",
+        "emitted": 460,
+        "port": 6700,
+        "transferred": 120,
+        "host": "SH02SVR4273",
+        "acked": 11526680,
+        "uptime": "4h 58m 0s",
+        "executeLatency": "0.073",
+        "executed": 11526680,
+        "processLatency": "0.001",
+        "capacity": "0.039",
+        "id": "[24-24]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR2583:8000\/log?file=worker-6703.log",
+        "emitted": 580,
+        "port": 6703,
+        "transferred": 240,
+        "host": "SH02SVR2583",
+        "acked": 11544160,
+        "uptime": "4h 57m 58s",
+        "executeLatency": "0.097",
+        "executed": 11544180,
+        "processLatency": "0.002",
+        "capacity": "0.067",
+        "id": "[25-25]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR2582:8000\/log?file=worker-6703.log",
+        "emitted": 500,
+        "port": 6703,
+        "transferred": 220,
+        "host": "SH02SVR2582",
+        "acked": 11918080,
+        "uptime": "4h 57m 52s",
+        "executeLatency": "0.060",
+        "executed": 11918080,
+        "processLatency": "0.001",
+        "capacity": "0.039",
+        "id": "[26-26]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR2581:8000\/log?file=worker-6703.log",
+        "emitted": 460,
+        "port": 6703,
+        "transferred": 160,
+        "host": "SH02SVR2581",
+        "acked": 11541140,
+        "uptime": "4h 57m 58s",
+        "executeLatency": "0.095",
+        "executed": 11541140,
+        "processLatency": "0.002",
+        "capacity": "0.058",
+        "id": "[27-27]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR2583:8000\/log?file=worker-6702.log",
+        "emitted": 560,
+        "port": 6702,
+        "transferred": 200,
+        "host": "SH02SVR2583",
+        "acked": 11508420,
+        "uptime": "4h 57m 57s",
+        "executeLatency": "0.096",
+        "executed": 11508400,
+        "processLatency": "0.002",
+        "capacity": "0.057",
+        "id": "[28-28]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR2582:8000\/log?file=worker-6702.log",
+        "emitted": 500,
+        "port": 6702,
+        "transferred": 200,
+        "host": "SH02SVR2582",
+        "acked": 11535240,
+        "uptime": "4h 57m 51s",
+        "executeLatency": "0.061",
+        "executed": 11535220,
+        "processLatency": "0.001",
+        "capacity": "0.045",
+        "id": "[29-29]",
+        "failed": 0
+    }
+], "tasks": 7, "window": ":all-time", "inputStats": [
+    {
+        "component": "mobiActionSpout",
+        "stream": "actionunicast",
+        "executeLatency": "0.041",
+        "processLatency": "0.041",
+        "executed": 48692680,
+        "acked": 48691760,
+        "failed": 0
+    },
+    {
+        "component": "mobiRestSpout",
+        "stream": "restunicast",
+        "executeLatency": "0.062",
+        "processLatency": "0.062",
+        "executed": 485380,
+        "acked": 482700,
+        "failed": 0
+    },
+    {
+        "component": "wpgSpout",
+        "stream": "wpgunicast",
+        "executeLatency": "0.145",
+        "processLatency": "0.145",
+        "executed": 32076940,
+        "acked": 32080560,
+        "failed": 0
+    }
+], "componentType": "bolt", "windowHint": "All time", "id": "mobile-count", "outputStats": [
+    {
+        "stream": "__metrics",
+        "emitted": 2320,
+        "transferred": 0
+    },
+    {
+        "stream": "alarm",
+        "emitted": 1220,
+        "transferred": 1220
+    },
+    {
+        "stream": "uniquealarm",
+        "emitted": 100,
+        "transferred": 100
+    }
+]}

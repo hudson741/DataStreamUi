@@ -1,0 +1,104 @@
+{"ubt-bolt": {
+    ":type": "bolt",
+    ":capacity": 0.0,
+    ":latency": 0,
+    ":transferred": 0,
+    ":stats": [
+        {
+            ":host": "SH02SVR4385",
+            ":port": 6702,
+            ":uptime_secs": 6252,
+            ":transferred": {
+                ":all-time": {
+                    "s__metrics-890398493": 0
+                },
+                "600": {
+                    "s__metrics-890398493": 0
+                },
+                "10800": {
+                    "s__metrics-890398493": 0
+                },
+                "86400": {
+                    "s__metrics-890398493": 0
+                }
+            }
+        }
+    ],
+    ":link": "\/component.html?id=ubt-bolt&topology_id=ubt-sid-uid-rules-4-1411546213",
+    ":inputs": [
+        {
+            ":component": "ubt-spout",
+            ":stream": "ubt-events",
+            ":sani-stream": "ubt-events2035012127",
+            ":grouping": "fields"
+        }
+    ]
+}, "__system": {
+    ":type": "spout",
+    ":capacity": 0,
+    ":latency": null,
+    ":transferred": null,
+    ":stats": [],
+    ":link": "\/component.html?id=__system&topology_id=ubt-sid-uid-rules-4-1411546213",
+    ":inputs": []
+}, "__acker": {
+    ":type": "spout",
+    ":capacity": 0,
+    ":latency": null,
+    ":transferred": null,
+    ":stats": [],
+    ":link": "\/component.html?id=__acker&topology_id=ubt-sid-uid-rules-4-1411546213",
+    ":inputs": [
+        {
+            ":component": "ubt-bolt",
+            ":stream": "__ack_ack",
+            ":sani-stream": "s__ack_ack1278315507",
+            ":grouping": "fields"
+        },
+        {
+            ":component": "ubt-bolt",
+            ":stream": "__ack_fail",
+            ":sani-stream": "s__ack_fail973222132",
+            ":grouping": "fields"
+        },
+        {
+            ":component": "ubt-spout",
+            ":stream": "__ack_init",
+            ":sani-stream": "s__ack_init973324006",
+            ":grouping": "fields"
+        }
+    ]
+}, "ubt-spout": {
+    ":type": "spout",
+    ":capacity": 0,
+    ":latency": 0,
+    ":transferred": 0,
+    ":stats": [
+        {
+            ":host": "SH02SVR4386",
+            ":port": 6702,
+            ":uptime_secs": 6252,
+            ":transferred": {
+                ":all-time": {},
+                "600": {},
+                "10800": {},
+                "86400": {}
+            }
+        }
+    ],
+    ":link": "\/component.html?id=ubt-spout&topology_id=ubt-sid-uid-rules-4-1411546213",
+    ":inputs": [
+        {
+            ":component": "__acker",
+            ":stream": "__ack_fail",
+            ":sani-stream": "s__ack_fail973222132",
+            ":grouping": "direct"
+        },
+        {
+            ":component": "__acker",
+            ":stream": "__ack_ack",
+            ":sani-stream": "s__ack_ack1278315507",
+            ":grouping": "direct"
+        }
+    ]
+}}

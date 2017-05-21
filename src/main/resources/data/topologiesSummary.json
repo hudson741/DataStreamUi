@@ -1,0 +1,38 @@
+{"topologies": [
+    {
+        "id": "ubt-sid-uid-rules-4-1411546213",
+        "name": "ubt-sid-uid-rules",
+        "status": "ACTIVE",
+        "uptime": "1h 44m 20s",
+        "tasksTotal": 8,
+        "workersTotal": 3,
+        "executorsTotal": 5
+    },
+    {
+        "id": "infosec-mysql-topology-2-1411546127",
+        "name": "infosec-mysql-topology",
+        "status": "ACTIVE",
+        "uptime": "1h 45m 46s",
+        "tasksTotal": 15,
+        "workersTotal": 6,
+        "executorsTotal": 15
+    },
+    {
+        "id": "infosec-es-topology-1-1411546118",
+        "name": "infosec-es-topology",
+        "status": "ACTIVE",
+        "uptime": "1h 45m 54s",
+        "tasksTotal": 15,
+        "workersTotal": 6,
+        "executorsTotal": 15
+    },
+    {
+        "id": "infosec-service-topology-3-1411546137",
+        "name": "infosec-service-topology",
+        "status": "ACTIVE",
+        "uptime": "1h 45m 36s",
+        "tasksTotal": 15,
+        "workersTotal": 6,
+        "executorsTotal": 15
+    }
+]}

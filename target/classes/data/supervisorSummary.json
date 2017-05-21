@@ -1,0 +1,30 @@
+{"supervisors": [
+    {
+        "id": "c8eb4fdc-f50f-4531-928c-8307bca26824",
+        "host": "SH02SVR4387",
+        "uptime": "1h 46m 27s",
+        "slotsTotal": 6,
+        "slotsUsed": 6
+    },
+    {
+        "id": "69397a13-37d9-4b76-9c25-5dfbf2e406fc",
+        "host": "SH02SVR4384",
+        "uptime": "1h 48m 38s",
+        "slotsTotal": 6,
+        "slotsUsed": 6
+    },
+    {
+        "id": "68165591-72b1-496b-a264-aa98fdf38ed7",
+        "host": "SH02SVR4386",
+        "uptime": "1h 48m 28s",
+        "slotsTotal": 6,
+        "slotsUsed": 4
+    },
+    {
+        "id": "d22d8e4b-cfd0-48b2-a7a7-da358c9d1742",
+        "host": "SH02SVR4385",
+        "uptime": "1h 48m 29s",
+        "slotsTotal": 6,
+        "slotsUsed": 5
+    }
+]}

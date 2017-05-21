@@ -1,0 +1,20 @@
+<div style="margin-bottom: 10px">
+
+  <input type="text" name="stormURL" class="form-control" placeholder="127.0.0.1:8080" ng-trim="true"
+         maxlength="255" ng-model="stormURL" style="margin-bottom: 10px"/>
+
+  <button type="button" class="btn btn-info" ng-click="setStormURL(stormURL.value)" style="margin-bottom: 10px">
+    Update Storm URL
+  </button>
+
+  <div ng-show="showMessage">
+    <alert type="info" style="margin-bottom: 10px">Storm url updated to <b>{{stormURL}}</b></alert>
+  </div>
+
+  <div ng-show="showFailMessage">
+    <alert type="danger" style="margin-bottom: 10px">Storm url <b>FAILED</b> to updated to <b>{{tobeset}}</b>. Please
+      check and make sure the new rest url is accessible on the host where this app is deployed.
+    </alert>
+  </div>
+
+</div>

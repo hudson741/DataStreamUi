@@ -1,0 +1,80 @@
+{"executors": 2, "componentErrors": [], "topologyId": "antibot-2-1411535907", "name": "antibot", "executorStats": [
+    {
+        "workerLogLink": "http:\/\/SH02SVR2581:8000\/log?file=worker-6702.log",
+        "emitted": 88524900,
+        "port": 6702,
+        "completeLatency": "0.000",
+        "transferred": 88524440,
+        "host": "SH02SVR2581",
+        "acked": 0,
+        "uptime": "4h 57m 57s",
+        "id": "[30-30]",
+        "failed": 0
+    },
+    {
+        "workerLogLink": "http:\/\/SH02SVR2583:8000\/log?file=worker-6701.log",
+        "emitted": 88524420,
+        "port": 6701,
+        "completeLatency": "0.000",
+        "transferred": 88523980,
+        "host": "SH02SVR2583",
+        "acked": 0,
+        "uptime": "4h 57m 55s",
+        "id": "[31-31]",
+        "failed": 0
+    }
+], "tasks": 2, "window": ":all-time", "spoutSummary": [
+    {
+        "windowPretty": "10m 0s",
+        "window": "600",
+        "emitted": 5494260,
+        "transferred": 5494240,
+        "completeLatency": "0.000",
+        "acked": 0,
+        "failed": 0
+    },
+    {
+        "windowPretty": "3h 0m 0s",
+        "window": "10800",
+        "emitted": 100245840,
+        "transferred": 100245240,
+        "completeLatency": "0.000",
+        "acked": 0,
+        "failed": 0
+    },
+    {
+        "windowPretty": "1d 0h 0m 0s",
+        "window": "86400",
+        "emitted": 177049320,
+        "transferred": 177048420,
+        "completeLatency": "0.000",
+        "acked": 0,
+        "failed": 0
+    },
+    {
+        "windowPretty": "All time",
+        "window": ":all-time",
+        "emitted": 177049320,
+        "transferred": 177048420,
+        "completeLatency": "0.000",
+        "acked": 0,
+        "failed": 0
+    }
+], "componentType": "spout", "windowHint": "All time", "id": "pprobeSource", "outputStats": [
+    {
+        "stream": "unicast",
+        "emitted": 177048420,
+        "transferred": 177048420,
+        "completeLatency": "0",
+        "acked": 0,
+        "failed": 0
+    },
+    {
+        "stream": "__metrics",
+        "emitted": 900,
+        "transferred": 0,
+        "completeLatency": "0",
+        "acked": 0,
+        "failed": 0
+    }
+]}

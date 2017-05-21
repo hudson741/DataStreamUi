@@ -1,0 +1,195 @@
+<div align="center" ng-show="showLoading && !showAPIFail">
+  <img src="images/loading.gif"> &nbsp;&nbsp; loading overview...
+</div>
+
+<div ng-show="showAPIFail">
+  <alert type="danger" style="margin-bottom: 10px">
+    Failed to 1) retrive data from SOFA-STREAM server or 2) YASU server failed to retrieve data from storm restful server.
+    Please 1) check the $http.get value in app.js of SOFA-STREAM project or 2) check the current storm restful server in
+    Settings tab.
+  </alert>
+</div>
+
+<div ng-show="!showLoading">
+
+  <h3>Cluster Summary</h3>
+  <table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>Version</th>
+      <th>Nimbus uptime</th>
+      <th>Supervisors</th>
+      <th>Used slots</th>
+      <th>Free slots</th>
+      <th>Total slots</th>
+      <th>Executors</th>
+      <th>Tasks</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="active">
+      <td>{{overview.clusterSummary.stormVersion}}</td>
+      <td>{{overview.clusterSummary.nimbusUptime}}</td>
+      <td>{{overview.clusterSummary.supervisors}}</td>
+      <td>{{overview.clusterSummary.slotsUsed}}</td>
+      <td>{{overview.clusterSummary.slotsFree}}</td>
+      <td>{{overview.clusterSummary.slotsTotal}}</td>
+      <td>{{overview.clusterSummary.executorsTotal}}</td>
+      <td>{{overview.clusterSummary.tasksTotal}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h3>Nimbus Summary</h3>
+  <table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>Host</th>
+      <th>Port</th>
+      <th>Status</th>
+      <th>Version</th>
+      <th>Uptime</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="nimbus in overview.nimbusSummary.nimbuses" class="active">
+      <td>{{nimbus.host}}</td>
+      <td>{{nimbus.port}}</td>
+      <td>{{nimbus.status}}</td>
+      <td>{{nimbus.version}}</td>
+      <td>{{nimbus.nimbusUpTime}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+
+  <h3>Topology Summary</h3>
+  <table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Id</th>
+      <th>Status</th>
+      <th>Uptime</th>
+      <th>Num workers</th>
+      <th>Num executors</th>
+      <th>Num tasks</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="topo in overview.topos" class="active">
+      <td><a href="#/topo?tabName={{topo.name}}&tabId={{topo.id}}">{{topo.name}}</a></td>
+      <td>{{topo.id}}</td>
+      <td>{{topo.status}}</td>
+      <td>{{topo.uptime}}</td>
+      <td>{{topo.workersTotal}}</td>
+      <td>{{topo.executorsTotal}}</td>
+      <td>{{topo.tasksTotal}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+
+  <h3>Supervisor Summary</h3>
+  <table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>
+        <a href="" ng-click="reverseSort.overview.ss = !reverseSort.overview.ss; orderByField.overview.ss='id';">
+          Id
+                <span ng-show="orderByField.overview.ss == 'id'">
+                    <span ng-show="!reverseSort.overview.ss">^</span>
+                    <span ng-show="reverseSort.overview.ss">v</span>
+                </span>
+        </a>
+
+      </th>
+      <th>
+        <a href="" ng-click="reverseSort.overview.ss = !reverseSort.overview.ss; orderByField.overview.ss='host';">
+          Host
+                <span ng-show="orderByField.overview.ss == 'host'">
+                    <span ng-show="!reverseSort.overview.ss">^</span>
+                    <span ng-show="reverseSort.overview.ss">v</span>
+                </span>
+        </a>
+      </th>
+      <th>
+        <a href="" ng-click="reverseSort.overview.ss = !reverseSort.overview.ss; orderByField.overview.ss='ip';">
+          IP
+                <span ng-show="orderByField.overview.ss == 'ip'">
+                    <span ng-show="!reverseSort.overview.ss">^</span>
+                    <span ng-show="reverseSort.overview.ss">v</span>
+                </span>
+        </a>
+      </th>
+      <th>
+        <a href=""
+           ng-click="reverseSort.overview.ss = !reverseSort.overview.ss; orderByField.overview.ss='uptime';">
+          Uptime
+                <span ng-show="orderByField.overview.ss == 'uptime'">
+                    <span ng-show="!reverseSort.overview.ss">^</span>
+                    <span ng-show="reverseSort.overview.ss">v</span>
+                </span>
+        </a>
+      </th>
+      <th>
+        <a href=""
+           ng-click="reverseSort.overview.ss = !reverseSort.overview.ss; orderByField.overview.ss='slotsTotal';">
+          Slots
+                <span ng-show="orderByField.overview.ss == 'slotsTotal'">
+                    <span ng-show="!reverseSort.overview.ss">^</span>
+                    <span ng-show="reverseSort.overview.ss">v</span>
+                </span>
+        </a>
+      </th>
+      <th>
+        <a href=""
+           ng-click="reverseSort.overview.ss = !reverseSort.overview.ss; orderByField.overview.ss='slotsUsed';">
+          Used slots
+                <span ng-show="orderByField.overview.ss == 'slotsUsed'">
+                    <span ng-show="!reverseSort.overview.ss">^</span>
+                    <span ng-show="reverseSort.overview.ss">v</span>
+                </span>
+        </a>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr
+      ng-repeat="sup in overview.supervisorSummary.supervisors|orderBy:orderByField.overview.ss:reverseSort.overview.ss"
+      class="active">
+      <td>{{sup.id}}</td>
+      <td>
+        <a href="#/host?tabName=Host&tabId=Host&scrollTo={{sup.host}}#{{sup.host}}">{{sup.host}}</a>
+
+      </td>
+      <td>{{sup.ip}}</td>
+      <td>{{sup.uptime}}</td>
+      <td>{{sup.slotsTotal}}</td>
+      <td>{{sup.slotsUsed}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+
+  <h3>Cluster Config</h3>
+
+  <table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+      <th>
+        Key
+      </th>
+      <th>Value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="(key, value) in overview.cluserConfig"
+        class="active">
+      <td>{{key}}</td>
+      <td>{{value}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
