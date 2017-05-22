@@ -1,0 +1,17 @@
+/.classpath
+/.project
+/.settings/
+*.iml
+*.idea*
+target*
+/.classpath
+/.project
+/.settings/
+/.settings/*
+.settings
+.settings/*
+*.settings/*
+.settings/
+lib/*
+/WebContent/WEB-INF/classes
+/WebContent/WEB-INF/lib
