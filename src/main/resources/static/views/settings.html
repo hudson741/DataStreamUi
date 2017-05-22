@@ -1,11 +1,15 @@
 <div style="margin-bottom: 10px">
 
-  <input type="text" name="stormURL" class="form-control" placeholder="127.0.0.1:8080" ng-trim="true"
-         maxlength="255" ng-model="stormURL" style="margin-bottom: 10px"/>
 
-  <button type="button" class="btn btn-info" ng-click="setStormURL(stormURL.value)" style="margin-bottom: 10px">
-    Update Storm URL
-  </button>
+  <form method="post" action="fileu" enctype="multipart/form-data">
+    <input type="file" name="file" class="form-control" placeholder="127.0.0.1:8080" ng-trim="true"
+           maxlength="255" ng-model="stormURL" style="margin-bottom: 10px" />
+    <input type="submit" type="button" class="btn btn-info" ng-click="setStormURL(stormURL.value)" style="margin-bottom: 10px"/>
+  </form>
+
+  <!--<button type="button" class="btn btn-info" ng-click="setStormURL(stormURL.value)" style="margin-bottom: 10px">-->
+    <!--Update Storm URL-->
+  <!--</button>-->
 
   <div ng-show="showMessage">
     <alert type="info" style="margin-bottom: 10px">Storm url updated to <b>{{stormURL}}</b></alert>
