@@ -10,13 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 public interface StorageService {
     void deleteAll();
 
-    void init();
+    void init(String path);
 
     Path load(String filename);
 
     Resource loadAsResource(String filename);
 
-    URI store(MultipartFile file);
+    URI store(String path,MultipartFile file);
 }
 
 

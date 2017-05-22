@@ -8,6 +8,8 @@ import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -26,6 +28,8 @@ import java.util.Map;
  */
 
 public class StormRemoteJarSubmiter implements StormSubmiter {
+
+    private Logger logger = LoggerFactory.getLogger(StormRemoteJarSubmiter.class);
 
     @Autowired
     private NimbusNodesService nimbusNodesService;
@@ -94,7 +98,6 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
             throw new RuntimeException(e);
         }finally {
             FileSystemUtils.deleteRecursively(new File(uri));
-
         }
     }
 

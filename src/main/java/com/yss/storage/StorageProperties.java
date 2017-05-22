@@ -8,7 +8,7 @@ public class StorageProperties {
     /**
      * Folder location for storing files
      */
-    private String location = "/stormJarDir/";
+    private String location = "stormJarDir/";
 
     public String getLocation() {
         return location;
