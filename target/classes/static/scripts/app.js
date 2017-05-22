@@ -35,10 +35,12 @@ app.run(function ($rootScope, $routeParams, $anchorScroll, $location) {
 function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
-    {tabName: "总览", tabId: "总览", tabLink: "/overview"},
-    {tabName: "上传", tabId: "上传", tabLink: "/settings"},
+      {tabName: "总览", tabId: "总览", tabLink: "/overview"},
+      {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
+      {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
+      {tabName: "上传", tabId: "上传", tabLink: "/settings"},
       {tabName: "下载", tabId: "下载", tabLink: "/download"},
-    {tabName: "Host", tabId: "Host", tabLink: "/host"}
+      {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
 }
 
@@ -50,10 +52,12 @@ function defaultFail($scope) {
 function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
-    {tabName: "总览", tabId: "总览", tabLink: "/overview"},
-    {tabName: "上传", tabId: "上传", tabLink: "/settings"},
+      {tabName: "总览", tabId: "总览", tabLink: "/overview"},
+      {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
+      {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
+      {tabName: "上传", tabId: "上传", tabLink: "/settings"},
       {tabName: "下载", tabId: "下载", tabLink: "/download"},
-    {tabName: "Host", tabId: "Host", tabLink: "/host"}
+      {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
 
   for (var i = 0; i < topos.length; i++) {
