@@ -8,11 +8,13 @@ package com.yss.storm.model;
 public class Topology {
     String id;
     String name;
+    String owner;
     String status;
     String uptime;
     int tasksTotal;
     int workersTotal;
     int executorsTotal;
+    double assignedCpu;
 
     public String getId() {
         return id;
@@ -68,5 +70,22 @@ public class Topology {
 
     public void setExecutorsTotal(int executorsTotal) {
         this.executorsTotal = executorsTotal;
+    }
+
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public double getAssignedCpu() {
+        return assignedCpu;
+    }
+
+    public void setAssignedCpu(double assignedCpu) {
+        this.assignedCpu = assignedCpu;
     }
 }

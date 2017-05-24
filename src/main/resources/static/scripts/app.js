@@ -38,6 +38,7 @@ function updateTabsOnFail($rootScope) {
       {tabName: "总览", tabId: "总览", tabLink: "/overview"},
       {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
+      {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "上传", tabId: "上传", tabLink: "/settings"},
       {tabName: "下载", tabId: "下载", tabLink: "/download"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
@@ -55,6 +56,7 @@ function updateTabs($rootScope, topos, status) {
       {tabName: "总览", tabId: "总览", tabLink: "/overview"},
       {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
+      {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "上传", tabId: "上传", tabLink: "/settings"},
       {tabName: "下载", tabId: "下载", tabLink: "/download"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
@@ -84,6 +86,18 @@ app.factory('client', ['$http', function ($http) {
     topo: function (topoid, callback, failcallback) {
       request('topo?topoid=' + topoid).success(callback).error(failcallback);
     },
+    killTopo: function(topoid,callback,failcallback) {
+      request('killTopology?topoid=' + topoid).success(callback).error(failcallback);
+    },
+    activeTopo: function(topoid,callback,failcallback) {
+      request('activeTopo?topoid=' + topoid).success(callback).error(failcallback)
+    },
+    deactiveTopo: function(topoid,callback,failcallback) {
+      request('deactiveTopo?topoid=' + topoid).success(callback).error(failcallback)
+    } ,
+    streamManager:function(callback,failcallback) {
+      request('streamManager').success(callback).error(failcallback);
+    },
     fileu: function (newStormRestHost, callback, failcallback) {
       request('fileu').success(callback).error(failcallback);
     }
@@ -99,6 +113,10 @@ app.config(function ($routeProvider) {
       templateUrl: 'views/overview.html',
       controller: 'OverviewCtrl'
     })
+      .when('/streamManager', {
+          templateUrl: 'views/streamManager.html',
+          controller: 'StreamManagerCtrl'
+      })
     .when('/topo', {
       templateUrl: 'views/topo.html',
       controller: 'TopoCtrl'

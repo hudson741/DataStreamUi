@@ -6,6 +6,9 @@ import com.yss.storm.nimbus.NimbusNode;
 import com.yss.storm.nimbus.NimbusNodesService;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
+import org.apache.storm.flux.model.SpoutDef;
+import org.apache.storm.generated.Bolt;
+import org.apache.storm.generated.SpoutSpec;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
@@ -90,6 +93,13 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
             }
 
             Map<String,Object> stormConf = buildConf();
+
+            StormTopology stormTopology = zcBuilder.getTopology();
+            Map<String,Bolt> map = stormTopology.get_bolts();
+            Map<String,SpoutSpec> map1 = stormTopology.get_spouts();
+            for(Bolt bolt:map.values()){
+                bolt.get_common().set_parallelism_hint(2);
+            }
 
             System.setProperty("storm.jar", new File(uri).toString());
             StormSubmitter.submitTopology("zc" + System.currentTimeMillis() + "", stormConf, zcBuilder.getTopology());

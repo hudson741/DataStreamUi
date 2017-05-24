@@ -3,6 +3,7 @@ package com.yss.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,34 @@ import com.yss.storm.monitor.StormMonitorRestApiService;
 public class StormUIController {
     @Autowired
     private StormMonitorRestApiService stormMonitorRestApiService;
+
+    @RequestMapping(
+            value = "/activeTopo",
+            method = RequestMethod.GET
+    )
+    public String activeTopology(@RequestParam("topoid") String topoid) throws Exception {
+        Map<String,Object> data = stormMonitorRestApiService.activeTopo(topoid);
+        return JSON.toJSONString(data);
+    }
+
+    @RequestMapping(
+            value = "/deactiveTopo",
+            method = RequestMethod.GET
+    )
+    public String deactiveTopology(@RequestParam("topoid") String topoid) throws Exception {
+        Map<String,Object> data = stormMonitorRestApiService.deactiveTopo(topoid);
+        return JSON.toJSONString(data);
+    }
+
+
+    @RequestMapping(
+       value = "/killTopology",
+       method = RequestMethod.GET
+    )
+    public String killTopology(@RequestParam("topoid") String topoid) throws Exception {
+        Map<String,Object> data = stormMonitorRestApiService.killTopology(topoid);
+        return JSON.toJSONString(data);
+    }
 
     @RequestMapping(
         value  = "/hosts",
@@ -44,6 +73,16 @@ public class StormUIController {
     )
     public String topolist() {
         Topology[] topologies = stormMonitorRestApiService.getTopologiesSummary();
+
+        return JSON.toJSONString(topologies);
+    }
+
+    @RequestMapping(
+            value  = "/streamManager",
+            method = RequestMethod.GET
+    )
+    public String streamManager() {
+        Map<String,Object> topologies = stormMonitorRestApiService.getTopologies();
 
         return JSON.toJSONString(topologies);
     }

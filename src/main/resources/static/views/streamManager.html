@@ -1,0 +1,46 @@
+<div align="center" ng-show="showLoading && !showAPIFail">
+    <img src="images/loading.gif"> &nbsp;&nbsp; loading overview...
+</div>
+
+<div ng-show="showAPIFail">
+    <alert type="danger" style="margin-bottom: 10px">
+        Failed to 1) retrive data from SOFA-STREAM server or 2) YASU server failed to retrieve data from storm restful server.
+        Please 1) check the $http.get value in app.js of SOFA-STREAM project or 2) check the current storm restful server in
+        Settings tab.
+    </alert>
+</div>
+
+<div ng-show="!showLoading" ng-controller="topoManager">
+
+    <h3>Topology Summary</h3>
+    <table class="table table-hover table-condensed">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Id</th>
+            <th>owner</th>
+            <th>Status</th>
+            <th>Uptime</th>
+            <th>管理</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="topo in topolist.topologies" class="active">
+            <td><a href="#/topo?tabName={{topo.name}}&tabId={{topo.id}}">{{topo.name}}</a></td>
+            <td>{{topo.id}}</td>
+            <td>{{topo.owner}}</td>
+            <td>{{topo.status}}</td>
+            <td>{{topo.uptime}}</td>
+            <td>
+                <input ng-disabled="{{topo.showa}}" ng-click='activeTopo(topo.id)'  type="button" value="Activate" class="btn btn-default">
+                <input ng-disabled="{{topo.showd}}" ng-click='deactiveTopo(topo.id)' type="button" value="Deactive" class="btn btn-default">
+                <input type="button" value="Rebalance" class="btn btn-default">
+                <input type="button" value="Kill" ng-click='killTopo(topo.id)' class="btn btn-default">
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+

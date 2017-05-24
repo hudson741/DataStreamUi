@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
 
+import com.yss.util.HttpUtilManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -19,7 +21,6 @@ import com.yss.storm.model.Topologies;
  * Created by zhangchi on 2017/5/19.
  */
 
-//@Service
 public class StormRestClient {
     private static PoolingClientConnectionManager ccm    = new PoolingClientConnectionManager();
     private static HttpClient                     client = new DefaultHttpClient(ccm);
@@ -31,6 +32,11 @@ public class StormRestClient {
 
     String stormRestHost;
     String apiBase;
+
+    public String getApiBase() {
+        return apiBase;
+    }
+
 
     public StormRestClient(String stormUIHost) {
         updateStormUIHost(stormUIHost);
@@ -60,10 +66,26 @@ public class StormRestClient {
         this.apiBase       = "http://" + stormRestHost + "/api/v1/";
     }
 
-    public String getApiBase() {
-        return apiBase;
+    /**
+     * post请求
+     * @param url
+     * @param params
+     * @return
+     */
+    private String getApiDataPost(String url, Map<String,String> params) {
+        try {
+            return HttpUtilManager.getInstance().requestHttpPost(apiBase, url, params, null);
+        }catch(Exception e){
+
+        }
+        return null;
     }
 
+    /**
+     * get请求
+     * @param url
+     * @return
+     */
     private String getApiData(String url) {
         HttpGet      get      = new HttpGet(apiBase + url);
         HttpResponse response = null;
@@ -79,36 +101,83 @@ public class StormRestClient {
         }
     }
 
+
+    /**
+     * 失效拓扑
+     * @param topologyId
+     * @return
+     */
+    public String deactiveTopo(String topologyId){
+        return getApiDataPost("topology/"+topologyId+"/deactivate",null);
+    }
+
+    /**
+     * 激活拓扑
+     * @param topologyId
+     * @return
+     */
+    public String activeTopolo(String topologyId){
+        return getApiDataPost("topology/"+topologyId+"/activate",null);
+    }
+
+    /**
+     * 移除拓扑
+     * @param topologyId
+     * @return
+     */
+    public String killTopology(String topologyId){
+        return getApiDataPost("topology/"+topologyId+"/kill/"+0,null);
+    }
+
+    /**
+     * 获取全局配置
+     * @return
+     */
     public String getClusterConfig() {
         return getApiData("cluster/configuration");
     }
 
+    /**
+     * 总览
+     * @return
+     * @throws IOException
+     */
     public String getClusterSummary() throws IOException {
         return getApiData("cluster/summary");
     }
 
+    /**
+     * 组件明细
+     * @param topoId
+     * @param compId
+     * @return
+     */
     public String getComponentDetails(String topoId, String compId) {
         String url = String.format("topology/%s/component/%s?sys=true&window=600", topoId, compId);
 
         return getApiData(url);
     }
 
+    /**
+     * 主节点总览
+     * @return
+     */
     public String getNimbusSummary() {
         return getApiData("nimbus/summary");
     }
 
-    public String getStormRestHost() {
-        return stormRestHost;
-    }
-
-    public void setStormRestHost(String stormRestHost) {
-        this.stormRestHost = stormRestHost;
-    }
-
+    /**
+     * 从节点总览
+     * @return
+     */
     public String getSupervisorSummary() {
         return getApiData("supervisor/summary");
     }
 
+    /**
+     * 组件总览
+     * @return
+     */
     public Topologies getTopoSummary() {
         String     topos      = getApiData("topology/summary");
         Topologies topologies = JSON.parseObject(topos, Topologies.class);
@@ -116,6 +185,19 @@ public class StormRestClient {
         return topologies;
     }
 
+    /**
+     * 组件总览
+     * @return
+     */
+    public String getTopoList() {
+        return getApiData("topology/summary");
+    }
+
+    /**
+     * 组件明细
+     * @param topoId
+     * @return
+     */
     public String getTopologyDetails(String topoId) {
         String url = String.format("topology/%s?sys=true&window=600", topoId);
 
@@ -127,7 +209,14 @@ public class StormRestClient {
 
         return getApiData(url);
     }
+
+    public String getStormRestHost() {
+        return stormRestHost;
+    }
+
+    public void setStormRestHost(String stormRestHost) {
+        this.stormRestHost = stormRestHost;
+    }
 }
 
 
-//~ Formatted by Jindent --- http://www.jindent.com

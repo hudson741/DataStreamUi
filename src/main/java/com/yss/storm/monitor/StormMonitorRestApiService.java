@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 
 import java.util.*;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
@@ -257,6 +259,34 @@ public class StormMonitorRestApiService implements StormMonitor {
         return topologies.getTopologies();
     }
 
+    @Override
+    public Map<String, Object> getTopologies() {
+        String topos =  stormRestClient.getTopoList();
+
+        JSONObject jsonObject = JSON.parseObject(topos);
+
+        JSONArray jsonArray = jsonObject.getJSONArray("topologies");
+
+        for(int i=0;i<jsonArray.size();i++){
+            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+
+            if(jsonObject1.get("status").equals("ACTIVE")){
+                jsonObject1.put("showa","true");
+                jsonObject1.put("showd","false");
+            }else{
+                jsonObject1.put("showa","false");
+                jsonObject1.put("showd","true");
+            }
+
+        }
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("topologies",jsonArray);
+
+        return map;
+
+    }
+
     public Map<String, Object> getTopologyDetails(String topoId) {
         return toMaps(stormRestClient.getTopologyDetails(topoId));
     }
@@ -309,6 +339,22 @@ public class StormMonitorRestApiService implements StormMonitor {
         ret.put("diffConfig", diffConfig);
 
         return ret;
+    }
+
+    @Override
+    public Map<String, Object> killTopology(String topologyId) {
+        String data = stormRestClient.killTopology(topologyId);
+        return toMaps(data);
+    }
+
+    @Override
+    public Map<String, Object> activeTopo(String topoId) {
+        return toMaps(stormRestClient.activeTopolo(topoId));
+    }
+
+    @Override
+    public Map<String, Object> deactiveTopo(String topoId) {
+        return toMaps(stormRestClient.deactiveTopo(topoId));
     }
 }
 

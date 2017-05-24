@@ -11,33 +11,33 @@
 </div>
 
 <div ng-show="!showLoading">
-  <h3>Topology summary</h3>
-  <table class="table table-hover table-condensed">
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Id</th>
-      <th>Status</th>
-      <th>Uptime</th>
-      <th>Num workers</th>
-      <th>Num executors</th>
-      <th>Num tasks</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="active">
-      <td>{{topo.name}}</td>
-      <td>{{topo.id}}</td>
-      <td>{{topo.status}}</td>
-      <td>{{topo.uptime}}</td>
-      <td>{{topo.workersTotal}}</td>
-      <td>{{topo.executorsTotal}}</td>
-      <td>{{topo.tasksTotal}}</td>
-    </tr>
-    </tbody>
-  </table>
+  <h3>计算拓扑</h3>
+    <table class="table table-hover table-condensed">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Id</th>
+            <th>Status</th>
+            <th>Uptime</th>
+            <th>Num workers</th>
+            <th>Num executors</th>
+            <th>Num tasks</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="active">
+            <td>{{topo.name}}</td>
+            <td>{{topo.id}}</td>
+            <td>{{topo.status}}</td>
+            <td>{{topo.uptime}}</td>
+            <td>{{topo.workersTotal}}</td>
+            <td>{{topo.executorsTotal}}</td>
+            <td>{{topo.tasksTotal}}</td>
+        </tr>
+        </tbody>
+    </table>
 
-  <h3>Topology stats</h3>
+  <h3>拓扑传输</h3>
   <table class="table table-hover table-condensed">
     <thead>
     <tr>
@@ -62,7 +62,7 @@
   </table>
 
 
-  <h3>Spouts (10 min)</h3>
+  <h3>输出组件 (10 min)</h3>
   <table class="table table-hover table-condensed">
     <thead>
     <tr>
@@ -409,7 +409,7 @@
   </table>
 
 
-  <h3>Bolts (10 min)</h3>
+  <h3>计算组件 (10 min)</h3>
   <table class="table table-hover table-condensed">
     <thead>
     <tr>
