@@ -1,13 +1,4 @@
-'use strict';
 
-/**
- * @ngdoc overview
- * @name anotherStormUiApp
- * @description
- * # anotherStormUiApp
- *
- * Main module of the application.
- */
 var app = angular
   .module('anotherStormUiApp', [
     'ngAnimate',

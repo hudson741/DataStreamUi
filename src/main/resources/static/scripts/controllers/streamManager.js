@@ -1,16 +1,3 @@
-/**
- * Created by mzang on 2014-09-28.
- */
-
-'use strict';
-
-/**
- * @ngdoc function
- * @name anotherStormUiApp.controller:TopoCtrl
- * @description
- * # AboutCtrl
- * Controller of the anotherStormUiApp
- */
 app.controller('StreamManagerCtrl', ['$scope', '$location', "client", function ($scope, $location, client) {
 
     $scope.showLoading = true;

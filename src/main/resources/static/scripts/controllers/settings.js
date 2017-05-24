@@ -1,12 +1,4 @@
-'use strict';
 
-/**
- * @ngdoc function
- * @name anotherStormUiApp.controller:AboutCtrl
- * @description
- * # AboutCtrl
- * Controller of the anotherStormUiApp
- */
 app.controller('SettingsCtrl', ['$scope', '$rootScope', '$cookies', '$timeout', "client",
   function ($scope, $rootScope, $cookies, $timeout, client) {
     $scope.stormURL = $cookies.stormURL;

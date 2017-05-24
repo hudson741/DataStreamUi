@@ -1,12 +1,4 @@
-'use strict';
 
-/**
- * @ngdoc function
- * @name anotherStormUiApp.controller:HostCtrl
- * @description
- * # MainCtrl
- * Controller of the anotherStormUiApp
- */
 angular.module('anotherStormUiApp')
   .controller('HostCtrl', ["$scope", '$anchorScroll', '$location', "client",
     function ($scope, $anchorScroll, $location, client) {
