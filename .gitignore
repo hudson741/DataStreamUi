@@ -3,7 +3,8 @@
 /.settings/
 *.iml
 *.idea*
-target*
+target/*
+log4j.log*
 /.classpath
 /.project
 /.settings/
@@ -15,3 +16,4 @@ target*
 lib/*
 /WebContent/WEB-INF/classes
 /WebContent/WEB-INF/lib
+/target/
