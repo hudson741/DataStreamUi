@@ -13,8 +13,6 @@
                 <!--p:maxUploadSize="5400000">-->
     <!--</bean>-->
 
-
-
     <bean id="testHandler" class="com.yss.TestHandler"/>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -42,14 +40,10 @@
          <property name="remoteZKPort" value="${zkServerPort}" />
     </bean>
 
-    <bean id="stormRestClient" class="com.yss.storm.monitor.StormRestClient">
-        <constructor-arg name="stormUIHost" value="${stormRestApiDaemon}"/>
-    </bean>
+    <bean id="stormNodesService" class="com.yss.storm.StormNodesService" />
+
+    <bean id="stormRestClient" class="com.yss.storm.monitor.StormRestClient"/>
 
     <bean id="stormMonitorRestApiService" class="com.yss.storm.monitor.StormMonitorRestApiService"/>
-
-
-
-
 
 </beans>

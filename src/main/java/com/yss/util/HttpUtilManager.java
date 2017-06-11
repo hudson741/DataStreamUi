@@ -1,6 +1,8 @@
 package com.yss.util;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.yss.storm.model.Rebalance;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
@@ -10,6 +12,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -18,6 +21,7 @@ import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -84,27 +88,24 @@ public class HttpUtilManager {
 	}
 
 	public static void main(String[] args) throws Exception{
-		String url_prex = "";
-		String url="http://localhost:8080/api/weixin/login";
+
+		String url = "http://119.29.65.85:8080/api/v1/topology/zc1495679005819-6-1495679087/rebalance/0";
+
+//		{"rebalanceOptions":{"executors":{"count":3,"spout":2},"numWorkers":3}}
+//		{"rebalanceOptions":{"numWorkers":3}}
+
+		Map<String,Integer> map = new HashMap<>();
+		map.put("zcStep2",2);
+		map.put("zcStep1",2);
+
+		String rebalance = Rebalance.getRebalanceInstanceJSONStr(3,map,null);
+		System.out.println(rebalance);
+
+		String data =  HttpUtilManager.getInstance().requestHttpPostJSON("",url,rebalance,null);
+
+		System.out.println(data);
 
 
-		String encryptedDataS = "WnnpDde4ial9L/pMiAFIPOm1w0EqPrtnQIe/P+Rc+YYwzs0E3b99AtJWFRjD6IkNh5msiOVngLb54+IOG0vL+R8VHZayBexKUJIKnDRuircZ9C2HfyWUdM15szQef/pU2CQ2yetXCrCS0w58Kf9RqrmWf+iaXNLS+8JmEVWIXFDAOwZZeMSAeQei8eYWPzqkSssRSzaCyU34rnGiZrJrWMwq4PKJOhpzx3bTI4u4D6N8RPjr5iqQuuexXJPfw9KuRf47alJj3tpKfh6ETscPNxHjQ0u8iyYFkUsLI+4wQmlNKouhhb2rMEMtos5UJNTmFnW3KrphMtSoYuk+kk1930QMaPPRB+CAAyHG7bKK7uGT0E+5xzneEUUr+pyqwPZ+c5S7zRzmUmVwTNStdgztdtbCWuxooS+e2thyjBvxlBqWkCqyqZJta/9BGw06D7WAipHd+xK+IEcscszezzu0QQR+6TV+Zh7F1yAgqxpi0CY=";
-
-		String ivs = "OsXR3S0DtqD1Y/wQ4jnT1A==";
-
-		String code = "003aATFc1L3NCs05yXEc159DFc1aATF3";
-
-		String param = "code="+code+"&ed="+encryptedDataS+"&iv="+ivs;
-
-		Map<String,String> map = new HashMap<>();
-		map.put("code",code);
-		map.put("ed",encryptedDataS);
-		map.put("iv",ivs);
-		String sid = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJob3N0IjoiMTI3LjAuMC4xIiwicmFuZG9tIjoiZGt3bzFhMDRmYiJ9.UFY-rjEuv6su4ThxAMOE9EVI3uSHEHKA-_pz1X_nt3U";
-		Map<String,String> headers = new HashMap<>();
-		headers.put("_T",sid);
-		System.out.println(HttpUtilManager.getInstance().requestHttpPost(url_prex,url,map,headers));
-//		System.out.println(HttpUtilManager.getInstance().requestHttpGet(url_prex,"http://localhost:8080/api/order/user/cart",sid));
 	}
 
 	public String requestHttpGet(String url_prex,String url,String param,Map<String,String> headers) throws HttpException, IOException{
@@ -183,6 +184,43 @@ public class HttpUtilManager {
 		}
 		return responseData;
 		
+	}
+
+	public String requestHttpPostJSON(String url_prex,String url,String jsonStr,Map<String,String> headers) throws HttpException, IOException{
+
+		IdleConnectionMonitor();
+		url=url_prex+url;
+		HttpPost method = this.httpPostMethod(url);
+		method.setEntity(new StringEntity(jsonStr, Charset.forName("UTF-8")));
+		method.setConfig(requestConfig);
+		method.addHeader("Content-type","application/json; charset=utf-8");
+		method.setHeader("Accept", "application/json");
+
+		if(headers!=null){
+			Set<String> keys = headers.keySet();
+			for(Iterator<String> i = keys.iterator();i.hasNext();){
+				String key =  i.next();
+				method.addHeader(key,headers.get(key));
+			}
+		}
+
+		HttpResponse response = client.execute(method);
+		HttpEntity entity =  response.getEntity();
+		if(entity == null){
+			return "";
+		}
+		InputStream is = null;
+		String responseData = "";
+		try{
+			is = entity.getContent();
+			responseData = IOUtils.toString(is, "UTF-8");
+		}finally{
+			if(is!=null){
+				is.close();
+			}
+		}
+		return responseData;
+
 	}
 	
 	private List<NameValuePair> convertMap2PostParams(Map<String,String> params){

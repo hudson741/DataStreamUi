@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.yss.storm.model.Host;
+import com.yss.storm.model.Rebalance;
 import com.yss.storm.model.Topology;
 
 /**
@@ -13,6 +14,23 @@ import com.yss.storm.model.Topology;
  * storm监控
  */
 public interface StormMonitor {
+
+
+    /**
+     * 动态调整topology  组件的并行度
+     * @param topoId
+     * @param map
+     * @return
+     */
+    Map<String,Object> modufyTopoComponentExecutors(String topoId,Map<String,Integer> map );
+
+    /**
+     * 修改计算拓扑工作节点数
+     * @param topoId
+     * @param num
+     * @return
+     */
+    Map<String,Object> modifyTopoWorkerNum(String topoId,int num);
 
     /**
      * 集群配置
@@ -70,6 +88,13 @@ public interface StormMonitor {
      * @return
      */
     Map<String, Object> getTopologyDetails(String topoId);
+
+    /**
+     * 获取拓扑组件明细
+     * @param topoId
+     * @return
+     */
+    Map<String,Object> getTopoComponents(String topoId);
 
     /**
      * 计算拓扑下组件明细

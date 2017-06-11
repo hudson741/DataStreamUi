@@ -1,27 +1,28 @@
 package com.yss.storm.submit;
 
+import com.alibaba.dcm.DnsCacheManipulator;
 import com.google.common.collect.Lists;
 import com.yss.sofa.stream.Builder;
-import com.yss.storm.nimbus.NimbusNode;
-import com.yss.storm.nimbus.NimbusNodesService;
+import com.yss.storm.node.NimbusNode;
+import com.yss.storm.StormNodesService;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
-import org.apache.storm.flux.model.SpoutDef;
 import org.apache.storm.generated.Bolt;
+import org.apache.storm.generated.NimbusSummary;
 import org.apache.storm.generated.SpoutSpec;
 import org.apache.storm.generated.StormTopology;
+import org.apache.storm.thrift.TException;
+import org.apache.storm.thrift.transport.TTransportException;
+import org.apache.storm.utils.NimbusClient;
 import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
     private Logger logger = LoggerFactory.getLogger(StormRemoteJarSubmiter.class);
 
     @Autowired
-    private NimbusNodesService nimbusNodesService;
+    private StormNodesService stormNodesService;
 
     private String remoteZKServer;
 
@@ -54,12 +55,12 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         return zcBuilder;
     }
 
-    private Map<String,Object> buildConf(){
+    private Map<String,Object> buildConf() throws TException, UnknownHostException {
         Map stormConf = Utils.readStormConfig();
         //Create a builder and configurations.
         Config config = new Config();
 
-        List<NimbusNode> nimbusNodes = nimbusNodesService.getNimbusNodeList();
+        List<NimbusNode> nimbusNodes = stormNodesService.getNimbusNodeList();
 
         if(CollectionUtils.isEmpty(nimbusNodes)){
             throw new RuntimeException("storm集群出了问题，请联系管理员");
@@ -68,7 +69,17 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         List<String> nimbusHosts = Lists.newArrayList();
 
         for(NimbusNode nimbusNode:nimbusNodes){
-            nimbusHosts.add(nimbusNode.getHost());
+
+            InetAddress ip = InetAddress.getByName(nimbusNode.getHost());
+            String nimbusAddr = ip.getHostAddress();
+
+            String dockerHost = nimbusNode.getDockerHost();
+
+            logger.info("set dns "+dockerHost+" "+nimbusAddr);
+
+            DnsCacheManipulator.setDnsCache(dockerHost,nimbusAddr);
+
+            nimbusHosts.add(dockerHost);
         }
 
         config.put(Config.NIMBUS_SEEDS, nimbusHosts);
@@ -76,7 +87,6 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         config.put(Config.NIMBUS_THRIFT_PORT, nimbusNodes.get(0).getPort());
 
         config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(remoteZKServer.split(",")));
-        //Arrays.asList("192.168.102.133","ss");
         config.put(Config.STORM_ZOOKEEPER_PORT, remoteZKPort);
         stormConf.putAll(config);
         return stormConf;
@@ -102,6 +112,7 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
             }
 
             System.setProperty("storm.jar", new File(uri).toString());
+
             StormSubmitter.submitTopology("zc" + System.currentTimeMillis() + "", stormConf, zcBuilder.getTopology());
 
         }catch(Exception e){

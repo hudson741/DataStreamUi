@@ -83,7 +83,17 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
       </exclusions>
+      <version>1.5.2.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
       <version>1.5.2.RELEASE</version>
     </dependency>
 
@@ -128,12 +138,12 @@
     </dependency>
       <!-- Provided -->
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-      <version>1.5.2.RELEASE</version>
-      <scope>provided</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.springframework.boot</groupId>-->
+      <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+      <!--<version>1.5.2.RELEASE</version>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>commons-fileupload</groupId>
@@ -193,6 +203,12 @@
       <version>${log4j-over-slf4j.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.alibaba/dns-cache-manipulator -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>dns-cache-manipulator</artifactId>
+      <version>1.5.1</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.storm</groupId>

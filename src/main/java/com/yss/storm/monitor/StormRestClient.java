@@ -4,8 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.yss.storm.StormNodesService;
+import com.yss.storm.model.Rebalance;
+import com.yss.storm.node.UiNode;
 import com.yss.util.HttpUtilManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -16,12 +21,14 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import com.alibaba.fastjson.JSON;
 
 import com.yss.storm.model.Topologies;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Created by zhangchi on 2017/5/19.
  */
 
-public class StormRestClient {
+public class StormRestClient implements InitializingBean {
     private static PoolingClientConnectionManager ccm    = new PoolingClientConnectionManager();
     private static HttpClient                     client = new DefaultHttpClient(ccm);
 
@@ -30,16 +37,26 @@ public class StormRestClient {
         ccm.setDefaultMaxPerRoute(4096);
     }
 
-    String stormRestHost;
-    String apiBase;
+
+    @Autowired
+    private StormNodesService stormNodesService;
 
     public String getApiBase() {
-        return apiBase;
+        return "http://" + getUIHttp() + "/api/v1/";
+    }
+
+    private String getUIHttp(){
+        List<UiNode>  list = stormNodesService.getUiNodeList();
+        UiNode uiNode = list.get(0);
+
+        String stormUIHost = uiNode.getHost()+":"+uiNode.getPort();
+        return stormUIHost;
     }
 
 
-    public StormRestClient(String stormUIHost) {
-        updateStormUIHost(stormUIHost);
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
     }
 
     private static String readContent(InputStream in) {
@@ -61,10 +78,10 @@ public class StormRestClient {
         return sb.toString();
     }
 
-    public void updateStormUIHost(String stormRestHost) {
-        this.stormRestHost = stormRestHost;
-        this.apiBase       = "http://" + stormRestHost + "/api/v1/";
-    }
+//    public void updateStormUIHost(String stormRestHost) {
+//        this.stormRestHost = stormRestHost;
+//        this.apiBase       = "http://" + stormRestHost + "/api/v1/";
+//    }
 
     /**
      * post请求
@@ -74,7 +91,21 @@ public class StormRestClient {
      */
     private String getApiDataPost(String url, Map<String,String> params) {
         try {
-            return HttpUtilManager.getInstance().requestHttpPost(apiBase, url, params, null);
+            return HttpUtilManager.getInstance().requestHttpPost(getApiBase() , url, params, null);
+        }catch(Exception e){
+
+        }
+        return null;
+    }
+
+    /**
+     * postJSON请求
+     * @param url
+     * @return
+     */
+    private String getApiDataPostJson(String url, String jsonStr) {
+        try {
+            return HttpUtilManager.getInstance().requestHttpPostJSON(getApiBase() , url,jsonStr, null);
         }catch(Exception e){
 
         }
@@ -87,7 +118,7 @@ public class StormRestClient {
      * @return
      */
     private String getApiData(String url) {
-        HttpGet      get      = new HttpGet(apiBase + url);
+        HttpGet      get      = new HttpGet(getApiBase()  + url);
         HttpResponse response = null;
 
         try {
@@ -99,6 +130,31 @@ public class StormRestClient {
 
             throw new RuntimeException("Got io exception");
         }
+    }
+
+    /**
+     * 动态调整topology worker 数量
+     * @param topoId
+     * @param num
+     * @return
+     */
+    public String modifyTopoWorkerNum(String topoId,int num){
+
+        String rebalance = Rebalance.getRebalanceInstanceJSONStr(num,null,null);
+
+        return getApiDataPostJson("topology/"+topoId+"/rebalance/0",rebalance);
+    }
+
+    /**
+     * 动态调整topology  组件的并行度
+     * @param topoId
+     * @param map
+     * @return
+     */
+    public String modufyTopoComponentExecutors(String topoId,Map<String,Integer> map ){
+        String rebalance = Rebalance.getRebalanceInstanceJSONStr(null,map,null);
+
+        return getApiDataPostJson("topology/"+topoId+"/rebalance/0",rebalance);
     }
 
 
@@ -210,13 +266,7 @@ public class StormRestClient {
         return getApiData(url);
     }
 
-    public String getStormRestHost() {
-        return stormRestHost;
-    }
 
-    public void setStormRestHost(String stormRestHost) {
-        this.stormRestHost = stormRestHost;
-    }
 }
 
 

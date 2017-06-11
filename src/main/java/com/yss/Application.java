@@ -29,4 +29,3 @@ public class Application extends SpringBootServletInitializer {
 }
 
 
-//~ Formatted by Jindent --- http://www.jindent.com

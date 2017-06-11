@@ -1,6 +1,7 @@
 package com.yss.storm.model;
 
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,19 +15,19 @@ public class Rebalance {
 
     private RebalanceOptions rebalanceOptions;
 
-    private String callback = "callback";
+    private String callback ;
 
     private static class RebalanceOptions {
 
-        private int numWorkers;
+        private Integer numWorkers;
 
         private JSONObject executors;
 
-        public int getNumWorkers() {
+        public Integer getNumWorkers() {
             return numWorkers;
         }
 
-        public void setNumWorkers(int numWorkers) {
+        public void setNumWorkers(Integer numWorkers) {
             this.numWorkers = numWorkers;
         }
 
@@ -58,10 +59,12 @@ public class Rebalance {
         this.callback = callback;
     }
 
-    public static String getRebalanceInstanceJSONStr(int numWorkers,Map<String,Integer> components){
+    public static String getRebalanceInstanceJSONStr(Integer numWorkers,Map<String,Integer> components,String callback){
         Rebalance rebalance = new Rebalance();
         RebalanceOptions rebalanceOptions = new RebalanceOptions();
-        rebalanceOptions.setNumWorkers(numWorkers);
+        if(numWorkers!=null && numWorkers > 0) {
+            rebalanceOptions.setNumWorkers(numWorkers);
+        }
         JSONObject jsonObject = new JSONObject();
         if(components!=null && !components.isEmpty()){
             for(String key:components.keySet()){
@@ -70,6 +73,10 @@ public class Rebalance {
             rebalanceOptions.setExecutors(jsonObject);
         }
         rebalance.setRebalanceOptions(rebalanceOptions);
+        if(!StringUtils.isEmpty(callback)){
+            rebalance.setCallback(callback);
+        }
+
         return JSONObject.toJSONString(rebalance);
     }
 
@@ -77,7 +84,8 @@ public class Rebalance {
         Map<String,Integer> map = new HashMap<>();
         map.put("spout",2);
         map.put("count",3);
-        System.out.println(Rebalance.getRebalanceInstanceJSONStr(3,map));
+        System.out.println(Rebalance.getRebalanceInstanceJSONStr(null,map,null));
+//        System.out.println(Rebalance.getRebalanceInstanceJSONStr(3,null,null));
 
     }
 

@@ -1,13 +1,4 @@
-'use strict';
 
-/**
- * @ngdoc overview
- * @name anotherStormUiApp
- * @description
- * # anotherStormUiApp
- *
- * Main module of the application.
- */
 var app = angular
   .module('anotherStormUiApp', [
     'ngAnimate',
@@ -25,22 +16,18 @@ app.run(function ($rootScope, $routeParams, $anchorScroll, $location) {
   $rootScope.orderByField = {};
   $rootScope.reverseSort = {};
 
-//    $rootScope.$on('$routeChangeSuccess', function (newRoute, oldRoute) {
-//        console.log("rrrrrrrrrrrrrrrrrrrrrrrrrrr"+$routeParams.scrollTo);
-//        $location.hash($routeParams.scrollTo);
-//        $anchorScroll();
-//    });
 });
 
 function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "总览", tabId: "总览", tabLink: "/overview"},
+      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/settings"},
+      {tabName: "SDK下载", tabId: "SDK下载", tabLink: "/download"},
+      {tabName: "streamSql执行", tabId: "streamSql执行", tabLink: "/download"},
       {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
-      {tabName: "上传", tabId: "上传", tabLink: "/settings"},
-      {tabName: "下载", tabId: "下载", tabLink: "/download"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
 }
@@ -54,11 +41,12 @@ function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "总览", tabId: "总览", tabLink: "/overview"},
+      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/settings"},
+      {tabName: "SDK下载", tabId: "SDK下载", tabLink: "/download"},
+      {tabName: "streamSql执行", tabId: "streamSql执行", tabLink: "/download"},
       {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
-      {tabName: "上传", tabId: "上传", tabLink: "/settings"},
-      {tabName: "下载", tabId: "下载", tabLink: "/download"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
 
@@ -86,8 +74,17 @@ app.factory('client', ['$http', function ($http) {
     topo: function (topoid, callback, failcallback) {
       request('topo?topoid=' + topoid).success(callback).error(failcallback);
     },
+    topom: function (topoid,callback,failcallback) {
+      request('topom?topoid=' + topoid).success(callback).error(failcallback);
+    },
     killTopo: function(topoid,callback,failcallback) {
       request('killTopology?topoid=' + topoid).success(callback).error(failcallback);
+    },
+    topoWorkNumModify: function(topoid,num,callback,failcallback) {
+      request('topoWorkNumModify?topoid=' + topoid+"&num="+num).success(callback).error(failcallback);
+    },
+    topoCExeModify: function(tid,cid,num,callback,failcallback) {
+      request('topoCExeModify?topoid=' + tid+"&cid="+cid+"&num="+num).success(callback).error(failcallback);
     },
     activeTopo: function(topoid,callback,failcallback) {
       request('activeTopo?topoid=' + topoid).success(callback).error(failcallback)
@@ -109,7 +106,8 @@ app.config(function ($routeProvider) {
   $routeProvider
     .when('/', {
       redirectTo: '/overview'
-    }).when('/overview', {
+    })
+      .when('/overview', {
       templateUrl: 'views/overview.html',
       controller: 'OverviewCtrl'
     })
@@ -120,7 +118,12 @@ app.config(function ($routeProvider) {
     .when('/topo', {
       templateUrl: 'views/topo.html',
       controller: 'TopoCtrl'
-    }).when('/host', {
+    })
+      .when('/topom',{
+          templateUrl: 'views/topom.html',
+          controller: 'TopoMCtrl'
+    })
+      .when('/host', {
       templateUrl: 'views/host.html',
       controller: 'HostCtrl'
     }).when('/settings', {

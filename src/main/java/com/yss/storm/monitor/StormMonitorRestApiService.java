@@ -95,6 +95,16 @@ public class StormMonitorRestApiService implements StormMonitor {
         return exeStatusList;
     }
 
+    @Override
+    public Map<String, Object> modufyTopoComponentExecutors(String topoId, Map<String, Integer> map) {
+        return toMaps(stormRestClient.modufyTopoComponentExecutors(topoId, map));
+    }
+
+    @Override
+    public Map<String, Object> modifyTopoWorkerNum(String topoId, int num) {
+        return toMaps(stormRestClient.modifyTopoWorkerNum(topoId, num));
+    }
+
     public Map<String, Object> getClusterConfig() {
         return toMaps(stormRestClient.getClusterConfig());
     }
@@ -289,6 +299,31 @@ public class StormMonitorRestApiService implements StormMonitor {
 
     public Map<String, Object> getTopologyDetails(String topoId) {
         return toMaps(stormRestClient.getTopologyDetails(topoId));
+    }
+
+    @Override
+    public Map<String, Object> getTopoComponents(String topoId) {
+
+        Map<String,Object> ret = toMaps(stormRestClient.getTopologyDetails(topoId));
+
+        List<Map<String, Object>> bolts  = (List<Map<String, Object>>) ret.get("bolts");
+        List<Map<String, Object>> spouts = (List<Map<String, Object>>) ret.get("spouts");
+        List<Map<String, Object>> workers = (List<Map<String, Object>>) ret.get("workers");
+
+        Map<String,Object> result = new HashMap<>();
+        result.put("workers",workers);
+        result.put("spouts",spouts);
+        result.put("bolts",bolts);
+
+        result.put("id",ret.get("id"));
+        result.put("name",ret.get("name"));
+        result.put("workersTotal",ret.get("workersTotal"));
+        result.put("executorsTotal",ret.get("executorsTotal"));
+        result.put("tasksTotal",ret.get("tasksTotal"));
+        result.put("status",ret.get("status"));
+        result.put("uptime",ret.get("uptime"));
+        return result;
+
     }
 
     public Map<String, Object> getTopologyDetailsWithComponentDetails(String topoId) {

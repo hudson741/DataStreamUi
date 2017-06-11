@@ -1,21 +1,17 @@
-package com.yss.controller;
+package com.yss.storm.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
+import com.yss.storm.model.Host;
+import com.yss.storm.model.Topology;
+import com.yss.storm.monitor.StormMonitorRestApiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-
-import com.yss.storm.model.Host;
-import com.yss.storm.model.Topology;
-import com.yss.storm.monitor.StormMonitorRestApiService;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class StormUIController {
@@ -50,6 +46,30 @@ public class StormUIController {
         return JSON.toJSONString(data);
     }
 
+
+    @RequestMapping(
+       value="/topoWorkNumModify",
+       method = RequestMethod.GET
+    )
+    public String topoWorkNumModify(@RequestParam("topoid") String topoid,@RequestParam("num") int num) throws Exception {
+        Map<String,Object> data = stormMonitorRestApiService.modifyTopoWorkerNum(topoid,num);
+        return JSON.toJSONString(data);
+    }
+
+    @RequestMapping(
+            value="/topoCExeModify",
+            method = RequestMethod.GET
+    )
+    public String topoCExeModify(@RequestParam("topoid") String topoid,@RequestParam("cid") String cid,@RequestParam("num") int num) throws Exception {
+
+        Map<String,Integer> map = new HashMap<>();
+        map.put(cid,num);
+
+        Map<String,Object> data = stormMonitorRestApiService.modufyTopoComponentExecutors(topoid,map);
+
+        return JSON.toJSONString(data);
+    }
+
     @RequestMapping(
         value  = "/hosts",
         method = RequestMethod.GET
@@ -63,6 +83,13 @@ public class StormUIController {
     @RequestMapping(value = "/topo")
     public String topo(@RequestParam("topoid") String topoid) {
         Map<String, Object> topo = stormMonitorRestApiService.getTopologyDetailsWithComponentDetails(topoid);
+
+        return JSON.toJSONString(topo);
+    }
+
+    @RequestMapping(value = "/topom" , method = RequestMethod.GET)
+    public String topoManager(@RequestParam("topoid") String topoid) {
+        Map<String,Object> topo = stormMonitorRestApiService.getTopoComponents(topoid);
 
         return JSON.toJSONString(topo);
     }
@@ -108,6 +135,3 @@ public class StormUIController {
         return JSON.toJSONString(overview);
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

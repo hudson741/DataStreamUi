@@ -1,27 +1,22 @@
-package com.yss.controller;
+package com.yss.storm.controller;
 
-import java.net.URI;
-
-import java.util.List;
-
+import com.yss.TestHandler;
+import com.yss.storage.StorageService;
+import com.yss.storm.monitor.StormMonitorRestApiService;
+import com.yss.storm.node.NimbusNode;
+import com.yss.storm.StormNodesService;
+import com.yss.storm.submit.StormSubmiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yss.TestHandler;
-import com.yss.storage.StorageService;
-import com.yss.storm.monitor.StormMonitorRestApiService;
-import com.yss.storm.nimbus.NimbusNode;
-import com.yss.storm.nimbus.NimbusNodesService;
-import com.yss.storm.submit.StormSubmiter;
-
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.List;
 
 /**
  * Created by zhangchi on 2017/5/17.
@@ -36,7 +31,7 @@ public class StormTopologySubmitController {
     @Autowired
     private StorageService             storageService;
     @Autowired
-    private NimbusNodesService         nimbusNodesService;
+    private StormNodesService         stormNodesService;
     @Autowired
     private StormMonitorRestApiService stormMonitorRestApiService;
     @Autowired
@@ -58,7 +53,7 @@ public class StormTopologySubmitController {
 
     @RequestMapping("/nimbus")
     public String nimbus() {
-        List<NimbusNode> list = nimbusNodesService.getNimbusNodeList();
+        List<NimbusNode> list = stormNodesService.getNimbusNodeList();
 
         return com.alibaba.fastjson.JSONObject.toJSONString(list);
     }

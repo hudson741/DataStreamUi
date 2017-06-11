@@ -26,7 +26,7 @@
         </thead>
         <tbody>
         <tr ng-repeat="topo in topolist.topologies" class="active">
-            <td><a href="#/topo?tabName={{topo.name}}&tabId={{topo.id}}">{{topo.name}}</a></td>
+            <td><a href="#/topom?topoid={{topo.id}}">{{topo.name}}</a></td>
             <td>{{topo.id}}</td>
             <td>{{topo.owner}}</td>
             <td>{{topo.status}}</td>
@@ -34,7 +34,6 @@
             <td>
                 <input ng-disabled="{{topo.showa}}" ng-click='activeTopo(topo.id)'  type="button" value="Activate" class="btn btn-default">
                 <input ng-disabled="{{topo.showd}}" ng-click='deactiveTopo(topo.id)' type="button" value="Deactive" class="btn btn-default">
-                <input type="button" value="Rebalance" class="btn btn-default">
                 <input type="button" value="Kill" ng-click='killTopo(topo.id)' class="btn btn-default">
 
             </td>
