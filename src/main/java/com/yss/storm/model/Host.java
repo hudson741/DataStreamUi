@@ -4,25 +4,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: mzang
- * Date: 2014-10-09
- * Time: 17:05
+ *
  */
 public class Host implements Comparable<Host> {
-    String host;
-    String ip;
-    String uptime;
-    String supId;
-    int slotsTotal;
-    int slotsUsed;
     List<SlotStatus> slots = new ArrayList<SlotStatus>();
+    String           host;
+    String           ip;
+    String           uptime;
+    String           supId;
+    int              slotsTotal;
+    int              slotsUsed;
 
-    public List<SlotStatus> getSlots() {
-        return slots;
+    @Override
+    public int compareTo(Host o) {
+        return this.getHost().compareTo(o.getHost());
     }
 
-    public void setSlots(List<SlotStatus> slots) {
-        this.slots = slots;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Host)) {
+            return false;
+        }
+
+        Host host1 = (Host) o;
+
+        if ((host != null)
+            ? !host.equals(host1.host)
+            : host1.host != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (host != null)
+               ? host.hashCode()
+               : 0;
     }
 
     public String getHost() {
@@ -41,20 +64,12 @@ public class Host implements Comparable<Host> {
         this.ip = ip;
     }
 
-    public String getUptime() {
-        return uptime;
+    public List<SlotStatus> getSlots() {
+        return slots;
     }
 
-    public void setUptime(String uptime) {
-        this.uptime = uptime;
-    }
-
-    public String getSupId() {
-        return supId;
-    }
-
-    public void setSupId(String supId) {
-        this.supId = supId;
+    public void setSlots(List<SlotStatus> slots) {
+        this.slots = slots;
     }
 
     public int getSlotsTotal() {
@@ -73,26 +88,19 @@ public class Host implements Comparable<Host> {
         this.slotsUsed = slotsUsed;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Host)) return false;
-
-        Host host1 = (Host) o;
-
-        if (host != null ? !host.equals(host1.host) : host1.host != null) return false;
-
-        return true;
+    public String getSupId() {
+        return supId;
     }
 
-    @Override
-    public int hashCode() {
-        return host != null ? host.hashCode() : 0;
+    public void setSupId(String supId) {
+        this.supId = supId;
     }
 
-    @Override
-    public int compareTo(Host o) {
-        return this.getHost().compareTo(o.getHost());
+    public String getUptime() {
+        return uptime;
+    }
+
+    public void setUptime(String uptime) {
+        this.uptime = uptime;
     }
 }

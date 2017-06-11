@@ -1,8 +1,13 @@
 package com.yss.util;
 
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
-import com.yss.storm.model.Rebalance;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.nio.charset.Charset;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
@@ -19,12 +24,11 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import com.alibaba.fastjson.JSONObject;
 
+import com.google.common.collect.Lists;
+
+import com.yss.storm.model.Rebalance;
 
 /**
  * 封装HTTP get post请求，简化发送http请求
@@ -32,214 +36,233 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class HttpUtilManager {
+    private static HttpUtilManager                   instance       = new HttpUtilManager();
+    private static long                              startTime      = System.currentTimeMillis();
+    public static PoolingHttpClientConnectionManager cm             = new PoolingHttpClientConnectionManager();
+    private static ConnectionKeepAliveStrategy       keepAliveStrat = new DefaultConnectionKeepAliveStrategy() {
+        public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
+            long keepAlive = super.getKeepAliveDuration(response, context);
 
-	private static HttpUtilManager instance = new HttpUtilManager();
-	private static HttpClient client;
-	private static long startTime = System.currentTimeMillis();
-	public  static PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();  
-	private static ConnectionKeepAliveStrategy keepAliveStrat = new DefaultConnectionKeepAliveStrategy() {
+            if (keepAlive == -1) {
+                keepAlive = 5000;
+            }
 
-	     public long getKeepAliveDuration(  
-	            HttpResponse response,
-	            HttpContext context) {
-	        long keepAlive = super.getKeepAliveDuration(response, context);  
-	        
-	        if (keepAlive == -1) {  
-	            keepAlive = 5000;  
-	        }  
-	        return keepAlive;  
-	    }  
-	  
-	};
-	private HttpUtilManager() {
-		client = HttpClients.custom().setConnectionManager(cm).setKeepAliveStrategy(keepAliveStrat).build(); 
-	}
+            return keepAlive;
+        }
+    };
+    private static RequestConfig requestConfig = RequestConfig.custom()
+                                                              .setSocketTimeout(20000)
+                                                              .setConnectTimeout(20000)
+                                                              .setConnectionRequestTimeout(20000)
+                                                              .build();
+    private static HttpClient client;
 
-    public static void IdleConnectionMonitor(){
-		
-		if(System.currentTimeMillis()-startTime>30000){
-			 startTime = System.currentTimeMillis();
-			 cm.closeExpiredConnections();  
-             cm.closeIdleConnections(30, TimeUnit.SECONDS);
-		}
-	}
-	 
-	private static RequestConfig requestConfig = RequestConfig.custom()
-	        .setSocketTimeout(20000)
-	        .setConnectTimeout(20000)
-	        .setConnectionRequestTimeout(20000)
-	        .build();
-	
-	
-	public static HttpUtilManager getInstance() {
-		return instance;
-	}
+    private HttpUtilManager() {
+        client = HttpClients.custom().setConnectionManager(cm).setKeepAliveStrategy(keepAliveStrat).build();
+    }
 
-	public HttpClient getHttpClient() {
-		return client;
-	}
+    public static void IdleConnectionMonitor() {
+        if (System.currentTimeMillis() - startTime > 30000) {
+            startTime = System.currentTimeMillis();
+            cm.closeExpiredConnections();
+            cm.closeIdleConnections(30, TimeUnit.SECONDS);
+        }
+    }
 
-	private HttpPost httpPostMethod(String url) {
-		return new HttpPost(url);
-	}
+    private List<NameValuePair> convertMap2PostParams(Map<String, String> params) {
+        if ((params == null) || params.isEmpty()) {
+            return Lists.newArrayList();
+        }
 
-	private HttpRequestBase httpGetMethod(String url) {
-		return new HttpGet(url);
-	}
+        List<String> keys = new ArrayList<String>(params.keySet());
 
-	public static void main(String[] args) throws Exception{
+        if (keys.isEmpty()) {
+            return null;
+        }
 
-		String url = "http://119.29.65.85:8080/api/v1/topology/zc1495679005819-6-1495679087/rebalance/0";
+        int                 keySize = keys.size();
+        List<NameValuePair> data    = new LinkedList<NameValuePair>();
 
-//		{"rebalanceOptions":{"executors":{"count":3,"spout":2},"numWorkers":3}}
-//		{"rebalanceOptions":{"numWorkers":3}}
+        for (int i = 0; i < keySize; i++) {
+            String key   = keys.get(i);
+            String value = params.get(key);
 
-		Map<String,Integer> map = new HashMap<>();
-		map.put("zcStep2",2);
-		map.put("zcStep1",2);
+            data.add(new BasicNameValuePair(key, value));
+        }
 
-		String rebalance = Rebalance.getRebalanceInstanceJSONStr(3,map,null);
-		System.out.println(rebalance);
+        return data;
+    }
 
-		String data =  HttpUtilManager.getInstance().requestHttpPostJSON("",url,rebalance,null);
+    private HttpRequestBase httpGetMethod(String url) {
+        return new HttpGet(url);
+    }
 
-		System.out.println(data);
+    private HttpPost httpPostMethod(String url) {
+        return new HttpPost(url);
+    }
 
+    public static void main(String[] args) throws Exception {
+        String url = "http://119.29.65.85:8080/api/v1/topology/zc1495679005819-6-1495679087/rebalance/0";
 
-	}
+//      {"rebalanceOptions":{"executors":{"count":3,"spout":2},"numWorkers":3}}
+//      {"rebalanceOptions":{"numWorkers":3}}
+        Map<String, Integer> map = new HashMap<>();
 
-	public String requestHttpGet(String url_prex,String url,String param,Map<String,String> headers) throws HttpException, IOException{
-		
-		IdleConnectionMonitor();
-		url=url_prex+url;
-		if(param!=null && !param.equals("")){
-		        if(url.endsWith("?")){
-			    url = url+param;
-			}else{
-			    url = url+"?"+param;
-			}
-		}
-		HttpRequestBase method = this.httpGetMethod(url);
-		if(headers!=null){
-			Set<String> keys = headers.keySet();
-			for(Iterator<String> i = keys.iterator();i.hasNext();){
-				String key = (String) i.next();
-				method.addHeader(key,headers.get(key));
-			}
-		}
-		method.setConfig(requestConfig);
-		HttpResponse response = client.execute(method);
-		HttpEntity entity =  response.getEntity();
-		if(entity == null){
-			return "";
-		}
-		InputStream is = null;
-		String responseData = "";
-		try{
-		    is = entity.getContent();
-		    responseData = IOUtils.toString(is, "UTF-8");
-		}finally{
-			if(is!=null){
-			    is.close();
-			}
-		}
-		return responseData;
-	}
+        map.put("zcStep2", 2);
+        map.put("zcStep1", 2);
 
+        String rebalance = Rebalance.getRebalanceInstanceJSONStr(3, map, null);
 
+        System.out.println(rebalance);
 
-	public String requestHttpPost(String url_prex,String url,Map<String,String> params,Map<String,String> headers) throws HttpException, IOException{
-		
-		IdleConnectionMonitor();
-		url=url_prex+url;
-		HttpPost method = this.httpPostMethod(url);
-		List<NameValuePair> valuePairs = this.convertMap2PostParams(params);
-		UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(valuePairs, Consts.UTF_8);
-		method.setEntity(urlEncodedFormEntity);
-		method.setConfig(requestConfig);
-		method.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        String data = HttpUtilManager.getInstance().requestHttpPostJSON("", url, rebalance, null);
 
-		if(headers!=null){
-			Set<String> keys = headers.keySet();
-			for(Iterator<String> i = keys.iterator();i.hasNext();){
-				String key =  i.next();
-				method.addHeader(key,headers.get(key));
-			}
-		}
+        System.out.println(data);
+    }
 
-		HttpResponse response = client.execute(method);
-		HttpEntity entity =  response.getEntity();
-		if(entity == null){
-			return "";
-		}
-		InputStream is = null;
-		String responseData = "";
-		try{
-		    is = entity.getContent();
-		    responseData = IOUtils.toString(is, "UTF-8");
-		}finally{
-			if(is!=null){
-			    is.close();
-			}
-		}
-		return responseData;
-		
-	}
+    public String requestHttpGet(String url_prex, String url, String param, Map<String, String> headers)
+            throws HttpException, IOException {
+        IdleConnectionMonitor();
+        url = url_prex + url;
 
-	public String requestHttpPostJSON(String url_prex,String url,String jsonStr,Map<String,String> headers) throws HttpException, IOException{
+        if ((param != null) &&!param.equals("")) {
+            if (url.endsWith("?")) {
+                url = url + param;
+            } else {
+                url = url + "?" + param;
+            }
+        }
 
-		IdleConnectionMonitor();
-		url=url_prex+url;
-		HttpPost method = this.httpPostMethod(url);
-		method.setEntity(new StringEntity(jsonStr, Charset.forName("UTF-8")));
-		method.setConfig(requestConfig);
-		method.addHeader("Content-type","application/json; charset=utf-8");
-		method.setHeader("Accept", "application/json");
+        HttpRequestBase method = this.httpGetMethod(url);
 
-		if(headers!=null){
-			Set<String> keys = headers.keySet();
-			for(Iterator<String> i = keys.iterator();i.hasNext();){
-				String key =  i.next();
-				method.addHeader(key,headers.get(key));
-			}
-		}
+        if (headers != null) {
+            Set<String> keys = headers.keySet();
 
-		HttpResponse response = client.execute(method);
-		HttpEntity entity =  response.getEntity();
-		if(entity == null){
-			return "";
-		}
-		InputStream is = null;
-		String responseData = "";
-		try{
-			is = entity.getContent();
-			responseData = IOUtils.toString(is, "UTF-8");
-		}finally{
-			if(is!=null){
-				is.close();
-			}
-		}
-		return responseData;
+            for (Iterator<String> i = keys.iterator(); i.hasNext(); ) {
+                String key = (String) i.next();
 
-	}
-	
-	private List<NameValuePair> convertMap2PostParams(Map<String,String> params){
-		if(params == null || params.isEmpty()){
-			return Lists.newArrayList();
-		}
-		List<String> keys = new ArrayList<String>(params.keySet());
-		if(keys.isEmpty()){
-			return null;
-		}
-		int keySize = keys.size();
-		List<NameValuePair>  data = new LinkedList<NameValuePair>() ;
-		for(int i=0;i<keySize;i++){
-			String key = keys.get(i);
-			String value = params.get(key);
-			data.add(new BasicNameValuePair(key,value));
-		}
-		return data;
-	}
+                method.addHeader(key, headers.get(key));
+            }
+        }
 
+        method.setConfig(requestConfig);
+
+        HttpResponse response = client.execute(method);
+        HttpEntity   entity   = response.getEntity();
+
+        if (entity == null) {
+            return "";
+        }
+
+        InputStream is           = null;
+        String      responseData = "";
+
+        try {
+            is           = entity.getContent();
+            responseData = IOUtils.toString(is, "UTF-8");
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+
+        return responseData;
+    }
+
+    public String requestHttpPost(String url_prex, String url, Map<String, String> params, Map<String, String> headers)
+            throws HttpException, IOException {
+        IdleConnectionMonitor();
+        url = url_prex + url;
+
+        HttpPost             method               = this.httpPostMethod(url);
+        List<NameValuePair>  valuePairs           = this.convertMap2PostParams(params);
+        UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(valuePairs, Consts.UTF_8);
+
+        method.setEntity(urlEncodedFormEntity);
+        method.setConfig(requestConfig);
+        method.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        if (headers != null) {
+            Set<String> keys = headers.keySet();
+
+            for (Iterator<String> i = keys.iterator(); i.hasNext(); ) {
+                String key = i.next();
+
+                method.addHeader(key, headers.get(key));
+            }
+        }
+
+        HttpResponse response = client.execute(method);
+        HttpEntity   entity   = response.getEntity();
+
+        if (entity == null) {
+            return "";
+        }
+
+        InputStream is           = null;
+        String      responseData = "";
+
+        try {
+            is           = entity.getContent();
+            responseData = IOUtils.toString(is, "UTF-8");
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+
+        return responseData;
+    }
+
+    public String requestHttpPostJSON(String url_prex, String url, String jsonStr, Map<String, String> headers)
+            throws HttpException, IOException {
+        IdleConnectionMonitor();
+        url = url_prex + url;
+
+        HttpPost method = this.httpPostMethod(url);
+
+        method.setEntity(new StringEntity(jsonStr, Charset.forName("UTF-8")));
+        method.setConfig(requestConfig);
+        method.addHeader("Content-type", "application/json; charset=utf-8");
+        method.setHeader("Accept", "application/json");
+
+        if (headers != null) {
+            Set<String> keys = headers.keySet();
+
+            for (Iterator<String> i = keys.iterator(); i.hasNext(); ) {
+                String key = i.next();
+
+                method.addHeader(key, headers.get(key));
+            }
+        }
+
+        HttpResponse response = client.execute(method);
+        HttpEntity   entity   = response.getEntity();
+
+        if (entity == null) {
+            return "";
+        }
+
+        InputStream is           = null;
+        String      responseData = "";
+
+        try {
+            is           = entity.getContent();
+            responseData = IOUtils.toString(is, "UTF-8");
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+
+        return responseData;
+    }
+
+    public HttpClient getHttpClient() {
+        return client;
+    }
+
+    public static HttpUtilManager getInstance() {
+        return instance;
+    }
 }
-

@@ -16,8 +16,5 @@ public interface StorageService {
 
     Resource loadAsResource(String filename);
 
-    URI store(String path,MultipartFile file);
+    URI store(String path, MultipartFile file);
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

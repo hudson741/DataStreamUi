@@ -1,49 +1,58 @@
 package com.yss.storm.model;
 
+import java.util.List;
 
 import com.yss.util.UptimeUtil;
 
-import java.util.List;
-
 /**
- * User: mzang
- * Date: 2014-10-09
- * Time: 18:18
+ *
  */
 public class SlotStatus implements Comparable<SlotStatus> {
-    String host;
-    String ip;
-    int port;
-    String uptime;
-
+    String               host;
+    String               ip;
+    int                  port;
+    String               uptime;
     List<ExecutorStatus> stats;
 
     @Override
+    public int compareTo(SlotStatus o) {
+        return this.port - o.port;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SlotStatus)) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof SlotStatus)) {
+            return false;
+        }
 
         SlotStatus that = (SlotStatus) o;
 
-        if (port != that.port) return false;
-        if (host != null ? !host.equals(that.host) : that.host != null) return false;
+        if (port != that.port) {
+            return false;
+        }
+
+        if ((host != null)
+            ? !host.equals(that.host)
+            : that.host != null) {
+            return false;
+        }
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = host != null ? host.hashCode() : 0;
+        int result = (host != null)
+                     ? host.hashCode()
+                     : 0;
+
         result = 31 * result + port;
+
         return result;
-    }
-
-    public String getUptime() {
-        return uptime;
-    }
-
-    public void setUptime(String uptime) {
-        this.uptime = uptime;
     }
 
     public void updateUptime(String uptime) {
@@ -84,8 +93,11 @@ public class SlotStatus implements Comparable<SlotStatus> {
         this.stats = stats;
     }
 
-    @Override
-    public int compareTo(SlotStatus o) {
-        return this.port - o.port;
+    public String getUptime() {
+        return uptime;
+    }
+
+    public void setUptime(String uptime) {
+        this.uptime = uptime;
     }
 }

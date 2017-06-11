@@ -15,14 +15,26 @@ import com.yss.storm.model.Topology;
  */
 public interface StormMonitor {
 
-
     /**
-     * 动态调整topology  组件的并行度
+     * 激活拓扑
      * @param topoId
-     * @param map
      * @return
      */
-    Map<String,Object> modufyTopoComponentExecutors(String topoId,Map<String,Integer> map );
+    Map<String, Object> activeTopo(String topoId);
+
+    /**
+     * 失效拓扑
+     * @param topoId
+     * @return
+     */
+    Map<String, Object> deactiveTopo(String topoId);
+
+    /**
+     * 杀死计算拓扑
+     * @param topologyId
+     * @return
+     */
+    Map<String, Object> killTopology(String topologyId);
 
     /**
      * 修改计算拓扑工作节点数
@@ -30,7 +42,15 @@ public interface StormMonitor {
      * @param num
      * @return
      */
-    Map<String,Object> modifyTopoWorkerNum(String topoId,int num);
+    Map<String, Object> modifyTopoWorkerNum(String topoId, int num);
+
+    /**
+     * 动态调整topology  组件的并行度
+     * @param topoId
+     * @param map
+     * @return
+     */
+    Map<String, Object> modufyTopoComponentExecutors(String topoId, Map<String, Integer> map);
 
     /**
      * 集群配置
@@ -71,6 +91,13 @@ public interface StormMonitor {
     Map<String, Object> getSupervisorSummary();
 
     /**
+     * 获取拓扑组件明细
+     * @param topoId
+     * @return
+     */
+    Map<String, Object> getTopoComponents(String topoId);
+
+    /**
      * 计算拓扑总览
      * @return
      */
@@ -90,40 +117,9 @@ public interface StormMonitor {
     Map<String, Object> getTopologyDetails(String topoId);
 
     /**
-     * 获取拓扑组件明细
-     * @param topoId
-     * @return
-     */
-    Map<String,Object> getTopoComponents(String topoId);
-
-    /**
      * 计算拓扑下组件明细
      * @param topoId
      * @return
      */
     Map<String, Object> getTopologyDetailsWithComponentDetails(String topoId);
-
-    /**
-     * 杀死计算拓扑
-     * @param topologyId
-     * @return
-     */
-    Map<String,Object> killTopology(String topologyId);
-
-    /**
-     * 激活拓扑
-     * @param topoId
-     * @return
-     */
-    Map<String,Object> activeTopo(String topoId);
-
-    /**
-     * 失效拓扑
-     * @param topoId
-     * @return
-     */
-    Map<String,Object> deactiveTopo(String topoId);
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -9,6 +9,3 @@ public class StorageException extends RuntimeException {
         super(message, cause);
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

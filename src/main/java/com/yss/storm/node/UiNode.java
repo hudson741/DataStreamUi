@@ -6,14 +6,16 @@ package com.yss.storm.node;
  * @Date: 2017/6/10
  */
 public class UiNode {
-
     private String host;
+    private int    port;
 
-    private int port;
-
-    public UiNode(String host,int port){
+    public UiNode(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public String toString() {
+        return "host : " + host + " port : " + port;
     }
 
     public String getHost() {
@@ -30,9 +32,5 @@ public class UiNode {
 
     public void setPort(int port) {
         this.port = port;
-    }
-
-    public String toString(){
-        return "host : "+host+" port : "+port;
     }
 }

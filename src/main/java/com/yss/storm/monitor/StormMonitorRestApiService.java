@@ -7,11 +7,11 @@ import java.net.UnknownHostException;
 
 import java.util.*;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import com.yss.storm.model.*;
 
@@ -21,6 +21,11 @@ import com.yss.storm.model.*;
 public class StormMonitorRestApiService implements StormMonitor {
     @Autowired
     private StormRestClient stormRestClient;
+
+    @Override
+    public Map<String, Object> activeTopo(String topoId) {
+        return toMaps(stormRestClient.activeTopolo(topoId));
+    }
 
     private void addIP(Map<String, Object> supervisorSummary) {
         if (supervisorSummary == null) {
@@ -46,6 +51,28 @@ public class StormMonitorRestApiService implements StormMonitor {
 
             exeMap.put("ip", getIpByHostName(host));
         }
+    }
+
+    @Override
+    public Map<String, Object> deactiveTopo(String topoId) {
+        return toMaps(stormRestClient.deactiveTopo(topoId));
+    }
+
+    @Override
+    public Map<String, Object> killTopology(String topologyId) {
+        String data = stormRestClient.killTopology(topologyId);
+
+        return toMaps(data);
+    }
+
+    @Override
+    public Map<String, Object> modifyTopoWorkerNum(String topoId, int num) {
+        return toMaps(stormRestClient.modifyTopoWorkerNum(topoId, num));
+    }
+
+    @Override
+    public Map<String, Object> modufyTopoComponentExecutors(String topoId, Map<String, Integer> map) {
+        return toMaps(stormRestClient.modufyTopoComponentExecutors(topoId, map));
     }
 
     private String refineComponentId(String compId) {
@@ -93,16 +120,6 @@ public class StormMonitorRestApiService implements StormMonitor {
         }
 
         return exeStatusList;
-    }
-
-    @Override
-    public Map<String, Object> modufyTopoComponentExecutors(String topoId, Map<String, Integer> map) {
-        return toMaps(stormRestClient.modufyTopoComponentExecutors(topoId, map));
-    }
-
-    @Override
-    public Map<String, Object> modifyTopoWorkerNum(String topoId, int num) {
-        return toMaps(stormRestClient.modifyTopoWorkerNum(topoId, num));
     }
 
     public Map<String, Object> getClusterConfig() {
@@ -259,6 +276,53 @@ public class StormMonitorRestApiService implements StormMonitor {
         return supervisorSummary;
     }
 
+    @Override
+    public Map<String, Object> getTopoComponents(String topoId) {
+        Map<String, Object>       ret     = toMaps(stormRestClient.getTopologyDetails(topoId));
+        List<Map<String, Object>> bolts   = (List<Map<String, Object>>) ret.get("bolts");
+        List<Map<String, Object>> spouts  = (List<Map<String, Object>>) ret.get("spouts");
+        List<Map<String, Object>> workers = (List<Map<String, Object>>) ret.get("workers");
+        Map<String, Object>       result  = new HashMap<>();
+
+        result.put("workers", workers);
+        result.put("spouts", spouts);
+        result.put("bolts", bolts);
+        result.put("id", ret.get("id"));
+        result.put("name", ret.get("name"));
+        result.put("workersTotal", ret.get("workersTotal"));
+        result.put("executorsTotal", ret.get("executorsTotal"));
+        result.put("tasksTotal", ret.get("tasksTotal"));
+        result.put("status", ret.get("status"));
+        result.put("uptime", ret.get("uptime"));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getTopologies() {
+        String     topos      = stormRestClient.getTopoList();
+        JSONObject jsonObject = JSON.parseObject(topos);
+        JSONArray  jsonArray  = jsonObject.getJSONArray("topologies");
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+
+            if (jsonObject1.get("status").equals("ACTIVE")) {
+                jsonObject1.put("showa", "true");
+                jsonObject1.put("showd", "false");
+            } else {
+                jsonObject1.put("showa", "false");
+                jsonObject1.put("showd", "true");
+            }
+        }
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("topologies", jsonArray);
+
+        return map;
+    }
+
     public Topology[] getTopologiesSummary() {
         Topologies topologies = stormRestClient.getTopoSummary();
 
@@ -269,61 +333,8 @@ public class StormMonitorRestApiService implements StormMonitor {
         return topologies.getTopologies();
     }
 
-    @Override
-    public Map<String, Object> getTopologies() {
-        String topos =  stormRestClient.getTopoList();
-
-        JSONObject jsonObject = JSON.parseObject(topos);
-
-        JSONArray jsonArray = jsonObject.getJSONArray("topologies");
-
-        for(int i=0;i<jsonArray.size();i++){
-            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-
-            if(jsonObject1.get("status").equals("ACTIVE")){
-                jsonObject1.put("showa","true");
-                jsonObject1.put("showd","false");
-            }else{
-                jsonObject1.put("showa","false");
-                jsonObject1.put("showd","true");
-            }
-
-        }
-
-        Map<String,Object> map = new HashMap<>();
-        map.put("topologies",jsonArray);
-
-        return map;
-
-    }
-
     public Map<String, Object> getTopologyDetails(String topoId) {
         return toMaps(stormRestClient.getTopologyDetails(topoId));
-    }
-
-    @Override
-    public Map<String, Object> getTopoComponents(String topoId) {
-
-        Map<String,Object> ret = toMaps(stormRestClient.getTopologyDetails(topoId));
-
-        List<Map<String, Object>> bolts  = (List<Map<String, Object>>) ret.get("bolts");
-        List<Map<String, Object>> spouts = (List<Map<String, Object>>) ret.get("spouts");
-        List<Map<String, Object>> workers = (List<Map<String, Object>>) ret.get("workers");
-
-        Map<String,Object> result = new HashMap<>();
-        result.put("workers",workers);
-        result.put("spouts",spouts);
-        result.put("bolts",bolts);
-
-        result.put("id",ret.get("id"));
-        result.put("name",ret.get("name"));
-        result.put("workersTotal",ret.get("workersTotal"));
-        result.put("executorsTotal",ret.get("executorsTotal"));
-        result.put("tasksTotal",ret.get("tasksTotal"));
-        result.put("status",ret.get("status"));
-        result.put("uptime",ret.get("uptime"));
-        return result;
-
     }
 
     public Map<String, Object> getTopologyDetailsWithComponentDetails(String topoId) {
@@ -375,23 +386,4 @@ public class StormMonitorRestApiService implements StormMonitor {
 
         return ret;
     }
-
-    @Override
-    public Map<String, Object> killTopology(String topologyId) {
-        String data = stormRestClient.killTopology(topologyId);
-        return toMaps(data);
-    }
-
-    @Override
-    public Map<String, Object> activeTopo(String topoId) {
-        return toMaps(stormRestClient.activeTopolo(topoId));
-    }
-
-    @Override
-    public Map<String, Object> deactiveTopo(String topoId) {
-        return toMaps(stormRestClient.deactiveTopo(topoId));
-    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

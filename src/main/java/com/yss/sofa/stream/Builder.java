@@ -8,6 +8,3 @@ import org.apache.storm.generated.StormTopology;
 public interface Builder {
     StormTopology getTopology();
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

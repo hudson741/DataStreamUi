@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
 
-
 /**
  * The type Executor status.
  */
@@ -12,70 +11,86 @@ public class ExecutorStatus implements Comparable<ExecutorStatus> {
     private static final Splitter SPLITTER = Splitter.on(Pattern.compile("[\\[|\\-|\\]]"))
                                                      .omitEmptyStrings()
                                                      .trimResults();
+
     /**
      * The Port.
      */
-    int    port;
+    int port;
+
     /**
      * The Host.
      */
     String host;
+
     /**
      * The Executor id.
      */
     String executorId;
+
     /**
      * The Uptime.
      */
     String uptime;
+
     /**
      * The Topo name.
      */
     String topoName;
+
     /**
      * The Topo id.
      */
     String topoId;
+
     /**
      * The Comp id.
      */
     String compId;
+
     /**
      * The Comp type.
      */
     String compType;
+
     /**
      * The Emitted.
      */
-    long   emitted;
+    long emitted;
+
     /**
      * The Transferred.
      */
-    long   transferred;
+    long transferred;
+
     /**
      * The Capacity.
      */
-    long   capacity;
+    long capacity;
+
     /**
      * The Execute latency.
      */
-    long   executeLatency;
+    long executeLatency;
+
     /**
      * The Executed.
      */
-    long   executed;
+    long executed;
+
     /**
      * The Process latency.
      */
     String processLatency;
+
     /**
      * The Acked.
      */
-    long   acked;
+    long acked;
+
     /**
      * The Failed.
      */
-    long   failed;
+    long failed;
 
     @Override
     public int compareTo(ExecutorStatus o) {
@@ -416,6 +431,3 @@ public class ExecutorStatus implements Comparable<ExecutorStatus> {
         this.uptime = uptime;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

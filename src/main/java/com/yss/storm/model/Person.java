@@ -1,9 +1,7 @@
 package com.yss.storm.model;
 
 /**
- * User: mzang
- * Date: 2014-09-22
- * Time: 16:06
+ *
  */
 public class Person {
     String name;
@@ -25,6 +23,3 @@ public class Person {
         this.phoneNumber = phoneNumber;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
