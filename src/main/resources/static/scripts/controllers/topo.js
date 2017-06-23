@@ -3,7 +3,6 @@ app.controller('TopoCtrl', ['$scope', '$location', "client", function ($scope, $
 
   $scope.showLoading = true;
   client.topo(params.tabId, function (data, status) {
-    $scope.showAPIFail = false;
     $scope.showLoading = false;
     $scope.topo = data;
   }, function () {
@@ -32,7 +31,6 @@ app.controller('TopoMCtrl', ['$scope', '$location', "client", function ($scope, 
     var params = $location.search();
     $scope.showLoading = true;
     client.topom(params.topoid,function (data, status) {
-        $scope.showAPIFail = false;
         $scope.showLoading = false;
         $scope.topo = data;
     }, function () {

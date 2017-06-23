@@ -132,8 +132,8 @@ public class StormRestClient implements InitializingBean {
             return readContent(response.getEntity().getContent());
         } catch (IOException e) {
             e.printStackTrace();
-
-            throw new RuntimeException("Got io exception");
+            return "";
+//            throw new RuntimeException("Got io exception");
         }
     }
 
@@ -153,7 +153,7 @@ public class StormRestClient implements InitializingBean {
             return HttpUtilManager.getInstance().requestHttpPost(getApiBase(), url, params, null);
         } catch (Exception e) {}
 
-        return null;
+        return "";
     }
 
     /**

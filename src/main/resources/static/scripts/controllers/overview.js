@@ -4,7 +4,7 @@ angular.module('anotherStormUiApp')
     $scope.showLoading = true;
     client.overview(function (data, status) {
       $scope.showLoading = false;
-      $scope.showAPIFail = false;
+
       $scope.overview = data;
     }, function () {
       defaultFail($scope)

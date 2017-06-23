@@ -34,7 +34,7 @@ function updateTabsOnFail($rootScope) {
 }
 
 function defaultFail($scope) {
-  $scope.showAPIFail = true;
+
 }
 
 

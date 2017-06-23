@@ -1,14 +1,7 @@
-<div align="center" ng-show="showLoading && !showAPIFail">
+<div align="center" ng-show="showLoading">
   <img src="images/loading.gif"> &nbsp;&nbsp; loading topology...
 </div>
 
-<div ng-show="showAPIFail">
-  <alert type="danger" style="margin-bottom: 10px">
-    Failed to 1) retrive data from SOFA-STREAM server or 2) SOFA-STREAM server failed to retrieve data from storm restful server.
-    Please 1) check the $http.get value in app.js of SOFA-STREAM project or 2) check the current storm restful server in
-    Settings tab.
-  </alert>
-</div>
 
 <div ng-show="!showLoading">
   <h3>计算拓扑</h3>

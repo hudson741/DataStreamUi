@@ -7,7 +7,7 @@ angular.module('anotherStormUiApp')
       client.hosts(function (data, status) {
         $scope.showLoading = false;
 
-        $scope.showAPIFail = false;
+
 
 
         $scope.hosts = data;

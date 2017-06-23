@@ -2,7 +2,7 @@ app.controller('StreamManagerCtrl', ['$scope', '$location', "client", function (
 
     $scope.showLoading = true;
     client.streamManager(function (data, status) {
-        $scope.showAPIFail = false;
+
         $scope.showLoading = false;
         $scope.topolist = data;
     }, function () {
