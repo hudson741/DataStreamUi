@@ -5,6 +5,7 @@ import java.io.File;
 import java.net.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -82,9 +83,19 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         List<String> nimbusHosts = Lists.newArrayList();
 
         for (NimbusNode nimbusNode : nimbusNodes) {
-            InetAddress ip         = InetAddress.getByName(nimbusNode.getHost());
-            String      nimbusAddr = ip.getHostAddress();
-            String      dockerHost = nimbusNode.getDockerHost();
+            InetAddress  ip         = InetAddress.getByName(nimbusNode.getHost());
+            String       nimbusAddr = ip.getHostAddress();
+            String       dockerHost = nimbusNode.getDockerHost();
+            List<String> list       = stormNodesService.getNimbusHosts();
+
+            for (String nimbusHost : list) {
+                if (nimbusHost.contains(dockerHost)) {
+                    logger.info("nimbus to dockerHosts " + nimbusHost + "  " + dockerHost);
+                    dockerHost = nimbusHost;
+
+                    break;
+                }
+            }
 
             logger.info("set dns " + dockerHost + " " + nimbusAddr);
             DnsCacheManipulator.setDnsCache(dockerHost, nimbusAddr);
@@ -95,6 +106,12 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         config.put(Config.NIMBUS_THRIFT_PORT, nimbusNodes.get(0).getPort());
         config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(remoteZKServer.split(",")));
         config.put(Config.STORM_ZOOKEEPER_PORT, remoteZKPort);
+
+//      Map<String, Object> hbConf = new HashMap<String, Object>();
+
+//      hbConf.put("hbase.rootdir","hdfs://10.104.108.213:9000/hbase");
+//      hbConf.put("hbase.zookeeper.quorum", "10.186.58.13:2181");
+//      config.put("hbase.conf",hbConf);
         stormConf.putAll(config);
 
         return stormConf;

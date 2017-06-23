@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.yss.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.yss.TestHandler;
-import com.yss.storage.StorageService;
 import com.yss.storm.StormNodesService;
 import com.yss.storm.monitor.StormMonitorRestApiService;
 import com.yss.storm.node.NimbusNode;
@@ -31,8 +30,6 @@ public class StormTopologySubmitController {
     @Autowired
     private StormSubmiter              stormSubmiter;
     @Autowired
-    private StorageService             storageService;
-    @Autowired
     private StormNodesService          stormNodesService;
     @Autowired
     private StormMonitorRestApiService stormMonitorRestApiService;
@@ -40,17 +37,18 @@ public class StormTopologySubmitController {
     private TestHandler                testHandler;
 
     @PostMapping("/fileu")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) throws Exception {
         String filePath = httpServletRequest.getServletContext().getRealPath("/");
 
         logger.info(" file tmp is " + filePath);
 
-        URI path = storageService.store(filePath, file);
+        URI path = FileUtil.store(filePath + "stormComputeJarDir", file);
 
         stormSubmiter.SubmitStormTopology(path);
 
         return "上传成功";
     }
+
 
     @RequestMapping("/nimbus")
     public String nimbus() {
@@ -59,30 +57,14 @@ public class StormTopologySubmitController {
         return com.alibaba.fastjson.JSONObject.toJSONString(list);
     }
 
-    @GetMapping(value = "/a")
+    @GetMapping(value = "/test2")
     public String printHello(ModelMap model) {
         testHandler.say();
 
         return "index1";
     }
 
-    /**
-     * 默认首页
-     * @param model
-     * @return
-     */
-    @RequestMapping(
-        value  = "/",
-        method = RequestMethod.GET
-    )
-    public ModelAndView printHello2(ModelMap model, HttpServletRequest httpServletRequest) {
-        System.out.println(httpServletRequest.getServletContext().getRealPath("/"));
-
-//      return new ModelAndView("file1");
-        return new ModelAndView("index");
-    }
-
-    @RequestMapping("/fuck")
+    @RequestMapping("/test")
     public String getJar(@RequestParam("code") String id) {
         String result = id;
 

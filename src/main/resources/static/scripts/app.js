@@ -26,6 +26,7 @@ function updateTabsOnFail($rootScope) {
       {tabName: "SDK下载", tabId: "SDK下载", tabLink: "/download"},
       {tabName: "streamSql执行", tabId: "streamSql执行", tabLink: "/download"},
       {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
+      {tabName: "docker发布", tabId: "docker发布", tabLink: "/dockerPub"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
@@ -45,6 +46,7 @@ function updateTabs($rootScope, topos, status) {
       {tabName: "SDK下载", tabId: "SDK下载", tabLink: "/download"},
       {tabName: "streamSql执行", tabId: "streamSql执行", tabLink: "/download"},
       {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
+      {tabName: "docker发布", tabId: "docker发布", tabLink: "/dockerPub"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
@@ -111,6 +113,10 @@ app.config(function ($routeProvider) {
       templateUrl: 'views/overview.html',
       controller: 'OverviewCtrl'
     })
+      .when('/dockerPub',{
+       templateUrl: 'views/dockerPub.html',
+       controller: 'DockerPubCtrl'
+      })
       .when('/streamManager', {
           templateUrl: 'views/streamManager.html',
           controller: 'StreamManagerCtrl'

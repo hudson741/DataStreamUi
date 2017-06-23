@@ -1,5 +1,6 @@
 package com.yss;
 
+import java.io.File;
 import java.net.InetAddress;
 
 import java.util.List;
@@ -35,9 +36,9 @@ public class TestMain {
     public static void main(String[] args) throws Exception {
         System.out.println("您正式真正的三国无双");
 
-        InetAddress ip = InetAddress.getByName("zhangc3");
+        File f = new File(new TestMain().getClass().getResource("").getPath());
+        System.out.println(System.getProperty("user.dir"));
 
-        System.out.println(ip.getHostAddress());
     }
 
     public static void remove(CuratorFramework client, String pathN) throws Exception {
