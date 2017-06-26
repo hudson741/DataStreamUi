@@ -32,7 +32,7 @@ public class YarnLaunch implements YarnLaunchService {
     private int                 amSize;
     private String              classPath;
 
-    public void launchStorm(String path,String jarName,String hdfsUrl,String yarnUrl,String lanchMainClass) throws Exception {
+    public void launchApp(String path,String jarName,String hdfsUrl,String yarnUrl,String lanchMainClass) throws Exception {
         URL jarPathUrl = new File(path).toURL();
         String jarPath    = jarPathUrl.getPath();
 

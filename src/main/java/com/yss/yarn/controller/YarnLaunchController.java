@@ -42,7 +42,7 @@ public class YarnLaunchController {
 
         String jarName = file.getOriginalFilename();
 
-        yarnLaunchService.launchStorm(path.getPath(),jarName,hdfsUrl,yarnUrl,launchMainClass);
+        yarnLaunchService.launchApp(path.getPath(),jarName,hdfsUrl,yarnUrl,launchMainClass);
 
         return "上传成功";
     }

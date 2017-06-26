@@ -9,10 +9,10 @@ package com.yss.yarn.launch;
 public interface YarnLaunchService {
 
     /**
-     * 提交stormDocker 至yarn调度平台
+     *
      * @throws Exception
      */
-    void launchStorm(String jarPath,String jarName,String hdfsUrl,String yarnUrl,String lanchMainClass) throws Exception;
+    void launchApp(String jarPath,String jarName,String hdfsUrl,String yarnUrl,String lanchMainClass) throws Exception;
 
 
 }

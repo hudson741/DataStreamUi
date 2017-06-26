@@ -78,7 +78,6 @@ public class APPLaunch {
     private void launchApp(String appName, String queue, int amMB, String appMasterJar,
                            String classPath,String lanchMainClass)
             throws Exception {
-        LOG.debug("StormOnYarn:launchApp() ...");
 
         YarnClientApplication     client_app = _yarn.createApplication();
         GetNewApplicationResponse app        = client_app.getNewApplicationResponse();
@@ -169,6 +168,7 @@ public class APPLaunch {
         capability.setMemory(amMB);
         appContext.setResource(capability);
         appContext.setAMContainerSpec(amContainer);
+        appContext.setApplicationName(appName);
 
         _yarn.submitApplication(appContext);
     }
@@ -177,11 +177,11 @@ public class APPLaunch {
                                               String appJarPath, Map<String, String> yarnConf,
                                               String classPath,String lanchMainClass)
             throws Exception {
-        APPLaunch storm = new APPLaunch(yarnConf);
+        APPLaunch appLaunch = new APPLaunch(yarnConf);
 
-        storm.launchApp(appName, queue, amMB, appJarPath, classPath,lanchMainClass);
+        appLaunch.launchApp(appName, queue, amMB, appJarPath, classPath,lanchMainClass);
 
-        return storm;
+        return appLaunch;
     }
 
     public ApplicationId getAppId() {
