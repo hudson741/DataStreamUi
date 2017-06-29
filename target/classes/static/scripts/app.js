@@ -22,11 +22,11 @@ function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "总览", tabId: "总览", tabLink: "/overview"},
-      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/settings"},
-      {tabName: "SDK下载", tabId: "SDK下载", tabLink: "/download"},
-      {tabName: "streamSql执行", tabId: "streamSql执行", tabLink: "/download"},
-      {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
-      {tabName: "docker发布", tabId: "docker发布", tabLink: "/dockerPub"},
+      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
+      {tabName: "conf", tabId: "conf", tabLink: "/conf"},
+      {tabName: "yarn", tabId: "yarn", tabLink: "/yarnindex"},
+      {tabName: "storm集群设置", tabId: "storm集群设置", tabLink: "/dockerPub"},
+      {tabName: "stormDocker组件发布", tabId: "stormDocker组件发布", tabLink: "/stormPub"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
@@ -42,11 +42,11 @@ function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "总览", tabId: "总览", tabLink: "/overview"},
-      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/settings"},
-      {tabName: "SDK下载", tabId: "SDK下载", tabLink: "/download"},
-      {tabName: "streamSql执行", tabId: "streamSql执行", tabLink: "/download"},
-      {tabName: "yarn", tabId: "yarn", tabLink: "/overview"},
-      {tabName: "docker发布", tabId: "docker发布", tabLink: "/dockerPub"},
+      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
+      {tabName: "conf", tabId: "conf", tabLink: "/conf"},
+      {tabName: "yarn", tabId: "yarn", tabLink: "/yarnindex"},
+      {tabName: "storm集群设置", tabId: "storm集群设置", tabLink: "/dockerPub"},
+      {tabName: "stormDocker组件发布", tabId: "stormDocker组件发布", tabLink: "/stormPub"},
       {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
@@ -69,6 +69,13 @@ app.factory('client', ['$http', function ($http) {
     },
     overview: function (callback, failcallback) {
       request('overview').success(callback).error(failcallback);
+    },
+
+      conf: function(callback , failcallback) {
+      request('conf').success(callback).error(failcallback);
+    },
+    yarnindex: function (callback, failcallback) {
+      request('yarnindex').success(callback).error(failcallback);
     },
     hosts: function (callback, failcallback) {
       request('hosts').success(callback).error(failcallback);
@@ -107,15 +114,25 @@ app.factory('client', ['$http', function ($http) {
 app.config(function ($routeProvider) {
   $routeProvider
     .when('/', {
-      redirectTo: '/overview'
+      redirectTo: '/conf'
     })
       .when('/overview', {
       templateUrl: 'views/overview.html',
       controller: 'OverviewCtrl'
     })
+      .when('/conf', {
+          templateUrl: 'views/conf.html',
+          controller: 'SettingsCtrl'
+      })
+      .when('/yarnindex',{
+          templateUrl: 'views/yarnindex.html',
+          controller: 'YarnIndexCtrl'
+      })
       .when('/dockerPub',{
-       templateUrl: 'views/dockerPub.html',
-       controller: 'DockerPubCtrl'
+       templateUrl: 'views/dockerPub.html'
+      })
+      .when('/stormPub',{
+          templateUrl: 'views/stormPub.html'
       })
       .when('/streamManager', {
           templateUrl: 'views/streamManager.html',
@@ -132,9 +149,9 @@ app.config(function ($routeProvider) {
       .when('/host', {
       templateUrl: 'views/host.html',
       controller: 'HostCtrl'
-    }).when('/settings', {
-      templateUrl: 'views/settings.html',
-      controller: 'SettingsCtrl'
+    }).when('/stormUpload', {
+      templateUrl: 'views/stormUpload.html',
+      controller: 'StormUploadCtrl'
     }).when('/download',{
       templateUrl: 'views/download.html',
       controller: 'DownloadCtrl'

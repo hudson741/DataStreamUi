@@ -29,22 +29,53 @@ public class YarnLaunchController {
     private YarnLaunchService yarnLaunchService;
 
     @PostMapping("/dockerPub")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                   @RequestParam("hdfsUrl") String hdfsUrl,
-                                   @RequestParam("yarnUrl") String yarnUrl,
-                                   @RequestParam("launchMainClass") String launchMainClass,
-                                   HttpServletRequest httpServletRequest) throws Exception {
-        String filePath = httpServletRequest.getServletContext().getRealPath("/");
+    public String dockerPub(
+                           @RequestParam("file") MultipartFile file,
+                           @RequestParam("appName") String appName,
+                           @RequestParam("netUrl") String netUrl,
+                           @RequestParam("cm") String cm,
+                           @RequestParam("zk") String zk,
+                           @RequestParam("uiIp")String uiIp,
+                           @RequestParam("nimbusSeeds") String nimbusSeeds,
+                           HttpServletRequest httpServletRequest) throws Exception {
 
-        logger.info(" file tmp is " + filePath);
 
-        URI path = FileUtil.store(filePath + "dockerPub", file);
+        Map<String,String> env = new HashMap<>();
+        env.put("netUrl",netUrl);
+        env.put("cm",cm);
+        env.put("zk",zk);
+        env.put("uiIp",uiIp);
+        env.put("nimbusSeeds",nimbusSeeds);
 
-        String jarName = file.getOriginalFilename();
-
-        yarnLaunchService.launchApp(path.getPath(),jarName,hdfsUrl,yarnUrl,launchMainClass);
+        if(file!=null){
+            String filePath = httpServletRequest.getServletContext().getRealPath("/");
+            logger.info(" file tmp is " + filePath);
+            URI path = FileUtil.store(filePath + "dockerPub", file);
+            yarnLaunchService.launchApp(path.getPath(),appName,env);
+        }else {
+            yarnLaunchService.launchApp(appName, env);
+        }
 
         return "上传成功";
     }
+
+//    @PostMapping("/dockerPubUpload")
+//    public String handleFileUpload(@RequestParam("file") MultipartFile file,
+//                                   @RequestParam("hdfsUrl") String hdfsUrl,
+//                                   @RequestParam("yarnUrl") String yarnUrl,
+//                                   @RequestParam("launchMainClass") String launchMainClass,
+//                                   HttpServletRequest httpServletRequest) throws Exception {
+//        String filePath = httpServletRequest.getServletContext().getRealPath("/");
+//
+//        logger.info(" file tmp is " + filePath);
+//
+//        URI path = FileUtil.store(filePath + "dockerPub", file);
+//
+//        String jarName = file.getOriginalFilename();
+//
+//        yarnLaunchService.launchApp(path.getPath(),jarName,hdfsUrl,yarnUrl,launchMainClass);
+//
+//        return "上传成功";
+//    }
 
 }

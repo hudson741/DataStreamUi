@@ -82,28 +82,30 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
 
         List<String> nimbusHosts = Lists.newArrayList();
 
+        List<String> list       = stormNodesService.getNimbusHosts();
+
+        int nimbusPort = 0;
+
         for (NimbusNode nimbusNode : nimbusNodes) {
             InetAddress  ip         = InetAddress.getByName(nimbusNode.getHost());
             String       nimbusAddr = ip.getHostAddress();
             String       dockerHost = nimbusNode.getDockerHost();
-            List<String> list       = stormNodesService.getNimbusHosts();
 
             for (String nimbusHost : list) {
                 if (nimbusHost.contains(dockerHost)) {
                     logger.info("nimbus to dockerHosts " + nimbusHost + "  " + dockerHost);
                     dockerHost = nimbusHost;
-
                     break;
                 }
             }
-
+            nimbusPort = nimbusNode.getPort();
             logger.info("set dns " + dockerHost + " " + nimbusAddr);
             DnsCacheManipulator.setDnsCache(dockerHost, nimbusAddr);
             nimbusHosts.add(dockerHost);
         }
 
         config.put(Config.NIMBUS_SEEDS, nimbusHosts);
-        config.put(Config.NIMBUS_THRIFT_PORT, nimbusNodes.get(0).getPort());
+        config.put(Config.NIMBUS_THRIFT_PORT, nimbusPort);
         config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(remoteZKServer.split(",")));
         config.put(Config.STORM_ZOOKEEPER_PORT, remoteZKPort);
 

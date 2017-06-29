@@ -1,8 +1,10 @@
 package com.yss.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import java.util.*;
@@ -51,11 +53,15 @@ public class HttpUtilManager {
         }
     };
     private static RequestConfig requestConfig = RequestConfig.custom()
-                                                              .setSocketTimeout(20000)
-                                                              .setConnectTimeout(20000)
-                                                              .setConnectionRequestTimeout(20000)
+                                                              .setSocketTimeout(5000)
+                                                              .setConnectTimeout(5000)
+                                                              .setConnectionRequestTimeout(5000)
                                                               .build();
     private static HttpClient client;
+
+    static{
+        cm.setMaxTotal(30);
+    }
 
     private HttpUtilManager() {
         client = HttpClients.custom().setConnectionManager(cm).setKeepAliveStrategy(keepAliveStrat).build();
@@ -118,6 +124,10 @@ public class HttpUtilManager {
         String data = HttpUtilManager.getInstance().requestHttpPostJSON("", url, rebalance, null);
 
         System.out.println(data);
+    }
+
+    public String httpGet(String url) throws IOException, HttpException {
+       return requestHttpGet("",url,"",null);
     }
 
     public String requestHttpGet(String url_prex, String url, String param, Map<String, String> headers)
@@ -256,6 +266,27 @@ public class HttpUtilManager {
         }
 
         return responseData;
+    }
+
+
+
+    private static String readContent(InputStream in) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder  sb     = new StringBuilder();
+
+        try {
+            String line = null;
+
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            return "";
+        }
+
+        return sb.toString();
     }
 
     public HttpClient getHttpClient() {

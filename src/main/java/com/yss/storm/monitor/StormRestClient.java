@@ -1,44 +1,37 @@
 package com.yss.storm.monitor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import com.alibaba.fastjson.JSONObject;
+import com.floodCtr.generate.FloodJobRunningState;
+import com.yss.yarn.discovery.YarnThriftClient;
 
+import org.apache.http.HttpException;
+import org.apache.thrift.TException;
+import org.assertj.core.util.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
 
-import com.yss.storm.StormNodesService;
 import com.yss.storm.model.Rebalance;
 import com.yss.storm.model.Topologies;
-import com.yss.storm.node.UiNode;
 import com.yss.util.HttpUtilManager;
 
 /**
  * Created by zhangchi on 2017/5/19.
  */
 public class StormRestClient implements InitializingBean {
-    private static PoolingClientConnectionManager ccm    = new PoolingClientConnectionManager();
-    private static HttpClient                     client = new DefaultHttpClient(ccm);
 
-    static {
-        ccm.setMaxTotal(4096);
-        ccm.setDefaultMaxPerRoute(4096);
-    }
+    private Logger logger            = LoggerFactory.getLogger(StormRestClient.class);
 
     @Autowired
-    private StormNodesService stormNodesService;
+    private YarnThriftClient yarnThriftClient;
 
     /**
      * 激活拓扑
@@ -94,26 +87,11 @@ public class StormRestClient implements InitializingBean {
         return getApiDataPostJson("topology/" + topoId + "/rebalance/0", rebalance);
     }
 
-    private static String readContent(InputStream in) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        StringBuilder  sb     = new StringBuilder();
-
-        try {
-            String line = null;
-
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return "";
-        }
-
-        return sb.toString();
-    }
 
     public String getApiBase() {
+        if(getUIHttp() == null){
+            return  null;
+        }
         return "http://" + getUIHttp() + "/api/v1/";
     }
 
@@ -123,24 +101,20 @@ public class StormRestClient implements InitializingBean {
      * @return
      */
     private String getApiData(String url) {
-        HttpGet      get      = new HttpGet(getApiBase() + url);
-        HttpResponse response = null;
-
+        if(getApiBase() == null){
+            return JSONObject.toJSONString(Lists.newArrayList());
+        }
         try {
-            response = client.execute(get);
-
-            return readContent(response.getEntity().getContent());
+            return HttpUtilManager.getInstance().httpGet(getApiBase()+url);
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
-//            throw new RuntimeException("Got io exception");
+        } catch (HttpException e) {
+            e.printStackTrace();
         }
+
+        return null;
     }
 
-//  public void updateStormUIHost(String stormRestHost) {
-//      this.stormRestHost = stormRestHost;
-//      this.apiBase       = "http://" + stormRestHost + "/api/v1/";
-//  }
 
     /**
      * post请求
@@ -251,10 +225,18 @@ public class StormRestClient implements InitializingBean {
     }
 
     private String getUIHttp() {
-        List<UiNode> list        = stormNodesService.getUiNodeList();
-        UiNode       uiNode      = list.get(0);
-        String       stormUIHost = uiNode.getHost() + ":" + uiNode.getPort();
-
-        return stormUIHost;
+        try {
+            logger.info("getUIHttp .... ");
+            String json = yarnThriftClient.getAllDockerJob();
+            List<FloodJobRunningState> list = JSONObject.parseArray(json,FloodJobRunningState.class);
+            for(FloodJobRunningState floodJobRunningState:list){
+                if(floodJobRunningState.getFloodJob().getBusinessTag().equals("ui")){
+                    return floodJobRunningState.getRunIp()+":9092";
+                }
+            }
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

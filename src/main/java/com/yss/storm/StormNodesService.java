@@ -3,11 +3,17 @@ package com.yss.storm;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.alibaba.fastjson.JSONObject;
+import com.yss.yarn.discovery.YarnThriftClient;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.retry.RetryUntilElapsed;
 
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,50 +22,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
+import com.yss.config.Conf;
 import com.yss.storm.node.NimbusNode;
 import com.yss.storm.node.UiNode;
 
 /**
  * Created by zhangchi on 2017/5/17.
  */
-public class StormNodesService implements InitializingBean {
-    public final static String                    STORM_NIMBUS_PATH = "/docker/storm/nimbus";
-    public final static String                    STORM_UI_PATH     = "/docker/storm/ui";
-    public final static String                    STORM_NIMBUS_HOSTS   = "/storm/nimbuses";
-
-    private Logger                                logger            = LoggerFactory.getLogger(StormNodesService.class);
-    private ConcurrentHashMap<String, NimbusNode> nimbusMap         = new ConcurrentHashMap<String, NimbusNode>();
-
-    private List<String> nimbusHosts = Lists.newArrayList();
-
-    private ConcurrentHashMap<String, UiNode>     uiMap             = new ConcurrentHashMap<>();
-    @Autowired
-    private CuratorFramework                      curatorFramework;
-    private PathChildrenCache                     nimbusChildrenCache;
-    private PathChildrenCache                     uiChildrenCache;
+public class StormNodesService {
+    public final static String                    STORM_NIMBUS_HOSTS = "/storm/nimbuses";
+    private Logger                                logger             = LoggerFactory.getLogger(StormNodesService.class);
+    private List<String>                          nimbusHosts        = Lists.newArrayList();
+    private CuratorFramework                      curatorFramework   = null;
     private PathChildrenCache                     nimbusHostsChildCache;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        startNimbusChildrenCache();
-        startUChildrenCache();
-        startNimbusHostsChildrenCache();
-    }
-
-    private void reloadNimbus(CuratorFramework client) throws Exception {
-        nimbusMap.clear();
-
-        List<String> stormNimbusChildren = client.getChildren().forPath(STORM_NIMBUS_PATH);
-
-        for (String nimbus : stormNimbusChildren) {
-            String[] nimbusNode = nimbus.split(":");
-            byte[]   port       = client.getData().forPath(STORM_NIMBUS_PATH + "/" + nimbus);
-
-            logger.info("reloadUI " + nimbusNode[0] + " : " + port);
-            nimbusMap.put(nimbusNode[0],
-                          new NimbusNode(nimbusNode[0], nimbusNode[1], Integer.parseInt(new String(port))));
-        }
-    }
+    @Autowired
+    private YarnThriftClient yarnThriftClient;
 
     private void reloadNimbusHosts(CuratorFramework client) throws Exception {
         nimbusHosts.clear();
@@ -68,106 +46,41 @@ public class StormNodesService implements InitializingBean {
 
         for (String nimbus : stormNimbusChildren) {
             String[] nimbusNode = nimbus.split(":");
-            logger.info("found nimbus : "+nimbus);
+
+            logger.info("found nimbus : " + nimbus);
             nimbusHosts.add(nimbusNode[0]);
         }
-    }
-
-    private void reloadUI(CuratorFramework client) throws Exception {
-        uiMap.clear();
-
-        List<String> stormUiChildren = client.getChildren().forPath(STORM_UI_PATH);
-
-        for (String ui : stormUiChildren) {
-            String[] uiNode = ui.split(":");
-            byte[]   port   = client.getData().forPath(STORM_UI_PATH + "/" + ui);
-
-            logger.info("reloadUI " + uiNode[0] + " : " + port);
-            uiMap.put(uiNode[0], new UiNode(uiNode[0], Integer.parseInt(new String(port))));
-        }
-    }
-
-    private void startNimbusChildrenCache() throws Exception {
-        nimbusChildrenCache = new PathChildrenCache(curatorFramework, STORM_NIMBUS_PATH, true);
-        nimbusChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
-        nimbusChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-                                            public void childEvent(CuratorFramework client,
-                                                                   PathChildrenCacheEvent event)
-                                                    throws Exception {
-                                                if (event.getType() == PathChildrenCacheEvent.Type.INITIALIZED) {
-                                                    reloadNimbus(client);
-                                                } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {
-                                                    reloadNimbus(client);
-                                                } else if (event.getType()
-                                                           == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
-                                                    reloadNimbus(client);
-                                                } else if (event.getType()
-                                                           == PathChildrenCacheEvent.Type.CHILD_UPDATED) {
-                                                    reloadNimbus(client);
-                                                }
-                                            }
-                                        });
     }
 
     private void startNimbusHostsChildrenCache() throws Exception {
         nimbusHostsChildCache = new PathChildrenCache(curatorFramework, STORM_NIMBUS_HOSTS, true);
         nimbusHostsChildCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
         nimbusHostsChildCache.getListenable().addListener(new PathChildrenCacheListener() {
-            public void childEvent(CuratorFramework client,
-                                   PathChildrenCacheEvent event)
-                    throws Exception {
-                if (event.getType() == PathChildrenCacheEvent.Type.INITIALIZED) {
-                    reloadNimbusHosts(client);
-                } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {
-                    reloadNimbusHosts(client);
-                } else if (event.getType()
-                        == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
-                    reloadNimbusHosts(client);
-                } else if (event.getType()
-                        == PathChildrenCacheEvent.Type.CHILD_UPDATED) {
-                    reloadNimbusHosts(client);
-                }
+                                              public void childEvent(CuratorFramework client,
+                                                                     PathChildrenCacheEvent event)
+                                                      throws Exception {
+                                                  reloadNimbusHosts(client);
+                                              }
+                                          });
+    }
+
+    public void updateCuratorFrameWork() throws Exception {
+        try {
+            if (curatorFramework != null) {
+                curatorFramework.close();
             }
-        });
-    }
 
-    private void startUChildrenCache() throws Exception {
-        uiChildrenCache = new PathChildrenCache(curatorFramework, STORM_UI_PATH, true);
-        uiChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
-        uiChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-                                        public void childEvent(CuratorFramework client,
-                                                               PathChildrenCacheEvent event) throws Exception {
-                                            if (event.getType() == PathChildrenCacheEvent.Type.INITIALIZED) {
-                                                reloadUI(client);
-                                            } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {
-                                                reloadUI(client);
-                                            } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
-                                                reloadUI(client);
-                                            } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_UPDATED) {
-                                                reloadUI(client);
-                                            }
-                                        }
-                                    });
-    }
+            if (StringUtils.isNotEmpty(Conf.getSTORM_ZK())) {
+                RetryUntilElapsed retryUntilElapsed = new RetryUntilElapsed(6000, 1000);
 
-    public List<NimbusNode> getNimbusNodeList() {
-        List<NimbusNode> list = Lists.newArrayList();
-
-        for (NimbusNode nimbusNode : nimbusMap.values()) {
-            list.add(nimbusNode);
+                curatorFramework = CuratorFrameworkFactory.newClient(Conf.getSTORM_ZK() + ":" + "2181",
+                                                                     retryUntilElapsed);
+                curatorFramework.start();
+                startNimbusHostsChildrenCache();
+            }
+        } catch (Exception e) {
+            logger.error("error ", e);
         }
-
-        return list;
-    }
-
-    public List<UiNode> getUiNodeList() {
-        List<UiNode> list = Lists.newArrayList();
-
-        for (UiNode uiNode : uiMap.values()) {
-            list.add(uiNode);
-        }
-
-        return list;
     }
 
     public List<String> getNimbusHosts() {
@@ -176,5 +89,25 @@ public class StormNodesService implements InitializingBean {
 
     public void setNimbusHosts(List<String> nimbusHosts) {
         this.nimbusHosts = nimbusHosts;
+    }
+
+    public List<NimbusNode> getNimbusNodeList() {
+        List<NimbusNode> list = Lists.newArrayList();
+        try {
+            String json = yarnThriftClient.getStormNimbus();
+            if(StringUtils.isEmpty(json)){
+                return Lists.newArrayList();
+            }
+            List<String> array = JSONObject.parseArray(json,String.class);
+            for(String nimbusNode:array){
+                String[] nimbus = nimbusNode.split(":");
+                NimbusNode nimbusNode1 = new NimbusNode(nimbus[1],nimbus[0],Integer.parseInt(nimbus[2]));
+                list.add(nimbusNode1);
+            }
+
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

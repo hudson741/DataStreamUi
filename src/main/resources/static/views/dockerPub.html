@@ -3,20 +3,32 @@
 
     <form method="post" action="dockerPub" enctype="multipart/form-data">
         <input type="file" name="file" class="form-control" placeholder="127.0.0.1:9090" ng-trim="true"
-               maxlength="255" ng-model="dockerPubURL" style="margin-bottom: 10px" />
+               maxlength="255"  style="margin-bottom: 10px" />
 
-        HDFSUrl:<input type="text" name="hdfsUrl" id="hdfsUrl" class="form-control" placeholder="请输入远程hdfsURL" ng-trim="true"
-               maxlength="245" ng-model="dockerPubURL" style="margin-bottom: 10px" />
-
-
-        YARNUrl:<input type="text" name="yarnUrl" id="yarnUrl" class="form-control" placeholder="请输入远程yarn.resourcemanager.address" ng-trim="true"
-               maxlength="245" ng-model="dockerPubURL" style="margin-bottom: 10px" />
+        appId:<input type="text" name="appName" id="appName" class="form-control" placeholder="资源调度唯一标识"
+               maxlength="245"  style="margin-bottom: 10px" />
 
 
-        类执行路径<input type="text" name="launchMainClass" id="launchMainClass" class="form-control" placeholder="请输入上述jar的执行类路径" ng-trim="true"
-               maxlength="245" ng-model="dockerPubURL" style="margin-bottom: 10px" />
+        netUrl:<input type="text" name="netUrl" id="netUrl" class="form-control" placeholder="所连接的docker网络环境标识"
+                     maxlength="245"  style="margin-bottom: 10px" />
 
-        <input type="submit" type="button" class="btn btn-info" ng-click="setDockerURL(dockerPubURL.value)" style="margin-bottom: 10px"/>
+        cm:<input type="text" name="cm" id="cm" class="form-control" placeholder="1cm-->(1cpuCore,1024MB Memory)"
+                      maxlength="245"  style="margin-bottom: 10px" />
+
+        zk:<input type="text" name="zk" id="zk" class="form-control" placeholder="storm集群所连接的zk地址"
+                  maxlength="245"  style="margin-bottom: 10px" />
+
+        uiIp:<input type="text" name="uiIp" id="uiIp" class="form-control" placeholder="storm-ui,DockerIp地址"
+                  maxlength="245"  style="margin-bottom: 10px" />
+
+        nimbusSeeds:<input type="text" name="nimbusSeeds" id="nimbusSeeds" class="form-control" placeholder="storm nimbus主节点ip地址"
+                  maxlength="245"  style="margin-bottom: 10px" />
+
+
+        <!--类执行路径<input type="text" name="launchMainClass" id="launchMainClass" class="form-control" placeholder="请输入上述jar的执行类路径" ng-trim="true"-->
+               <!--maxlength="245" ng-model="dockerPubURL" style="margin-bottom: 10px" />-->
+
+        <input type="submit" type="button" class="btn btn-info" style="margin-bottom: 10px"/>
     </form>
 
     <div ng-show="showMessage">

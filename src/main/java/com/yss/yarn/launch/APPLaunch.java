@@ -76,7 +76,7 @@ public class APPLaunch {
 
 
     private void launchApp(String appName, String queue, int amMB, String appMasterJar,
-                           String classPath,String lanchMainClass)
+                           String classPath,String lanchMainClass,Map<String,String> runenv)
             throws Exception {
 
         YarnClientApplication     client_app = _yarn.createApplication();
@@ -140,6 +140,7 @@ public class APPLaunch {
         env.put("appName", appName);
         env.put("appId", new Integer(_appId.getId()).toString());
         env.put("STORM_LOG_DIR", ApplicationConstants.LOG_DIR_EXPANSION_VAR);
+        env.putAll(runenv);
         amContainer.setEnvironment(env);
 
         // Set the necessary command to execute the application master
@@ -169,17 +170,16 @@ public class APPLaunch {
         appContext.setResource(capability);
         appContext.setAMContainerSpec(amContainer);
         appContext.setApplicationName(appName);
-
         _yarn.submitApplication(appContext);
     }
 
     public static APPLaunch launchApplication(String appName, String queue, int amMB,
                                               String appJarPath, Map<String, String> yarnConf,
-                                              String classPath,String lanchMainClass)
+                                              String classPath,String lanchMainClass,Map<String,String> runenv)
             throws Exception {
         APPLaunch appLaunch = new APPLaunch(yarnConf);
 
-        appLaunch.launchApp(appName, queue, amMB, appJarPath, classPath,lanchMainClass);
+        appLaunch.launchApp(appName, queue, amMB, appJarPath, classPath,lanchMainClass,runenv);
 
         return appLaunch;
     }
