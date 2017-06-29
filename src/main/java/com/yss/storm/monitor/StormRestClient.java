@@ -227,13 +227,8 @@ public class StormRestClient implements InitializingBean {
     private String getUIHttp() {
         try {
             logger.info("getUIHttp .... ");
-            String json = yarnThriftClient.getAllDockerJob();
-            List<FloodJobRunningState> list = JSONObject.parseArray(json,FloodJobRunningState.class);
-            for(FloodJobRunningState floodJobRunningState:list){
-                if(floodJobRunningState.getFloodJob().getBusinessTag().equals("ui")){
-                    return floodJobRunningState.getRunIp()+":9092";
-                }
-            }
+            String ui = yarnThriftClient.getStormUi();
+            return ui;
         } catch (TException e) {
             e.printStackTrace();
         }
