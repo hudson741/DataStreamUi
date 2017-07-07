@@ -23,8 +23,7 @@ public class StormPubController {
 
 
     @PostMapping("/stormdockerPub")
-    public String stormdockerPub(@RequestParam("applicationId") String applicationId,
-                                 @RequestParam("dockerIp") String dockerIp,
+    public String stormdockerPub(@RequestParam("dockerIp") String dockerIp,
                                  @RequestParam("process") String process,
                                  @RequestParam(value = "host",required=false) String host) throws Exception {
 
@@ -38,10 +37,7 @@ public class StormPubController {
             }
         }
 
-
-
-
-        yarnLaunchService.launchStormDockerComponent(applicationId,process+"-"+System.currentTimeMillis(),
+        yarnLaunchService.launchStormDockerComponent(process+"-"+System.currentTimeMillis(),
                 dockerIp,process,hostMap);
 
 

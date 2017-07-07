@@ -1,13 +1,23 @@
 package com.yss.storm.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.google.common.io.Files;
+import com.yss.util.FileUtil;
+import com.yss.yarn.controller.YarnLaunchController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import sun.rmi.runtime.Log;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Enumeration;
 
 /**
  * Project Name:DataStreamUi
@@ -20,23 +30,26 @@ import java.io.*;
 @RestController
 public class StormSDKDownloadController {
 
-    // private static final String source_directory = "/DataStreamUi/opt/download";
-    private static final String source_directory = "D:/softs/";
+    private Logger logger = LoggerFactory.getLogger(StormSDKDownloadController.class);
 
     @RequestMapping(
         value  = "/filed",
         method = RequestMethod.GET
     )
-    public String handleFileDown(@RequestParam("fileName") String fileName, HttpServletRequest request,
-                                 HttpServletResponse response) {
-        if ((null != fileName) &&!"".equals(fileName)) {
+    public String handleFileDown(@RequestParam("dir") String dir, HttpServletRequest request,
+                                 HttpServletResponse response) throws IOException {
+        if ((null != dir) &&!"".equals(dir)) {
+
+            String source_directory = FileUtil.getJarPath(StormSDKDownloadController.class) + "/"+dir;
+
 
             /* String realPath = request.getServletContext().getRealPath(source_directory); */
-            File file = new File(source_directory, fileName);
+            File file = new File(source_directory, "execute.sh");
+            System.out.println(file.length());
 
             if (file.exists()) {
                 response.setContentType("application/force-download");
-                response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
+                response.addHeader("Content-Disposition", "attachment;fileName=" + "execute.sh");
 
                 byte[]              bytes = new byte[1024];
                 FileInputStream     fis   = null;
@@ -74,7 +87,7 @@ public class StormSDKDownloadController {
                     }
                 }
             } else {
-                throw new RuntimeException("the [" + fileName + "] file is not exists");
+                throw new RuntimeException("the [" + file.getAbsolutePath() + "] file is not exists");
             }
         }
 

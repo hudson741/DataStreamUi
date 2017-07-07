@@ -18,6 +18,7 @@ package com.yss.util;
 
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.ftp.FTPFileSystem;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.yarn.api.records.LocalResource;
@@ -50,7 +51,6 @@ public class YarnUtil {
   }
 
   public static String getStormHomeInZip(FileSystem fs, Path zip, String stormVersion) throws IOException, RuntimeException {
-      logger.info("fuck  "+fs.getUri()  +"  "+zip.getName()+"   "+stormVersion);
     FSDataInputStream fsInputStream = fs.open(zip);
     ZipInputStream zipInputStream = new ZipInputStream(fsInputStream);
     ZipEntry entry = zipInputStream.getNextEntry();
@@ -70,18 +70,6 @@ public class YarnUtil {
     throw new RuntimeException("Can not find storm home entry in storm zip file.");
   }
 
-  public static LocalResource newYarnAppResource(FileSystem fs, Path path,
-      LocalResourceType type, LocalResourceVisibility vis) throws IOException {
-    Path qualified = fs.makeQualified(path);
-    FileStatus status = fs.getFileStatus(qualified);
-    LocalResource resource = Records.newRecord(LocalResource.class);
-    resource.setType(type);
-    resource.setVisibility(vis);
-    resource.setResource(ConverterUtils.getYarnUrlFromPath(qualified)); 
-    resource.setTimestamp(status.getModificationTime());
-    resource.setSize(status.getLen());
-    return resource;
-  }
 
   @SuppressWarnings("rawtypes")
   public static void rmNulls(Map map) {
@@ -129,6 +117,27 @@ public class YarnUtil {
       throws IOException {
     return YarnUtil.newYarnAppResource(fs, path, LocalResourceType.FILE,
         LocalResourceVisibility.APPLICATION);
+  }
+
+    public static LocalResource newYarnAppResource(FileSystem fs, Path path,
+                                                   LocalResourceType type, LocalResourceVisibility vis) throws IOException {
+        Path qualified = fs.makeQualified(path);
+        FileStatus status = fs.getFileStatus(qualified);
+        LocalResource resource = Records.newRecord(LocalResource.class);
+        resource.setType(type);
+        resource.setVisibility(vis);
+        resource.setResource(ConverterUtils.getYarnUrlFromPath(qualified));
+        resource.setTimestamp(status.getModificationTime());
+        resource.setSize(status.getLen());
+        return resource;
+    }
+
+
+  public static LocalResource newYarnAppResource(FTPFileSystem fs,Path path) throws IOException {
+
+      return YarnUtil.newYarnAppResource(fs, path, LocalResourceType.FILE,
+              LocalResourceVisibility.APPLICATION);
+
   }
 
   private static void CreateLogbackXML(OutputStream out) throws IOException {

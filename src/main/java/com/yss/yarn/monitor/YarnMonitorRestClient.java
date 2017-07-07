@@ -1,5 +1,7 @@
 package com.yss.yarn.monitor;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.yss.config.Conf;
 import com.yss.util.HttpUtilManager;
 import com.yss.yarn.controller.YarnLaunchController;
@@ -33,8 +35,51 @@ public class YarnMonitorRestClient {
         return "http://" + Conf.getYarnResourceUiAddress() + "/ws/v1/cluster/";
     }
 
-    public String getYarnApps(){
-        return getApiData("apps");
+    /**
+     * yarn application信息
+     * @return
+     */
+    public JSONArray getYarnApps(){
+        String jsonStr =  getApiData("apps");
+        if(StringUtils.isEmpty(jsonStr)){
+            return null;
+        }
+
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+
+        JSONObject apps =  jsonObject.getJSONObject("apps");
+
+        if(apps == null){
+            return new JSONArray();
+        }
+
+        JSONArray jsonArray =  jsonObject.getJSONObject("apps").getJSONArray("app");
+
+        for(int i=0;i<jsonArray.size();i++){
+            JSONObject jsonObject1 =  jsonArray.getJSONObject(i);
+            String state = jsonObject1.getString("state");
+            String noShowKill = state.equals("RUNNING")?"false":"true";
+            jsonObject1.put("noShowKill",noShowKill);
+        }
+        return jsonArray;
+
+
+    }
+
+    /**
+     * yarn节点信息
+     * @return
+     */
+    public String getYarnNodes(){
+        return getApiData("nodes");
+    }
+
+    /**
+     * yarn集群信息
+     * @return
+     */
+    public String getYarnCluster(){
+        return getApiData("metrics");
     }
 
     /**

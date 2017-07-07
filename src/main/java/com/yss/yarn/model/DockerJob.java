@@ -17,7 +17,7 @@ public class DockerJob implements Serializable{
 
     private String businessType;
 
-    private int state;
+    private String state;
 
     private int cpu;
 
@@ -30,6 +30,10 @@ public class DockerJob implements Serializable{
     private String iPBind;
 
     private String businessTag;
+
+    private String noShowStop;
+
+    private String noShowRestart;
 
     public String getJobId() {
         return jobId;
@@ -55,11 +59,11 @@ public class DockerJob implements Serializable{
         this.businessType = businessType;
     }
 
-    public int getState() {
+    public String getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(String state) {
         this.state = state;
     }
 
@@ -111,18 +115,40 @@ public class DockerJob implements Serializable{
         this.businessTag = businessTag;
     }
 
+    public String getNoShowRestart() {
+        return noShowRestart;
+    }
+
+    public String getNoShowStop() {
+        return noShowStop;
+    }
+
+    public void setNoShowStop(String noShowStop) {
+        this.noShowStop = noShowStop;
+    }
+
+
+    public void setNoShowRestart(String noShowRestart) {
+        this.noShowRestart = noShowRestart;
+    }
     public static DockerJob convert(FloodJobRunningState floodJobRunningState){
         DockerJob dockerJob = new DockerJob();
         dockerJob.setBusinessTag(floodJobRunningState.getFloodJob().getBusinessTag());
         dockerJob.setBusinessType(floodJobRunningState.getBusinessType());
         dockerJob.setCpu(floodJobRunningState.getFloodJob().getCpu());
         dockerJob.setDockerIp(floodJobRunningState.getFloodJob().getDockerCMD().getIp());
-        dockerJob.setState(floodJobRunningState.getState());
+        dockerJob.setState(floodJobRunningState.getRunningState().getCode());
         dockerJob.setiPBind(floodJobRunningState.getFloodJob().getNodeBind());
         dockerJob.setMemory(floodJobRunningState.getFloodJob().getMemory());
         dockerJob.setJobId(floodJobRunningState.getFloodJob().getJobId());
         dockerJob.setNetUrl(floodJobRunningState.getFloodJob().getNetUrl());
         dockerJob.setRunIp(floodJobRunningState.getRunIp());
+        dockerJob.setNoShowRestart(
+                (floodJobRunningState.getRunningState() == FloodJobRunningState.RUNNING_STATE.RUNNING
+                ||floodJobRunningState.getRunningState() == FloodJobRunningState.RUNNING_STATE.RESTARTING
+                ||floodJobRunningState.getRunningState() == FloodJobRunningState.RUNNING_STATE.WAITING
+                ) ?"true":"false");
+        dockerJob.setNoShowStop(floodJobRunningState.getRunningState() == FloodJobRunningState.RUNNING_STATE.RUNNING?"false":"true");
         return dockerJob;
     }
 

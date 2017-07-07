@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 
 import java.util.*;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
@@ -90,6 +92,9 @@ public class StormMonitorRestApiService implements StormMonitor {
     }
 
     public static Map<String, Object> toMaps(String json) {
+        if(StringUtils.isEmpty(json)){
+            return new HashMap<>();
+        }
         return JSON.parseObject(json, Map.class);
     }
 
@@ -237,6 +242,10 @@ public class StormMonitorRestApiService implements StormMonitor {
     private Map<String, Host> getHosts() {
         Map<String, Host> hosts = new TreeMap<String, Host>();
         List<Map>         sups  = (List<Map>) getSupervisorSummary().get("supervisors");
+        if(CollectionUtils.isEmpty(sups)){
+            return new HashMap<>();
+        }
+
 
         for (Map sup : sups) {
             Host host = new Host();
@@ -301,6 +310,9 @@ public class StormMonitorRestApiService implements StormMonitor {
     @Override
     public Map<String, Object> getTopologies() {
         String     topos      = stormRestClient.getTopoList();
+        if(StringUtils.isEmpty(topos)){
+            return new HashMap<>();
+        }
         JSONObject jsonObject = JSON.parseObject(topos);
         JSONArray  jsonArray  = jsonObject.getJSONArray("topologies");
 

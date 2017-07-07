@@ -17,6 +17,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.entity.StringEntity;
@@ -108,22 +109,36 @@ public class HttpUtilManager {
     }
 
     public static void main(String[] args) throws Exception {
-        String url = "http://119.29.65.85:8080/api/v1/topology/zc1495679005819-6-1495679087/rebalance/0";
+//        String url = "http://119.29.65.85:8080/api/v1/topology/zc1495679005819-6-1495679087/rebalance/0";
+//
+////      {"rebalanceOptions":{"executors":{"count":3,"spout":2},"numWorkers":3}}
+////      {"rebalanceOptions":{"numWorkers":3}}
+//        Map<String, Integer> map = new HashMap<>();
+//
+//        map.put("zcStep2", 2);
+//        map.put("zcStep1", 2);
+//
+//        String rebalance = Rebalance.getRebalanceInstanceJSONStr(3, map, null);
+//
+//        System.out.println(rebalance);
+//
+//        String data = HttpUtilManager.getInstance().requestHttpPostJSON("", url, rebalance, null);
+//
+//        System.out.println(data);
 
-//      {"rebalanceOptions":{"executors":{"count":3,"spout":2},"numWorkers":3}}
-//      {"rebalanceOptions":{"numWorkers":3}}
-        Map<String, Integer> map = new HashMap<>();
+        StringBuilder a = new StringBuilder();
 
-        map.put("zcStep2", 2);
-        map.put("zcStep1", 2);
+     for(int i =0 ;i<100;i++){
+         a.append("无双kjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj "+i+"\n");
+     }
 
-        String rebalance = Rebalance.getRebalanceInstanceJSONStr(3, map, null);
+     Map<String,String> map = new HashMap<>();
+        map.put("s",a.toString());
+        map.put("dir","fuck3");
 
-        System.out.println(rebalance);
+        HttpUtilManager.getInstance().requestHttpGet("http://","localhost:9090/filed?dir=fuck3",null,null);
 
-        String data = HttpUtilManager.getInstance().requestHttpPostJSON("", url, rebalance, null);
 
-        System.out.println(data);
     }
 
     public String httpGet(String url) throws IOException, HttpException {
@@ -268,6 +283,49 @@ public class HttpUtilManager {
         return responseData;
     }
 
+    public String requestHttpPutJSON(String url_prex, String url, String jsonStr, Map<String, String> headers)
+            throws HttpException, IOException {
+        IdleConnectionMonitor();
+        url = url_prex + url;
+
+        HttpPut method = new HttpPut(url);
+
+        method.setEntity(new StringEntity(jsonStr, Charset.forName("UTF-8")));
+        method.setConfig(requestConfig);
+        method.addHeader("Content-type", "application/json; charset=utf-8");
+        method.setHeader("Accept", "application/json");
+
+        if (headers != null) {
+            Set<String> keys = headers.keySet();
+
+            for (Iterator<String> i = keys.iterator(); i.hasNext(); ) {
+                String key = i.next();
+
+                method.addHeader(key, headers.get(key));
+            }
+        }
+
+        HttpResponse response = client.execute(method);
+        HttpEntity   entity   = response.getEntity();
+
+        if (entity == null) {
+            return "";
+        }
+
+        InputStream is           = null;
+        String      responseData = "";
+
+        try {
+            is           = entity.getContent();
+            responseData = IOUtils.toString(is, "UTF-8");
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+
+        return responseData;
+    }
 
 
     private static String readContent(InputStream in) {

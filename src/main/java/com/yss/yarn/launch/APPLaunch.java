@@ -166,7 +166,7 @@ public class APPLaunch {
 
         Resource capability = Records.newRecord(Resource.class);
 
-        capability.setMemory(amMB);
+//        capability.setMemory(amMB);
         appContext.setResource(capability);
         appContext.setAMContainerSpec(amContainer);
         appContext.setApplicationName(appName);

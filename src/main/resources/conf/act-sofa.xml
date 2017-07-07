@@ -1,0 +1,71 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+    <import resource="classpath:conf/act-properties.xml" />
+
+    <bean id="testHandler" class="com.yss.TestHandler"/>
+
+    <!--ftp  -->
+    <bean id="ftpService" class = "com.yss.ftp.FtpService">
+        <property name="addr" value="${ftpAddr}"/>
+        <property name="port" value="${ftpPort}"/>
+        <property name="userName" value="${ftpUserName}"/>
+        <property name="password" value="${ftpPassword}"/>
+    </bean>
+
+    <!-- storm相关                 -->
+
+    <bean id="stormSubmiter" class="com.yss.storm.submit.StormRemoteJarSubmiter">
+         <!--<property name="remoteZKServer" value="${zkServerHost}" />-->
+         <!--<property name="remoteZKPort" value="${zkServerPort}" />-->
+    </bean>
+
+    <bean id="stormNodesService" class="com.yss.storm.StormNodesService" />
+
+    <bean id="stormRestClient" class="com.yss.storm.monitor.StormRestClient"/>
+
+    <bean id="stormMonitorRestApiService" class="com.yss.storm.monitor.StormMonitorRestApiService"/>
+
+
+    <!-- yarn相关                 -->
+    <bean id="yarnThriftClient" class="com.yss.yarn.discovery.YarnThriftClient"/>
+
+    <bean id="yarnLaunchService" class="com.yss.yarn.launch.YarnLaunch">
+        <property name="defaultQueue" value="${yarnQueue}" />
+        <property name="classPath" value="${appMasterClassPath}" />
+        <property name="appMasterPort" value="${appMasterPort}" />
+        <property name="nimbusPort" value="${nimbusPort}" />
+        <property name="uiPort" value="${uiPort}" />
+
+    </bean>
+
+    <bean id="yarnMonitorRestClient" class="com.yss.yarn.monitor.YarnMonitorRestClient"/>
+
+    <bean id="yarnMonitorService" class="com.yss.yarn.monitor.YarnMonitorService" />
+
+    <!-- 服务发现  -->
+    <bean id="serverAddressDiscovery" class="com.yss.yarn.discovery.YarnMasterServerDiscovery"/>
+
+    <!--  thrift代理  -->
+    <bean id="ThriftClientProxy" class="com.yss.yarn.discovery.ThriftClientProxy">
+        <property name ="proxyClient">
+            <bean class="com.floodCtr.generate.StormThriftService.Client">
+                <constructor-arg index="0">
+                    <null />
+                </constructor-arg>
+            </bean>
+        </property>
+
+        <property name="factory">
+             <bean class="com.yss.yarn.discovery.StormTServiceFactory"/>
+        </property>
+    </bean>
+
+
+</beans>

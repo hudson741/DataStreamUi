@@ -17,6 +17,10 @@ public class Conf {
 
     private static volatile String YARN_RESOURCE_UI_ADDRESS ;
 
+    private static volatile String YARN_JAVA_HOME;
+
+    private static volatile String YARN_HADOOP_HOME;
+
     public static  String getSTORM_ZK() {
         return STORM_ZK;
     }
@@ -55,6 +59,22 @@ public class Conf {
 
     public static void setYarnResourceUiAddress(String yarnResourceUiAddress) {
         YARN_RESOURCE_UI_ADDRESS = yarnResourceUiAddress;
+    }
+
+    public static String getYarnJavaHome() {
+        return YARN_JAVA_HOME;
+    }
+
+    public static void setYarnJavaHome(String yarnJavaHome) {
+        YARN_JAVA_HOME = yarnJavaHome;
+    }
+
+    public static String getYarnHadoopHome() {
+        return YARN_HADOOP_HOME;
+    }
+
+    public static void setYarnHadoopHome(String yarnHadoopHome) {
+        YARN_HADOOP_HOME = yarnHadoopHome;
     }
 
 }

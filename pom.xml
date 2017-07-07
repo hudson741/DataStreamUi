@@ -17,7 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j-over-slf4j.version>1.6.6</log4j-over-slf4j.version>
     <log4j.version>2.8</log4j.version>
-    <hadoop.version>2.7.3</hadoop.version>
+    <hadoop.version>2.8.0</hadoop.version>
   </properties>
 
 
@@ -96,21 +96,10 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-        <!--<exclusion>-->
-          <!--<groupId>org.springframework.boot</groupId>-->
-          <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-        <!--</exclusion>-->
       </exclusions>
       <version>1.5.2.RELEASE</version>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>org.springframework.boot</groupId>-->
-      <!--<artifactId>spring-boot-starter-jetty</artifactId>-->
-      <!--<version>1.5.2.RELEASE</version>-->
-    <!--</dependency>-->
-
-    <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
@@ -124,11 +113,11 @@
 	</dependency>
 
     <!-- https://mvnrepository.com/artifact/org.apache.curator/curator-recipes -->
-    <dependency>
-      <groupId>org.apache.curator</groupId>
-      <artifactId>curator-recipes</artifactId>
-      <version>2.12.0</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.curator</groupId>-->
+      <!--<artifactId>curator-recipes</artifactId>-->
+      <!--<version>2.12.0</version>-->
+    <!--</dependency>-->
 
     <!-- https://mvnrepository.com/artifact/org.apache.curator/curator-framework -->
     <dependency>
@@ -145,19 +134,25 @@
     </dependency>
 
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>4.3.7.RELEASE</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.ftpserver/ftpserver-core -->
+    <dependency>
+      <groupId>org.apache.ftpserver</groupId>
+      <artifactId>ftpserver-core</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+
+    <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>bootstrap</artifactId>
         <version>3.0.3</version>
     </dependency>
-      <!-- Provided -->
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat -->
-    <!--<dependency>-->
-      <!--<groupId>org.springframework.boot</groupId>-->
-      <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-      <!--<version>1.5.2.RELEASE</version>-->
-      <!--<scope>provided</scope>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
@@ -166,42 +161,43 @@
 
     <dependency>
       <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-yarn-server-tests</artifactId>
-      <version>${hadoop.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
       <version>${hadoop.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
-      <version>${hadoop.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-yarn-client</artifactId>
       <version>${hadoop.version}</version>
-      <!--<scope>provided</scope>-->
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs -->
+
+    <!-- 如果不依赖这个，那么会报错:  No FileSystem for scheme: hdfs -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
-      <version>2.7.3</version>
+      <version>${hadoop.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.storm</groupId>
       <artifactId>storm-core</artifactId>
       <version>1.1.0</version>
-      <!--<scope>provided</scope>-->
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka_2.10 -->
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+      <version>2.4.2</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+      <version>3.2.5</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.10</artifactId>
@@ -217,6 +213,9 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+
+
 
 
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
@@ -253,27 +252,12 @@
       <version>1.5.1</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-client -->
+    <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
     <dependency>
-      <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-client</artifactId>
-      <version>1.3.1</version>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.17</version>
     </dependency>
-
-
-    <dependency>
-      <groupId>org.apache.storm</groupId>
-      <artifactId>flux-core</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-    <!-- Flux Wrappers include -->
-    <dependency>
-      <groupId>org.apache.storm</groupId>
-      <artifactId>flux-wrappers</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-
-
 
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf -->
     <dependency>

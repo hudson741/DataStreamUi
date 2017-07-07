@@ -5,23 +5,20 @@
         <input type="file" name="file" class="form-control" placeholder="127.0.0.1:9090" ng-trim="true"
                maxlength="255"  style="margin-bottom: 10px" />
 
-        appId:<input type="text" name="appName" id="appName" class="form-control" placeholder="资源调度唯一标识"
+        storm集群标识:<input type="text" name="appName" id="appName" class="form-control" placeholder="唯一区分storm集群标识"
                maxlength="245"  style="margin-bottom: 10px" />
 
 
         netUrl:<input type="text" name="netUrl" id="netUrl" class="form-control" placeholder="所连接的docker网络环境标识"
                      maxlength="245"  style="margin-bottom: 10px" />
 
-        cm:<input type="text" name="cm" id="cm" class="form-control" placeholder="1cm-->(1cpuCore,1024MB Memory)"
+        cm:<input type="text" name="cm" id="cm" class="form-control" placeholder="1cm-->(1cpuCore,2048MB Memory)"
                       maxlength="245"  style="margin-bottom: 10px" />
 
-        zk:<input type="text" name="zk" id="zk" class="form-control" placeholder="storm集群所连接的zk地址"
+        uiIp:<input type="text" name="uiIp" id="uiIp" class="form-control" placeholder="storm-ui,dockerIp.与netUrl设定有关.例: 192.168.10.5"
                   maxlength="245"  style="margin-bottom: 10px" />
 
-        uiIp:<input type="text" name="uiIp" id="uiIp" class="form-control" placeholder="storm-ui,DockerIp地址"
-                  maxlength="245"  style="margin-bottom: 10px" />
-
-        nimbusSeeds:<input type="text" name="nimbusSeeds" id="nimbusSeeds" class="form-control" placeholder="storm nimbus主节点ip地址"
+        nimbusSeeds:<input type="text" name="nimbusSeeds" id="nimbusSeeds" class="form-control" placeholder="storm nimbus主节点dockerIp地址，与netUrl设定有关.例：192.168.10.3,192.168.10.4"
                   maxlength="245"  style="margin-bottom: 10px" />
 
 

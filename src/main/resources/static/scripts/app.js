@@ -21,13 +21,13 @@ app.run(function ($rootScope, $routeParams, $anchorScroll, $location) {
 function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
-      {tabName: "总览", tabId: "总览", tabLink: "/overview"},
+      {tabName: "settings", tabId: "settings", tabLink: "/conf"},
+      {tabName: "资源监控", tabId: "资源监控", tabLink: "/yarnindex"},
+      {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
+      {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
+      {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
       {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
-      {tabName: "conf", tabId: "conf", tabLink: "/conf"},
-      {tabName: "yarn", tabId: "yarn", tabLink: "/yarnindex"},
-      {tabName: "storm集群设置", tabId: "storm集群设置", tabLink: "/dockerPub"},
-      {tabName: "stormDocker组件发布", tabId: "stormDocker组件发布", tabLink: "/stormPub"},
-      {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
+      // {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
@@ -38,16 +38,17 @@ function defaultFail($scope) {
 }
 
 
+
 function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
-      {tabName: "总览", tabId: "总览", tabLink: "/overview"},
+      {tabName: "settings", tabId: "settings", tabLink: "/conf"},
+      {tabName: "资源监控", tabId: "资源监控", tabLink: "/yarnindex"},
+      {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
+      {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
+      {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
       {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
-      {tabName: "conf", tabId: "conf", tabLink: "/conf"},
-      {tabName: "yarn", tabId: "yarn", tabLink: "/yarnindex"},
-      {tabName: "storm集群设置", tabId: "storm集群设置", tabLink: "/dockerPub"},
-      {tabName: "stormDocker组件发布", tabId: "stormDocker组件发布", tabLink: "/stormPub"},
-      {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
+      // {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
@@ -106,7 +107,17 @@ app.factory('client', ['$http', function ($http) {
     },
     fileu: function (newStormRestHost, callback, failcallback) {
       request('fileu').success(callback).error(failcallback);
+    },
+    yarnRestart: function (jobId,callback,failcallback) {
+      request('yarnRestart?jobId=' + jobId).success(callback).error(failcallback);
+    },
+    yarnKillApp: function (appId,callback,failcallback) {
+      request('yarnKillApp?appId=' + appId).success(callback).error(failcallback);
+    },
+    yarnStopDockerJob: function (jobId,callback,failcallback) {
+        request('yarnStopDockerJob?jobId=' + jobId).success(callback).error(failcallback);
     }
+
   };
 }]);
 

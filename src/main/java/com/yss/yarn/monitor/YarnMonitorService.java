@@ -8,7 +8,9 @@ import com.yss.yarn.discovery.YarnMasterServerDiscovery;
 import com.yss.yarn.discovery.YarnThriftClient;
 import com.yss.yarn.model.DockerJob;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.storm.security.auth.ThriftClient;
+import org.apache.storm.shade.cheshire.generate.JSONable;
 import org.apache.thrift.TException;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +32,62 @@ public class YarnMonitorService {
     @Autowired
     private YarnThriftClient yarnThriftClient;
 
-    public Map<String,Object> getApps(){
-        String data = yarnMonitorRestClient.getYarnApps();
+    public JSONArray getApps(){
+        JSONArray jsonArray = yarnMonitorRestClient.getYarnApps();
+        return jsonArray;
+
+    }
+
+    public Map<String,Object> getNodes(){
+        String data = yarnMonitorRestClient.getYarnNodes();
         return toMaps(data);
+    }
+
+    public JSONObject getCluster(){
+        String data = yarnMonitorRestClient.getYarnCluster();
+        if(StringUtils.isEmpty(data)){
+            return null;
+        }
+
+        JSONObject jsonObject = JSONObject.parseObject(data);
+
+        JSONObject cluster = jsonObject.getJSONObject("clusterMetrics");
+
+        int allocatedMB = cluster.getInteger("allocatedMB");
+
+        int totalMB = cluster.getInteger("totalMB");
+
+        cluster.put("allocateGB",allocatedMB/1000);
+        cluster.put("totalGB",totalMB/1000);
+
+        return cluster;
     }
 
     public  List<DockerJob> getDockerJobs(){
         return yarnThriftClient.getDockerJobs();
     }
 
+    public String yarnRestart(String jobId){
+        try {
+            return yarnThriftClient.restartDocker(jobId);
+        } catch (TException e) {
+           return "请刷新配置";
+        }
+    }
+
+    public String killApp(String appId){
+            return yarnThriftClient.killApplication(appId);
+    }
+
+    public String stopDockerJob(String jobId){
+            return yarnThriftClient.stopDocker(jobId);
+    }
+
 
     public static Map<String, Object> toMaps(String json) {
+        if(StringUtils.isEmpty(json)){
+            return new HashMap<>();
+        }
         return JSON.parseObject(json, Map.class);
     }
 

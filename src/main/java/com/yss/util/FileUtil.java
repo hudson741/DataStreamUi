@@ -6,9 +6,12 @@ import java.io.InputStream;
 
 import java.net.URI;
 
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +97,45 @@ public class FileUtil {
             return path.toUri();
         } catch (IOException e) {
             throw new Exception("Failed to store file " + file.getOriginalFilename(), e);
+        }
+    }
+
+    public static String getJarPath(Class<?> my_class) throws IOException {
+        ClassLoader loader     = my_class.getClassLoader();
+        String      class_file = my_class.getName().replaceAll("\\.", "/") + ".class";
+
+        for (Enumeration<URL> itr = loader.getResources(class_file); itr.hasMoreElements(); ) {
+            URL url = itr.nextElement();
+
+            if ("jar".equals(url.getProtocol())) {
+                String toReturn = url.getPath();
+
+                toReturn = toReturn.replaceAll("\\+", "%2B");
+                toReturn = URLDecoder.decode(toReturn, "UTF-8");
+
+                String returnP = toReturn.replaceAll("!.*$", "");
+
+                return new File(returnP).getParent().replace("file:", "");
+
+            }
+        }
+
+        File   file = new File(loader.getResource(class_file).getFile());
+        String pro  = System.getProperty("user.dir");
+
+        while (true) {
+            if (file.exists() && file.getAbsolutePath().endsWith(pro)) {
+                return file.getAbsolutePath().replace("file:", "");
+            } else {
+                File file1 = file;
+
+                file = new File(file1.getParent());
+                logger.info("hudson " + file.getAbsolutePath());
+
+                if (!file.exists()) {
+                    return null;
+                }
+            }
         }
     }
 

@@ -1,60 +1,242 @@
 package com.yss.yarn.launch;
 
 import java.io.File;
+import java.io.FileInputStream;
+
 import java.io.IOException;
-
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import com.yss.config.Conf;
+import com.yss.util.YarnUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.service.Service;
+import org.apache.hadoop.yarn.api.ApplicationConstants;
+import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponse;
+import org.apache.hadoop.yarn.api.records.*;
+import org.apache.hadoop.yarn.client.api.YarnClient;
+import org.apache.hadoop.yarn.client.api.YarnClientApplication;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.apache.hadoop.yarn.util.Apps;
+import org.apache.hadoop.yarn.util.Records;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.floodCtr.generate.FloodContrThriftService;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
+
+import com.google.common.collect.Lists;
+
+import com.yss.config.Conf;
+import com.yss.ftp.FtpService;
+import com.yss.storm.StormNodesService;
+import com.yss.storm.node.NimbusNode;
 import com.yss.util.FileUtil;
 import com.yss.yarn.Exception.JarNotExsitsException;
 import com.yss.yarn.controller.YarnLaunchController;
+import com.yss.yarn.discovery.YarnThriftClient;
 
 /**
  * @Description
  * @author: zhangchi
  * @Date: 2017/6/20
  */
-public class YarnLaunch implements YarnLaunchService {
-    private Logger              logger        = LoggerFactory.getLogger(YarnLaunchService.class);
-    private int                 appMasterPort = 9000;
-    private String              appName;
-    private String              defaultQueue;
-    private int                 amSize;
-    private String              classPath;
-//    private Map<String, String> yarnConf;
-    private String              remoteAPPMasterHost;
-    private int nimbusPort = 9005;
-    private int uiPort = 9002;
+public class YarnLaunch implements YarnLaunchService, InitializingBean {
+    private Logger            logger        = LoggerFactory.getLogger(YarnLaunch.class);
+    private int               appMasterPort ;
+    private int               nimbusPort   ;
+    private int               uiPort        ;
+    private YarnClient        yarnClient;
+    private YarnConfiguration yarnConf;
+    private String            defaultQueue;
+    private String            classPath;
+    @Autowired
+    private YarnThriftClient  yarnThriftClient;
+    @Autowired
+    private StormNodesService stormNodesService;
+    @Autowired
+    private FtpService        ftpService;
 
-    private Map<String,String> getYarnConf(){
-        Map<String,String> map = new HashMap<>();
-        map.put("fs.defaultFS", Conf.getFS_DEFAULT_FS());
-        map.put("yarn.resourcemanager.address",Conf.getYARN_RESOURCEMANAGER_ADDREES());
-        map.put("yarn.resourcemanager.scheduler.address",Conf.getYARN_RESOURCEMANAGER_SCHEDULER_ADDRESS());
-        return map;
+    @Override
+    public void afterPropertiesSet() throws Exception {
+    }
+
+    private String buildNimbusHostsArrays() {
+        List<NimbusNode> list = stormNodesService.getNimbusNodeList();
+
+        if (CollectionUtils.isEmpty(list)) {
+            throw new RuntimeException("请刷新配置");
+        }
+
+        List<String> nimbusSeedsList = Lists.newArrayList();
+
+        for (NimbusNode nimbusNode : list) {
+            nimbusSeedsList.add(nimbusNode.getDockerIp());
+        }
+
+        String nimbusSeedsArray = "[";
+
+        for (Object nimbus : nimbusSeedsList) {
+            nimbusSeedsArray = nimbusSeedsArray + "\\\"" + nimbus + "\\\"" + ",";
+        }
+
+        nimbusSeedsArray = nimbusSeedsArray.substring(0, nimbusSeedsArray.length() - 1) + "]";
+
+        return nimbusSeedsArray;
+    }
+
+    private String buildZkHostsArrays(String zk) {
+
+        // 调用服务
+        String       zkHostsArrays = "[";
+        List<String> zkList        = Lists.newArrayList();
+        String[]     zkArray       = zk.split(",");
+
+        for (String zkHost : zkArray) {
+            zkList.add(zkHost);
+        }
+
+        for (Object zkHost : zkList) {
+            zkHostsArrays = zkHostsArrays + "\\\"" + zkHost + "\\\" ";
+        }
+
+        zkHostsArrays = zkHostsArrays.substring(0, zkHostsArrays.length() - 1) + "]";
+
+        return zkHostsArrays;
+    }
+
+    /**
+     * 将文件写入yarn依赖的底层FTP存储系统，再封装成localResource给yarn使用
+     * @param appHome
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    private LocalResource writeReturnFTPLocalResources(String appHome,File file) throws IOException, URISyntaxException {
+        long size = file.length();
+
+        ftpService.upload(appHome, file);
+
+        long          timeStamp     = ftpService.getFtpFileTimeStamp(Path.SEPARATOR +appHome + Path.SEPARATOR  + file.getName());
+        LocalResource localResource = LocalResource.newInstance(
+                org.apache.hadoop.yarn.api.records.URL.fromURI(
+                        new URI(ftpService.getRemoteFtpServerAddress()+Path.SEPARATOR +appHome+Path.SEPARATOR +file.getName())),
+                LocalResourceType.FILE,
+                LocalResourceVisibility.APPLICATION,
+                size,
+                timeStamp);
+        return localResource;
+
+    }
+
+
+    /**
+     * 将文件写入yarn依赖的底层HDFS存储系统，再封装成localResource给yarn使用
+     * @param appHome
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    private LocalResource writeReturnHDFSLocalResources(String appHome,File file) throws IOException {
+        FileSystem fs      = FileSystem.get(yarnConf);
+        Path src     = new Path(file.getPath());
+        Path       dst     = new Path(fs.getHomeDirectory(), appHome + Path.SEPARATOR + file.getName());
+        fs.copyFromLocalFile(false, true, src, dst);
+        return  YarnUtil.newYarnAppResource(fs, dst);
+
+    }
+
+    private void launch(String appName, String appMasterJar, String lanchMainClass,
+                        Map<String, String> runenv)
+            throws Exception {
+        String hadoopHome = Conf.getYarnHadoopHome();
+        this.classPath = classPath.replaceAll("HADOOP_HOME", hadoopHome);
+        YarnClientApplication        client_app = yarnClient.createApplication();
+        GetNewApplicationResponse    app        = client_app.getNewApplicationResponse();
+        ApplicationId                appId      = app.getApplicationId();
+        ApplicationSubmissionContext appContext = Records.newRecord(ApplicationSubmissionContext.class);
+
+        appContext.setApplicationId(app.getApplicationId());
+        appContext.setApplicationName(appName);
+        appContext.setQueue(defaultQueue);
+
+        ContainerLaunchContext     amContainer    = Records.newRecord(ContainerLaunchContext.class);
+        Map<String, LocalResource> localResources = new HashMap<String, LocalResource>();
+
+        logger.info("Copy App Master jar from local filesystem and add to local environment");
+        logger.info("fuck  " + appMasterJar);
+
+        File file = new File(appMasterJar);
+        String     appHome = YarnUtil.getApplicationHomeForId(appId.toString());
+        LocalResource localResource = null;
+
+        String FS_SYSTEM = Conf.getFS_DEFAULT_FS();
+        String fs = null;
+        Map<String, String> env = new HashMap<String, String>();
+
+        if(FS_SYSTEM.startsWith("hdfs")){
+             localResource = writeReturnHDFSLocalResources(appHome,file);
+             fs = "hdfs";
+        }else if(FS_SYSTEM.startsWith("ftp")){
+             localResource = writeReturnFTPLocalResources(appHome,file);
+             fs="ftp";
+             env.put("ftpAddr",ftpService.getAddr());
+             env.put("ftpPort",ftpService.getPort());
+             env.put("ftpUserName",ftpService.getUserName());
+             env.put("ftpPassword",ftpService.getPassword());
+        }
+
+        localResources.put(file.getName(), localResource);
+        amContainer.setLocalResources(localResources);
+        logger.info("Set the environment for the application master");
+
+
+
+        List<String> yarn_classpath_cmd = java.util.Arrays.asList("yarn", "classpath");
+
+        logger.info("YARN CLASSPATH COMMAND = [" + yarn_classpath_cmd + "]");
+
+        String yarn_class_path = classPath;
+        Apps.addToEnvironment(env, ApplicationConstants.Environment.CLASSPATH.name(), "./"+file.getName());
+        Apps.addToEnvironment(env, ApplicationConstants.Environment.CLASSPATH.name(), yarn_class_path);
+        logger.info("YARN CLASSPATH = [" + yarn_class_path + "]");
+        env.put("appName", appName);
+        env.put("fs",fs);
+        env.put("appId", new Integer(appId.getId()).toString());
+        env.putAll(runenv);
+        amContainer.setEnvironment(env);
+
+        Vector<String> vargs = new Vector<String>();
+
+        vargs.add(Conf.getYarnJavaHome() + "/bin/java");
+        vargs.add("-Dlogfile.name=" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/master.log");
+        vargs.add(lanchMainClass);
+        vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout");
+        vargs.add("2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr");
+        logger.info("Setting up app master command:" + vargs);
+        amContainer.setCommands(vargs);
+
+        Resource capability = Resource.newInstance(1000,1);
+        appContext.setResource(capability);
+        appContext.setAMContainerSpec(amContainer);
+        appContext.setApplicationName(appName);
+        yarnClient.submitApplication(appContext);
     }
 
     @Override
-    public void launchApp(String appName,Map<String,String> env) throws Exception {
+    public void launchApp(String appName, Map<String, String> env)
+            throws Exception {
         URL    jarPathUrl = com.google.common.io.Resources.getResource("FloodContrYu-1.0-release.jar");
         String jarPath    = jarPathUrl.getPath();
 
@@ -62,111 +244,94 @@ public class YarnLaunch implements YarnLaunchService {
             throw new JarNotExsitsException("需要指定运行的jar不存在");
         }
 
-        String targetPath = getJarPath(YarnLaunchController.class) + "/dockerpubjar";
+        String targetPath = FileUtil.getJarPath(YarnLaunchController.class) + "/dockerpubjar";
 
         targetPath = targetPath.replace("file:", "");
 
-        String target = FileUtil.copy(jarPathUrl.openStream(), targetPath, "FloodContrYu-1.0-release.jar");
+        String targetFilePath = FileUtil.copy(jarPathUrl.openStream(), targetPath, "FloodContrYu-1.0-release.jar");
 
-        APPLaunch.launchApplication(appName,
-                                    defaultQueue,
-                                    amSize,
-                                    target,
-                                    getYarnConf(),
-                                    classPath,
-                                    "com.floodCtr.storm.MasterServer",
-                                    env);
+        launch(appName, targetFilePath, "com.floodCtr.storm.MasterServer", env);
     }
 
     @Override
-    public void launchApp(String path, String appName, Map<String, String> env) throws Exception {
-        URL    jarPathUrl = new File(path).toURL();
-        String jarPath    = jarPathUrl.getPath();
-
-        if (StringUtils.isEmpty(jarPath)) {
-            throw new JarNotExsitsException("需要指定运行的jar不存在");
-        }
-
-        String targetPath = getJarPath(YarnLaunchController.class) + "/dockerpubjar";
-
-        targetPath = targetPath.replace("file:", "");
-
-        String target = FileUtil.copy(jarPathUrl.openStream(), targetPath, "FloodContrYu-1.0-release.jar");
-
-        APPLaunch.launchApplication(appName,
-                defaultQueue,
-                amSize,
-                target,
-                getYarnConf(),
-                classPath,
-                "com.floodCtr.storm.MasterServer",
-                env);
-    }
-
-    public void launchApp(String path, String jarName, String hdfsUrl, String yarnUrl, String lanchMainClass,Map<String,String> env)
+    public void launchApp(String jarSourcePath, String appName,
+                          Map<String, String> env)
             throws Exception {
-        URL    jarPathUrl = new File(path).toURL();
-        String jarPath    = jarPathUrl.getPath();
+        logger.info("hadoop class path is " + this.classPath);
+        File   sourceJar = new File(jarSourcePath);
+        String jarPath   = sourceJar.getPath();
 
         if (StringUtils.isEmpty(jarPath)) {
             throw new JarNotExsitsException("需要指定运行的jar不存在");
         }
 
-        String targetPath = getJarPath(YarnLaunchController.class) + "/dockerpubjar";
+        String targetPath = FileUtil.getJarPath(YarnLaunchController.class) + "/dockerpubjar";
 
-        targetPath = targetPath.replace("file:", "");
 
-        String              target   = FileUtil.copy(jarPathUrl.openStream(), targetPath, jarName);
-        Map<String, String> yarnConf = new HashMap<>();
+        String target = FileUtil.copy(new FileInputStream(sourceJar), targetPath, sourceJar.getName());
 
-        yarnConf.put("fs.defaultFS", hdfsUrl);
-        yarnConf.put("yarn.resourcemanager.address", yarnUrl);
-        APPLaunch.launchApplication(appName, defaultQueue, amSize, target, yarnConf, classPath, lanchMainClass,env);
+        launch(appName, target, "com.floodCtr.storm.MasterServer", env);
     }
 
     @Override
-    public void launchStormDockerComponent(String appName,String containerName, String dockerIp, String process,
+    public void launchStormDockerComponent(String containerName, String dockerIp, String process,
                                            Map<String, String> host) {
-        TTransport transport = new TSocket(appName, appMasterPort);
-
         try {
-            transport.open();
 
-            // 协议层
-            TProtocol protocol = new TBinaryProtocol(transport);
-
-            // 创建RPC客户端
-            FloodContrThriftService.Client client = new FloodContrThriftService.Client(protocol);
             // 调用服务
+            String              dockerArgs = "storm " + process + " -c nimbus.thrift.port=" + nimbusPort
+                                             + " -c ui.port=" + uiPort;
+            Map<String, String> port       = new HashMap<>();
 
-            String dockerArgs = "storm " + process + " -c nimbus.thrift.port="+nimbusPort+" -c ui.port="+uiPort;
-            Map<String, String> port = new HashMap<>();
-
-            port.put(uiPort + "", uiPort + "");
-
+//          port.put(uiPort + "", uiPort + "");
             if (process.equals("nimbus")) {
                 port.put(nimbusPort + "", nimbusPort + "");
             } else if (process.equals("ui")) {
                 port.put(uiPort + "", uiPort + "");
             }
 
-            client.addDockerComponent("storm", containerName, dockerIp, dockerArgs, "192.168.10.8", host, port);
+            if (StringUtils.isEmpty(Conf.getSTORM_ZK())) {
+                return;
+            }
 
-            // 关闭通道
-            transport.close();
+            String zkHostsArrays = buildZkHostsArrays(Conf.getSTORM_ZK());
+
+            dockerArgs = dockerArgs + " -c storm.zookeeper.servers=" + zkHostsArrays;
+
+            String nimbusSeedsArray = buildNimbusHostsArrays();
+
+            dockerArgs = dockerArgs + " -c nimbus.seeds=" + nimbusSeedsArray;
+            yarnThriftClient.addDockerComponent("storm",
+                                                containerName,
+                                                null,
+                                                dockerIp,
+                                                process,
+                                                null,
+                                                dockerArgs,
+                                                null,
+                                                host,
+                                                port);
         } catch (TTransportException e) {
-            e.printStackTrace();
+            logger.error("error ", e);
         } catch (TException e) {
-            e.printStackTrace();
+            logger.error("error ", e);
         }
     }
 
-    public int getAmSize() {
-        return amSize;
-    }
+    public void refresh() {
+        if ((yarnClient != null) && yarnClient.isInState(Service.STATE.STARTED)) {
+            yarnClient.stop();
+        }
+        Configuration conf =  new Configuration();
+        conf.set("fs.defaultFS", Conf.getFS_DEFAULT_FS());
+        conf.set("yarn.resourcemanager.address", Conf.getYARN_RESOURCEMANAGER_ADDREES());
+        conf.set("yarn.resourcemanager.scheduler.address", Conf.getYARN_RESOURCEMANAGER_SCHEDULER_ADDRESS());
 
-    public void setAmSize(int amSize) {
-        this.amSize = amSize;
+        yarnConf   = new YarnConfiguration(conf);
+
+        yarnClient = YarnClient.createYarnClient();
+        yarnClient.init(yarnConf);
+        yarnClient.start();
     }
 
     public int getAppMasterPort() {
@@ -175,14 +340,6 @@ public class YarnLaunch implements YarnLaunchService {
 
     public void setAppMasterPort(int appMasterPort) {
         this.appMasterPort = appMasterPort;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
     }
 
     public String getClassPath() {
@@ -201,61 +358,6 @@ public class YarnLaunch implements YarnLaunchService {
         this.defaultQueue = defaultQueue;
     }
 
-    private String getJarPath(Class<?> my_class) throws IOException {
-        ClassLoader loader     = my_class.getClassLoader();
-        String      class_file = my_class.getName().replaceAll("\\.", "/") + ".class";
-
-        for (Enumeration<URL> itr = loader.getResources(class_file); itr.hasMoreElements(); ) {
-            URL url = itr.nextElement();
-
-            if ("jar".equals(url.getProtocol())) {
-                String toReturn = url.getPath();
-
-                toReturn = toReturn.replaceAll("\\+", "%2B");
-                toReturn = URLDecoder.decode(toReturn, "UTF-8");
-
-                String returnP = toReturn.replaceAll("!.*$", "");
-
-                return new File(returnP).getParent();
-            }
-        }
-
-        File   file = new File(loader.getResource(class_file).getFile());
-        String pro  = System.getProperty("user.dir");
-
-        while (true) {
-            if (file.exists() && file.getAbsolutePath().endsWith(pro)) {
-                return file.getAbsolutePath();
-            } else {
-                File file1 = file;
-
-                file = new File(file1.getParent());
-                logger.info("hudson " + file.getAbsolutePath());
-
-                if (!file.exists()) {
-                    return null;
-                }
-            }
-        }
-    }
-
-    public String getRemoteAPPMasterHost() {
-        return remoteAPPMasterHost;
-    }
-
-    public void setRemoteAPPMasterHost(String remoteAPPMasterHost) {
-        this.remoteAPPMasterHost = remoteAPPMasterHost;
-    }
-
-//    public Map<String, String> getYarnConf() {
-//        return yarnConf;
-//    }
-//
-//    public void setYarnConf(Map<String, String> yarnConf) {
-//        this.yarnConf = yarnConf;
-//    }
-
-
     public int getNimbusPort() {
         return nimbusPort;
     }
@@ -271,4 +373,5 @@ public class YarnLaunch implements YarnLaunchService {
     public void setUiPort(int uiPort) {
         this.uiPort = uiPort;
     }
+
 }

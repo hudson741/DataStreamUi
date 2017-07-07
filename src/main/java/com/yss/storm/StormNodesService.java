@@ -14,6 +14,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.RetryUntilElapsed;
 
 import org.apache.thrift.TException;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import com.yss.storm.node.UiNode;
  * Created by zhangchi on 2017/5/17.
  */
 public class StormNodesService {
+    public final static String                    STORM_INIT_PATH = "/storm";
     public final static String                    STORM_NIMBUS_HOSTS = "/storm/nimbuses";
     private Logger                                logger             = LoggerFactory.getLogger(StormNodesService.class);
     private List<String>                          nimbusHosts        = Lists.newArrayList();
@@ -64,7 +66,7 @@ public class StormNodesService {
                                           });
     }
 
-    public void updateCuratorFrameWork() throws Exception {
+    public void refresh() throws Exception {
         try {
             if (curatorFramework != null) {
                 curatorFramework.close();
@@ -80,6 +82,34 @@ public class StormNodesService {
             }
         } catch (Exception e) {
             logger.error("error ", e);
+        }
+    }
+
+    public static void main(String[] args){
+
+        CuratorFramework curatorFramework;
+        try {
+                RetryUntilElapsed retryUntilElapsed = new RetryUntilElapsed(20000, 100);
+
+                curatorFramework = CuratorFrameworkFactory.newClient("123.207.8.134" + ":" + "2181",
+                        retryUntilElapsed);
+                curatorFramework.start();
+                Stat stat = curatorFramework.checkExists().forPath(STORM_INIT_PATH);
+                if(stat!=null) {
+                    curatorFramework.delete().deletingChildrenIfNeeded().forPath(STORM_INIT_PATH);
+                }
+
+//            }
+        } catch (Exception e) {
+            e.printStackTrace();
+//            logger.error("error ", e);
+        }
+    }
+
+    public void clearStorm() throws Exception {
+        Stat stat = curatorFramework.checkExists().forPath(STORM_INIT_PATH);
+        if(stat!=null) {
+            curatorFramework.delete().deletingChildrenIfNeeded().forPath(STORM_INIT_PATH);
         }
     }
 
@@ -101,12 +131,12 @@ public class StormNodesService {
             List<String> array = JSONObject.parseArray(json,String.class);
             for(String nimbusNode:array){
                 String[] nimbus = nimbusNode.split(":");
-                NimbusNode nimbusNode1 = new NimbusNode(nimbus[1],nimbus[0],Integer.parseInt(nimbus[2]));
+                NimbusNode nimbusNode1 = new NimbusNode(nimbus[0],nimbus[1],nimbus[2],Integer.parseInt(nimbus[3]));
                 list.add(nimbusNode1);
             }
 
         } catch (TException e) {
-            e.printStackTrace();
+          logger.error("error ",e);
         }
         return list;
     }

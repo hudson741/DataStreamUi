@@ -102,7 +102,7 @@ public class StormRestClient implements InitializingBean {
      */
     private String getApiData(String url) {
         if(getApiBase() == null){
-            return JSONObject.toJSONString(Lists.newArrayList());
+            return null;
         }
         try {
             return HttpUtilManager.getInstance().httpGet(getApiBase()+url);
@@ -124,6 +124,9 @@ public class StormRestClient implements InitializingBean {
      */
     private String getApiDataPost(String url, Map<String, String> params) {
         try {
+            if(getApiBase() == null){
+                return null;
+            }
             return HttpUtilManager.getInstance().requestHttpPost(getApiBase(), url, params, null);
         } catch (Exception e) {}
 
@@ -137,6 +140,9 @@ public class StormRestClient implements InitializingBean {
      */
     private String getApiDataPostJson(String url, String jsonStr) {
         try {
+            if(getApiBase() == null){
+                return null;
+            }
             return HttpUtilManager.getInstance().requestHttpPostJSON(getApiBase(), url, jsonStr, null);
         } catch (Exception e) {}
 
@@ -228,6 +234,7 @@ public class StormRestClient implements InitializingBean {
         try {
             logger.info("getUIHttp .... ");
             String ui = yarnThriftClient.getStormUi();
+            logger.info("ui is "+ui);
             return ui;
         } catch (TException e) {
             e.printStackTrace();
