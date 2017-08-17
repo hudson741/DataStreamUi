@@ -2,8 +2,8 @@
 /.project
 /.settings/
 *.iml
-*.idea*
-target/*
+.idea/
+target/
 log4j.log*
 /.classpath
 /.project
