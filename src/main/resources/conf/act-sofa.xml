@@ -9,15 +9,18 @@
 
     <import resource="classpath:conf/act-properties.xml" />
 
-    <bean id="testHandler" class="com.yss.TestHandler"/>
-
-    <!--ftp  -->
-    <bean id="ftpService" class = "com.yss.ftp.FtpService">
-        <property name="addr" value="${ftpAddr}"/>
-        <property name="port" value="${ftpPort}"/>
-        <property name="userName" value="${ftpUserName}"/>
-        <property name="password" value="${ftpPassword}"/>
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:application.properties</value>
+            </list>
+        </property>
     </bean>
+
+    <bean class="com.yss.spark.common.InitDatabase"></bean>
+
+
+
 
     <!-- storm相关                 -->
 

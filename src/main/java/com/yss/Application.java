@@ -2,6 +2,7 @@ package com.yss;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,6 +22,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 //@ImportResource(value = { "classpath:conf/applicationContext-*.xml", "classpath*:conf/applicationContext-config" })
 @ImportResource(value = { "classpath:conf/act-sofa.xml"})
 @ComponentScan(basePackages = { "com.yss" })
+@MapperScan("com.yss.spark.persistence.mapper")
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
     @Override

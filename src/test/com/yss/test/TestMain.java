@@ -1,4 +1,4 @@
-package com.yss;
+package com.yss.test;
 
 import java.io.File;
 import java.net.InetAddress;

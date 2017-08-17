@@ -64,8 +64,8 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
     private YarnThriftClient  yarnThriftClient;
     @Autowired
     private StormNodesService stormNodesService;
-    @Autowired
-    private FtpService        ftpService;
+//    @Autowired
+//    private FtpService        ftpService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -126,17 +126,18 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
     private LocalResource writeReturnFTPLocalResources(String appHome,File file) throws IOException, URISyntaxException {
         long size = file.length();
 
-        ftpService.upload(appHome, file);
+//        ftpService.upload(appHome, file);
 
-        long          timeStamp     = ftpService.getFtpFileTimeStamp(Path.SEPARATOR +appHome + Path.SEPARATOR  + file.getName());
-        LocalResource localResource = LocalResource.newInstance(
-                org.apache.hadoop.yarn.api.records.URL.fromURI(
-                        new URI(ftpService.getRemoteFtpServerAddress()+Path.SEPARATOR +appHome+Path.SEPARATOR +file.getName())),
-                LocalResourceType.FILE,
-                LocalResourceVisibility.APPLICATION,
-                size,
-                timeStamp);
-        return localResource;
+//        long          timeStamp     = ftpService.getFtpFileTimeStamp(Path.SEPARATOR +appHome + Path.SEPARATOR  + file.getName());
+//        LocalResource localResource = LocalResource.newInstance(
+//                org.apache.hadoop.yarn.api.records.URL.fromURI(
+//                        new URI(ftpService.getRemoteFtpServerAddress()+Path.SEPARATOR +appHome+Path.SEPARATOR +file.getName())),
+//                LocalResourceType.FILE,
+//                LocalResourceVisibility.APPLICATION,
+//                size,
+//                timeStamp);
+//        return localResource;
+        return null;
 
     }
 
@@ -191,10 +192,10 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         }else if(FS_SYSTEM.startsWith("ftp")){
              localResource = writeReturnFTPLocalResources(appHome,file);
              fs="ftp";
-             env.put("ftpAddr",ftpService.getAddr());
-             env.put("ftpPort",ftpService.getPort());
-             env.put("ftpUserName",ftpService.getUserName());
-             env.put("ftpPassword",ftpService.getPassword());
+//             env.put("ftpAddr",ftpService.getAddr());
+//             env.put("ftpPort",ftpService.getPort());
+//             env.put("ftpUserName",ftpService.getUserName());
+//             env.put("ftpPassword",ftpService.getPassword());
         }
 
         localResources.put(file.getName(), localResource);

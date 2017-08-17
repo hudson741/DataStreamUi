@@ -15,7 +15,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.yss.TestHandler;
 import com.yss.storm.StormNodesService;
 import com.yss.storm.monitor.StormMonitorRestApiService;
 import com.yss.storm.node.NimbusNode;
@@ -33,8 +32,7 @@ public class StormTopologySubmitController {
     private StormNodesService          stormNodesService;
     @Autowired
     private StormMonitorRestApiService stormMonitorRestApiService;
-    @Autowired
-    private TestHandler                testHandler;
+
 
     @PostMapping("/fileu")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) throws Exception {
@@ -57,12 +55,7 @@ public class StormTopologySubmitController {
         return com.alibaba.fastjson.JSONObject.toJSONString(list);
     }
 
-    @GetMapping(value = "/test2")
-    public String printHello(ModelMap model) {
-        testHandler.say();
 
-        return "index1";
-    }
 
     @RequestMapping("/test")
     public String getJar(@RequestParam("code") String id) {

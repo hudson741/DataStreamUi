@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lcw.dao.LogEntityMapper">
+  <resultMap id="BaseResultMap" type="com.yss.spark.persistence.entity.LogEntity">
+    <id column="log_id" jdbcType="INTEGER" property="logId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="action" jdbcType="VARCHAR" property="action" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    log_id, user_id, user_name, ip, action
+  </sql>
+
+  <insert id="insert" parameterType="com.yss.spark.persistence.entity.LogEntity">
+    insert into operation_log (user_id, user_name,
+    ip, action)
+    values ( #{userId,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR},
+    #{ip,jdbcType=VARCHAR}, #{action,jdbcType=VARCHAR})
+  </insert>
+
+</mapper>
