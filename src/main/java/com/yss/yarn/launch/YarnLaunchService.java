@@ -24,7 +24,7 @@ public interface YarnLaunchService {
     /**
      * 发布storm
      */
-    void launchStormDockerComponent(String containerName, String dockerIp, String process, Map<String, String> host);
+    void launchStormDockerComponent(String containerName, String dockerIp, String process, String node,Map<String, String> host);
 
     /**
      * 更新

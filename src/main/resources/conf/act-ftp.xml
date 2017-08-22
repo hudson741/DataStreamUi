@@ -9,11 +9,7 @@
     <import resource="classpath:conf/act-properties.xml" />
 
     <!--ftp  -->
-    <bean id="ftpServer" class = "com.yss.ftp.SofaFtpServer">
-        <constructor-arg name="serverPort" value="${ftpPort}"/>
-        <constructor-arg name="userName" value="${ftpUserName}"/>
-        <constructor-arg name="password" value="${ftpPassword}"/>
-    </bean>
+    <bean id="ftpServer" class = "com.yss.ftp.SofaFtpServer"/>
 
 
 </beans>

@@ -10,6 +10,8 @@ import java.net.URL;
 
 import java.util.*;
 
+import com.floodCtr.generate.FloodJob;
+import com.yss.util.PropertiesUtil;
 import com.yss.util.YarnUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -69,6 +71,12 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        appMasterPort = Integer.parseInt(PropertiesUtil.getProperty("appMasterPort"));
+        nimbusPort = Integer.parseInt(PropertiesUtil.getProperty("nimbusPort"));
+        uiPort = Integer.parseInt(PropertiesUtil.getProperty("uiPort"));
+        defaultQueue = PropertiesUtil.getProperty("defaultQueue");
+        classPath = PropertiesUtil.getProperty("appMasterClassPath");
+
     }
 
     private String buildNimbusHostsArrays() {
@@ -161,7 +169,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
                         Map<String, String> runenv)
             throws Exception {
         String hadoopHome = Conf.getYarnHadoopHome();
-        this.classPath = classPath.replaceAll("HADOOP_HOME", hadoopHome);
+        classPath = classPath.replaceAll("HADOOP_HOME", hadoopHome);
         YarnClientApplication        client_app = yarnClient.createApplication();
         GetNewApplicationResponse    app        = client_app.getNewApplicationResponse();
         ApplicationId                appId      = app.getApplicationId();
@@ -274,7 +282,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
     }
 
     @Override
-    public void launchStormDockerComponent(String containerName, String dockerIp, String process,
+    public void launchStormDockerComponent(String containerName, String dockerIp, String process,String node,
                                            Map<String, String> host) {
         try {
 
@@ -303,10 +311,10 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             dockerArgs = dockerArgs + " -c nimbus.seeds=" + nimbusSeedsArray;
             yarnThriftClient.addDockerComponent("storm",
                                                 containerName,
-                                                null,
+                                                StringUtils.isEmpty(node)?null:node,
                                                 dockerIp,
                                                 process,
-                                                null,
+                    FloodJob.PRIORITY.HIGH.getCode()+"",
                                                 dockerArgs,
                                                 null,
                                                 host,

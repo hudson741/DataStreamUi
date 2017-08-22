@@ -22,12 +22,12 @@ function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "settings", tabId: "settings", tabLink: "/conf"},
+      {tabName: "物理资源管理",tabId: "物理资源管理",tabLink: "/nodeM"},
       {tabName: "资源监控", tabId: "资源监控", tabLink: "/yarnindex"},
       {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
       {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
       {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
       {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
-      // {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
@@ -43,12 +43,12 @@ function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "settings", tabId: "settings", tabLink: "/conf"},
+      {tabName: "物理资源管理",tabId: "物理资源管理",tabLink: "/nodeM"},
       {tabName: "资源监控", tabId: "资源监控", tabLink: "/yarnindex"},
       {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
       {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
       {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
       {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
-      // {tabName: "节点性能监控", tabId: "节点性能监控", tabLink: "/overview"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
       {tabName: "Host", tabId: "Host", tabLink: "/host"}
   ];
@@ -71,9 +71,11 @@ app.factory('client', ['$http', function ($http) {
     overview: function (callback, failcallback) {
       request('overview').success(callback).error(failcallback);
     },
-
-      conf: function(callback , failcallback) {
+    conf: function(callback , failcallback) {
       request('conf').success(callback).error(failcallback);
+    },
+    nodeM:function(callback , failcallback) {
+      request('nodeM').success(callback).error(failcallback);
     },
     yarnindex: function (callback, failcallback) {
       request('yarnindex').success(callback).error(failcallback);
@@ -116,6 +118,24 @@ app.factory('client', ['$http', function ($http) {
     },
     yarnStopDockerJob: function (jobId,callback,failcallback) {
         request('yarnStopDockerJob?jobId=' + jobId).success(callback).error(failcallback);
+    },
+    delPNodes: function(jobId,callback,failcallback) {
+        request('delPNodes?key='+jobId).success(callback).error(failcallback);
+    },
+    checkConnect: function(id,callback,failcallback) {
+        request('checkConnect?id='+id).success(callback).error(failcallback);
+    },
+    remoteInstall: function(jobId,callback,failcallback) {
+        request('remoteInstall?key='+jobId).success(callback).error(failcallback);
+    },
+    confSyn: function(jobId,callback,failcallback) {
+        request('confSyn?key='+jobId).success(callback).error(failcallback);
+    },
+    exehcmd: function(hcmd,key,callback,failcallback){
+        request('hcmd?hcmd='+hcmd+"&key="+key).success(callback).error(failcallback);
+    },
+    logio: function(jobId,callback,failcallback) {
+        request('logio?key='+jobId).success(callback).error(failcallback);
     }
 
   };
@@ -134,6 +154,10 @@ app.config(function ($routeProvider) {
       .when('/conf', {
           templateUrl: 'views/conf.html',
           controller: 'SettingsCtrl'
+      })
+      .when('/nodeM',{
+          templateUrl: 'views/nodeM.html',
+          controller: 'NodeMCtrl'
       })
       .when('/yarnindex',{
           templateUrl: 'views/yarnindex.html',

@@ -1,6 +1,7 @@
 package com.yss.ftp;
 
 import com.yss.util.FileUtil;
+import com.yss.util.PropertiesUtil;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authority;
@@ -22,16 +23,21 @@ import java.util.List;
  */
 public class SofaFtpServer {
 
-    private Logger logger        = LoggerFactory.getLogger(FtpService.class);
+    private Logger logger        = LoggerFactory.getLogger(SofaFtpServer.class);
 
     private FtpServerFactory serverFactory;
     private String              homeDirectory;
 
-    public SofaFtpServer(int serverPort,String userName,String password) throws FtpException {
+    public SofaFtpServer() throws FtpException {
+
+        int serverPort = Integer.parseInt(PropertiesUtil.getProperty("ftpPort"));
+        String userName = PropertiesUtil.getProperty("ftpUserName");
+        String password = PropertiesUtil.getProperty("ftpPassword");
+
         serverFactory = new FtpServerFactory();
 
         try {
-            homeDirectory = (FileUtil.getJarPath(FtpService.class) + "/ftp").replace("file:","");
+            homeDirectory = FileUtil.getJarPath(SofaFtpServer.class) + "/ftp";
         } catch (IOException e) {
             homeDirectory = "/opt";
         }

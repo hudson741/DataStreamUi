@@ -1,5 +1,8 @@
 package com.yss.config;
 
+
+import com.yss.util.PropertiesUtil;
+
 /**
  * @Description
  * @author: zhangchi
@@ -9,6 +12,8 @@ public class Conf {
 
     private static volatile String STORM_ZK ;
 
+    private static volatile int STORM_ZK_PORT = Integer.parseInt(PropertiesUtil.getProperty("stormZkPort"));
+
     private static volatile String FS_DEFAULT_FS ;
 
     private static volatile String YARN_RESOURCEMANAGER_ADDREES ;
@@ -17,9 +22,9 @@ public class Conf {
 
     private static volatile String YARN_RESOURCE_UI_ADDRESS ;
 
-    private static volatile String YARN_JAVA_HOME;
+    private static volatile String YARN_JAVA_HOME = PropertiesUtil.getProperty("yarnJavaHome");
 
-    private static volatile String YARN_HADOOP_HOME;
+    private static volatile String YARN_HADOOP_HOME = PropertiesUtil.getProperty("yarnHadoopHome");
 
     public static  String getSTORM_ZK() {
         return STORM_ZK;
@@ -44,7 +49,6 @@ public class Conf {
     public static void setYARN_RESOURCEMANAGER_ADDREES(String YARN_RESOURCEMANAGER_ADDREES) {
         Conf.YARN_RESOURCEMANAGER_ADDREES = YARN_RESOURCEMANAGER_ADDREES;
     }
-
     public static String getYARN_RESOURCEMANAGER_SCHEDULER_ADDRESS() {
         return YARN_RESOURCEMANAGER_SCHEDULER_ADDRESS;
     }
@@ -75,6 +79,14 @@ public class Conf {
 
     public static void setYarnHadoopHome(String yarnHadoopHome) {
         YARN_HADOOP_HOME = yarnHadoopHome;
+    }
+
+    public static int getStormZkPort() {
+        return STORM_ZK_PORT;
+    }
+
+    public static void setStormZkPort(int stormZkPort) {
+        STORM_ZK_PORT = stormZkPort;
     }
 
 }

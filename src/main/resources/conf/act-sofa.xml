@@ -12,12 +12,7 @@
     <bean id="testHandler" class="com.yss.TestHandler"/>
 
     <!--ftp  -->
-    <bean id="ftpService" class = "com.yss.ftp.FtpService">
-        <property name="addr" value="${ftpAddr}"/>
-        <property name="port" value="${ftpPort}"/>
-        <property name="userName" value="${ftpUserName}"/>
-        <property name="password" value="${ftpPassword}"/>
-    </bean>
+    <bean id="ftpService" class = "com.yss.ftp.FtpService"/>
 
     <!-- storm相关                 -->
 
@@ -36,14 +31,7 @@
     <!-- yarn相关                 -->
     <bean id="yarnThriftClient" class="com.yss.yarn.discovery.YarnThriftClient"/>
 
-    <bean id="yarnLaunchService" class="com.yss.yarn.launch.YarnLaunch">
-        <property name="defaultQueue" value="${yarnQueue}" />
-        <property name="classPath" value="${appMasterClassPath}" />
-        <property name="appMasterPort" value="${appMasterPort}" />
-        <property name="nimbusPort" value="${nimbusPort}" />
-        <property name="uiPort" value="${uiPort}" />
-
-    </bean>
+    <bean id="yarnLaunchService" class="com.yss.yarn.launch.YarnLaunch"/>
 
     <bean id="yarnMonitorRestClient" class="com.yss.yarn.monitor.YarnMonitorRestClient"/>
 

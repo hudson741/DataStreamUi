@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yss.config.Conf;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.Bolt;
@@ -106,8 +107,9 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
 
         config.put(Config.NIMBUS_SEEDS, nimbusHosts);
         config.put(Config.NIMBUS_THRIFT_PORT, nimbusPort);
-        config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(remoteZKServer.split(",")));
-        config.put(Config.STORM_ZOOKEEPER_PORT, remoteZKPort);
+        config.put(Config.STORM_ZOOKEEPER_SERVERS,  Arrays.asList(Conf.getSTORM_ZK().split(",")));
+//        config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(remoteZKServer.split(",")));
+        config.put(Config.STORM_ZOOKEEPER_PORT, Conf.getStormZkPort());
 
 //      Map<String, Object> hbConf = new HashMap<String, Object>();
 

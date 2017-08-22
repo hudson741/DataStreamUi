@@ -41,13 +41,11 @@ public class TestMain {
     }
 
     public static void main(String[] args) throws Exception {
-        String a = "[{\"businessType\":\"storm\",\"floodJob\":{\"businessTag\":\"ui\",\"cpu\":1,\"dockerCMD\":{\"containerName\":\"ui-1\",\"dockerArgs\":\"storm ui -c ui.port=9002 -c storm.zookeeper.servers=[\\\\\\\"10.186.58.13\\\\\\\"] -c nimbus.seeds=[\\\\\\\"192.168.10.3,192.168.10.4\\\\\\\"]\",\"host\":{\"ui-1\":\"192.168.10.5\"},\"hostName\":\"ui-1\",\"imageName\":\"storm\",\"ip\":\"192.168.10.5\",\"port\":{\"9092\":\"9092\"}},\"jobId\":\"c5029853-80f8-4cc7-b144-cf6239237f10\",\"memory\":1024,\"netUrl\":\"overlay\"},\"runIp\":\"zhangc3\",\"state\":0},{\"businessType\":\"storm\",\"floodJob\":{\"businessTag\":\"nimbus\",\"cpu\":1,\"dockerCMD\":{\"containerName\":\"nimbus-1498655934406\",\"dockerArgs\":\"storm  nimbus  -c nimbus.thrift.port=9005 -c storm.zookeeper.servers=[\\\\\\\"10.186.58.13\\\\\\\"] -c nimbus.seeds=[\\\\\\\"192.168.10.3,192.168.10.4\\\\\\\"]\",\"host\":{\"nimbus-1498655934406\":\"192.168.10.3\"},\"hostName\":\"nimbus-1498655934406\",\"imageName\":\"storm\",\"ip\":\"192.168.10.3\",\"port\":{\"9005\":\"9005\"}},\"jobId\":\"140c4711-4e7a-492f-a817-d9bdf976847f\",\"memory\":1024,\"netUrl\":\"overlay\",\"nodeBind\":\"zhangc4\"},\"runIp\":\"zhangc4\",\"state\":0}]\n";
-
-        List<FloodJobRunningState> list = JSONObject.parseArray(a,FloodJobRunningState.class);
-
-        for(FloodJobRunningState floodJobRunningState:list){
-            System.out.println(floodJobRunningState.getContainerId());
-        }
+       for(int count =0;count<10000;count++){
+            if(count%50 ==0){
+                System.out.println(count);
+            }
+       }
     }
 
     public static void remove(CuratorFramework client, String pathN) throws Exception {

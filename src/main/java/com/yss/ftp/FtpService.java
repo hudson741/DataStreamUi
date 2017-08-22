@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.yss.util.FileUtil;
+import com.yss.util.PropertiesUtil;
 
 /**
  * @Description
@@ -43,7 +44,13 @@ public class FtpService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        connect();
+        userName = PropertiesUtil.getProperty("ftpUserName");
+        password = PropertiesUtil.getProperty("ftpPassword");
+        addr     = PropertiesUtil.getProperty("ftpAddr");
+        port     = PropertiesUtil.getProperty("ftpPort");
+        if(StringUtils.isEmpty(System.getProperty("ftp"))){
+            connect();
+        }
     }
 
     public boolean changeWorkingDirectory(String directory) {
@@ -64,22 +71,24 @@ public class FtpService implements InitializingBean {
         return flag;
     }
 
-    private void connect() throws IOException {
-        ftpClient = new FTPClient();
+    private void connect() {
+        try {
+            ftpClient = new FTPClient();
+            int reply;
+            ftpClient.connect(addr, Integer.parseInt(port));
+            ftpClient.login(userName, password);
+            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+            reply = ftpClient.getReplyCode();
 
-        int reply;
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                ftpClient.disconnect();
+            }
 
-        ftpClient.connect(addr, Integer.parseInt(port));
-        ftpClient.login(userName, password);
-        ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-        reply = ftpClient.getReplyCode();
-
-        if (!FTPReply.isPositiveCompletion(reply)) {
-            ftpClient.disconnect();
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.enterLocalPassiveMode();
+        }catch(Throwable e){
+            logger.error("ftp连接异常，请确认ftpServer健康状态 ",e);
         }
-
-        ftpClient.enterLocalPassiveMode();
-        ftpClient.enterLocalPassiveMode();
     }
 
     public void connect(String addr, String port, String userName, String password) throws IOException {

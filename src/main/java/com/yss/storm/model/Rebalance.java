@@ -23,7 +23,6 @@ public class Rebalance {
         map.put("count", 3);
         System.out.println(Rebalance.getRebalanceInstanceJSONStr(null, map, null));
 
-//      System.out.println(Rebalance.getRebalanceInstanceJSONStr(3,null,null));
     }
 
     public String getCallback() {

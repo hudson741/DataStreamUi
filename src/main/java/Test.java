@@ -121,15 +121,40 @@ public class Test {
         return path.isAbsolute()?path:new Path(workDir, path);
     }
 
+    public static void delAuthorizedKeysMatch(String fileStr,String lineToRemove) throws IOException {
+        File file = new File(fileStr);
+        if(!file.exists() || !file.isFile()){
+            return;
+        }
+        File tempFile = new File(file.getAbsolutePath() + ".tmp");
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+
+        String line = null;
+
+        while ((line = br.readLine()) != null) {
+
+            if (!line.trim().endsWith(lineToRemove)) {
+                pw.println(line);
+                pw.flush();
+            }
+        }
+        pw.close();
+        br.close();
+
+        //Delete the original file
+        if (!file.delete()) {
+            System.out.println("Could not delete file");
+            return;
+        }
+
+        //Rename the new file to the filename the original file had.
+        if (!tempFile.renameTo(file))
+            System.out.println("Could not rename file");
+    }
 
 
     public static void main(String[] args) throws Exception {
-        Test t = new Test();
-        t.connect("/", "zhangc1", 9099, "test", "123456");
-        File file = new File("/Users/zhangchi/tool/ss.xc");
-//        t.copyFile("ss.xc","/Users/zhangchi/tool","/");
-        t.upload(file);
-        System.out.println(t.getFtpFileTimeStamp("zhangc1",9099,"test","123456","aa.sh"));
 
     }
 }

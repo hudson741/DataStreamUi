@@ -30,6 +30,7 @@ public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
             if(ArrayUtils.isNotEmpty(args) && args[0].equals("ftp")){
+                System.setProperty("ftp","1");
                 ApplicationContext factory = new ClassPathXmlApplicationContext(new String[]{"classpath:conf/act-ftp.xml"});
         }else {
             System.out.println("not ftp");

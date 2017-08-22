@@ -44,7 +44,6 @@ public class SettingsController {
         data.put("yarnui", Conf.getYarnResourceUiAddress());
         data.put("yarnJavaHome", Conf.getYarnJavaHome());
         data.put("yarnHadoopHome",Conf.getYarnHadoopHome());
-
         return JSON.toJSONString(data);
     }
 
@@ -56,17 +55,13 @@ public class SettingsController {
                               @RequestParam("hdfs") String hdfs,
                               @RequestParam("yarn") String yarn,
                               @RequestParam("yarns") String yarns,
-                              @RequestParam("yarnui") String yarnui,
-                              @RequestParam("yarnJavaHome") String yarnJavaHome,
-                              @RequestParam("yarnHadoopHome") String yarnHadoopHome)
+                              @RequestParam("yarnui") String yarnui)
             throws Exception {
         Conf.setFS_DEFAULT_FS(hdfs);
         Conf.setSTORM_ZK(stormZk);
         Conf.setYARN_RESOURCEMANAGER_ADDREES(yarn);
         Conf.setYARN_RESOURCEMANAGER_SCHEDULER_ADDRESS(yarns);
         Conf.setYarnResourceUiAddress(yarnui);
-        Conf.setYarnJavaHome(yarnJavaHome);
-        Conf.setYarnHadoopHome(yarnHadoopHome);
         serverAddressDiscovery.refresh();
         stormNodesService.refresh();
         yarnLaunchService.refresh();

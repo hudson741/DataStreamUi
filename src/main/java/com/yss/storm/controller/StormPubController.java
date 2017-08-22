@@ -25,6 +25,7 @@ public class StormPubController {
     @PostMapping("/stormdockerPub")
     public String stormdockerPub(@RequestParam("dockerIp") String dockerIp,
                                  @RequestParam("process") String process,
+                                 @RequestParam(value = "node" , required = false) String node,
                                  @RequestParam(value = "host",required=false) String host) throws Exception {
 
 
@@ -38,7 +39,7 @@ public class StormPubController {
         }
 
         yarnLaunchService.launchStormDockerComponent(process+"-"+System.currentTimeMillis(),
-                dockerIp,process,hostMap);
+                dockerIp,process,node,hostMap);
 
 
         return "发布成功";
