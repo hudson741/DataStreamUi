@@ -23,6 +23,7 @@
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/controller/StormTopologySubmitController.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/controller/ExpansionController.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/model/Rebalance.java
+/Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/JschProxy.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/discovery/ThriftClientObjectFactory.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/ftp/SofaFtpServer.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/launch/APPLaunch.java
@@ -51,11 +52,13 @@
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/model/Topologies.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/ftp/FtpService.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/model/ExecutorStatus.java
+/Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/JschSessionObjectFactory.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/model/DockerJob.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/util/FileUtil.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/StormNodesService.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/sofa/stream/Builder.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/model/YarnApp.java
+/Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/JschPoolKey.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/monitor/StormMonitor.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/util/PropertiesUtil.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/floodCtr/generate/FloodJob.java

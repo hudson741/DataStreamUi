@@ -82,7 +82,11 @@ public class ThriftClientProxy implements InitializingBean {
         pool.clear();
     }
 
-    public static void main(String[] args) throws Exception {}
+    public static void main(String[] args) throws Exception {
+
+
+
+    }
 
     public TServiceClientFactory getFactory() {
         return factory;

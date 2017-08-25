@@ -46,6 +46,7 @@ com/floodCtr/generate/StormThriftService$getStormUi_args$getStormUi_argsTupleSch
 com/floodCtr/generate/FloodJob$DockerCMD.class
 com/floodCtr/generate/StormThriftService$getStormNimbus_args$_Fields.class
 com/floodCtr/generate/StormThriftService$getStormUi_result$_Fields.class
+com/yss/Expansion/JschProxy.class
 com/yss/config/SettingsController.class
 com/floodCtr/generate/StormThriftService$getStormUi_result.class
 com/floodCtr/generate/StormThriftService$getStormNimbus_result$_Fields.class
@@ -77,7 +78,9 @@ com/floodCtr/generate/StormThriftService$AsyncClient$killApplication_call.class
 com/floodCtr/generate/StormThriftService$AsyncProcessor.class
 com/yss/yarn/model/DockerJob.class
 com/floodCtr/generate/StormThriftService$AsyncClient$getAllDockerJob_call.class
+com/yss/Expansion/JschPoolKey.class
 com/yss/Expansion/JschUtil$MyUserInfo.class
+com/yss/Expansion/JschSessionObjectFactory.class
 com/floodCtr/generate/StormThriftService$addDockerComponent_result$addDockerComponent_resultStandardScheme.class
 com/floodCtr/generate/StormThriftService$addDockerComponent_args$_Fields.class
 com/yss/yarn/discovery/ServerAddressDiscovery.class
@@ -199,5 +202,4 @@ com/floodCtr/generate/StormThriftService$AsyncClient$restartDocker_call.class
 com/floodCtr/generate/StormThriftService$AsyncProcessor$getAllDockerJob.class
 com/floodCtr/generate/StormThriftService$getAllDockerJob_result$getAllDockerJob_resultTupleSchemeFactory.class
 com/yss/yarn/controller/YarnMonitorController.class
-com/yss/Expansion/JschUtil$1.class
 com/floodCtr/generate/StormThriftService$getStormNimbus_result$getStormNimbus_resultStandardScheme.class

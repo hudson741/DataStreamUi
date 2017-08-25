@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.yss.Expansion.ExpYamlDataBase;
-import com.yss.Expansion.JschUtil;
-import com.yss.config.Conf;
+import com.yss.Expansion.JschProxy;
+import com.yss.Expansion.JschService;
 import com.yss.util.FileUtil;
 import com.yss.util.PropertiesUtil;
 import com.yss.yarn.Exception.HadoopUserAddException;
@@ -56,11 +56,11 @@ public class ExpansionController {
     )
     public String generateRemoteSshKeygen(@RequestParam("remoteUser") String remoteUser,
                                            @RequestParam("password") String password,
-                                          @RequestParam("remoteHost") String remoteHost) throws InterruptedException, JSchException, IOException {
+                                          @RequestParam("remoteHost") String remoteHost) throws Exception {
 
 
 
-        JschUtil.generateRemoteSshKeygen(JschUtil.createSession(remoteUser, password, remoteHost));
+        JschService.generateRemoteSshKeygen(remoteUser, password, remoteHost);
         return "true";
     }
 
@@ -78,119 +78,9 @@ public class ExpansionController {
     public String setRemoteKnownHosts(@RequestParam("user") String user,
                                       @RequestParam("password") String password,
                                       @RequestParam("host") String host) throws JSchException, UnknownHostException {
-        JschUtil.setRemoteKnownHosts(user,password,host);
+        JschService.setRemoteKnownHosts(user,password,host);
         return "true";
     }
-
-    /**
-     * 设置本机knownhosts (1)
-     * @param user
-     * @return
-     * @throws JSchException
-     * @throws UnknownHostException
-     */
-    @RequestMapping(
-            value  = "/setLocalKnownHosts",
-            method = RequestMethod.GET
-    )
-    public String setLocalKnownHosts( @RequestParam("user") String user,
-                                      @RequestParam("password") String password) throws JSchException, UnknownHostException {
-        JschUtil.setLocalKnownHosts(user,password);
-        return "true";
-    }
-
-    /**
-     * 传输远程id_rsa至本地并写入authorized_keys（4）
-     * @param remoteUser
-     * @param password
-     * @param remoteHost
-     * @return
-     * @throws InterruptedException
-     * @throws JSchException
-     * @throws IOException
-     */
-    @RequestMapping(
-            value  = "/scpRemoteIdRsaPub",
-            method = RequestMethod.GET
-    )
-    public String scpRemoteIdRsaPub(@RequestParam("remoteUser") String remoteUser,
-                                    @RequestParam("password") String password,
-                                    @RequestParam("remoteHost") String remoteHost) throws InterruptedException, JSchException, IOException {
-        JschUtil.scpRemoteIdRsaPub(JschUtil.createSession(remoteUser, password, remoteHost), remoteUser, remoteHost);
-        JschUtil.localWriteFileAppend("/"+remoteUser+"/.ssh/"+remoteHost+".pub",
-                "/"+remoteUser+"/.ssh/authorized_keys");
-        return "true";
-    }
-
-    /**
-     * 将本地knownHosts同步更新至远程服务器 (5)
-     * @param user
-     * @param password
-     * @param host
-     * @return
-     */
-    @RequestMapping(
-            value  = "/urkhs",
-            method = RequestMethod.GET
-    )
-    public String updateRemoteKnownHosts(@RequestParam("user") String user,
-                                         @RequestParam("password") String password,
-                                         @RequestParam("host") String host) throws JSchException {
-
-        Session session = JschUtil.createSession(user, password, host);
-
-        JschUtil.updateRemoteKnownHosts(session,user);
-        return "true";
-    }
-
-    /**
-     * 将本地authorized_keys同步更新至远程服务器 (6)
-     * @param user
-     * @param password
-     * @param host
-     * @return
-     */
-    @RequestMapping(
-            value  = "/urHaks",
-            method = RequestMethod.GET
-    )
-    public String updateRemoteHostAuthorizedKeys(@RequestParam("user") String user,
-                                                 @RequestParam("password") String password,
-                                                 @RequestParam("host") String host) throws JSchException {
-
-        JschUtil.updateRemoteHostAuthorizedKeys(JschUtil.createSession(user, password, host),user);
-        return "true";
-    }
-
-
-    /**
-     * 一键初始化本地节点
-     * @param user
-     * @param password
-     * @return
-     */
-    @RequestMapping(
-            value  = "/initLocal",
-            method = RequestMethod.GET
-    )
-    public String initLocalNode(@RequestParam("user") String user,
-                                @RequestParam("password") String password,
-                                @RequestParam("host") String host) throws JSchException, IOException, InterruptedException {
-
-
-        Session session = JschUtil.createSession(user, password, host);
-        JschUtil.delRemoteSSHDir(session,user);
-        //1,将本机加入本机的信任列表中
-        JschUtil.setLocalKnownHosts(user,password);
-        //1，生成本机的秘钥key
-        JschUtil.generateRemoteSshKeygen(session);
-        //2,更新本机的authorized_keys
-        JschUtil.localWriteFileAppend("/"+user+"/.ssh/id_rsa.pub",
-                "/"+user+"/.ssh/authorized_keys");
-
-        return "true";
-    }
-
 
     /**
      * 获取已注册的物理节点信息
@@ -211,12 +101,10 @@ public class ExpansionController {
 
             ExpYamlDataBase.PhysicalNode physicalNode = map.get(id);
            physicalNode.setId(id);
-           Session session = null;
            try {
-               session = JschUtil.createSession(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
                logger.info("host : "+physicalNode.getHost());
-               boolean isNodeManagerRunning = JschUtil.isNodeManagerRunning(session);
-               boolean isResourceManagerRunning = JschUtil.isResourceManagerRunning(session);
+               boolean isNodeManagerRunning = JschService.isNodeManagerRunning(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
+               boolean isResourceManagerRunning = JschService.isResourceManagerRunning(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
                if(isNodeManagerRunning){
                    runningProcess.append("NodeManager ");
                }
@@ -267,7 +155,7 @@ public class ExpansionController {
     public String checkConnect(@RequestParam("id") String id) throws IOException, InterruptedException {
         LinkedHashMap<String,ExpYamlDataBase.PhysicalNode>  map =  ExpYamlDataBase.getNodes();
         ExpYamlDataBase.PhysicalNode physicalNode =  map.get(id);
-        boolean result = JschUtil.checkConnect(physicalNode.getUser(), physicalNode.getPassword(),physicalNode.getHost());
+        boolean result = JschService.checkConnect("hadoop", "Tudou=123",physicalNode.getHost());
         if(result){
             return "已成功注册";
         }else{
@@ -280,7 +168,7 @@ public class ExpansionController {
             value = "/registerRoot",
             method = RequestMethod.POST
     )
-    public String registerRoot(@RequestParam("admin") String admin,@RequestParam("pwd") String pwd) {
+    public String registerRoot(@RequestParam("admin") String admin,@RequestParam("pwd") String pwd) throws Exception {
 
         String localHostName = null;
         try {
@@ -290,16 +178,8 @@ public class ExpansionController {
             return "请确保本地hosts配置正确";
         }
 
-        Session rootLocalSession = null;
         try {
-            rootLocalSession = JschUtil.createSession(admin,pwd,localHostName);
-        } catch (JSchException e) {
-            logger.error("error",e);
-            return "admin用户验证失败，请确保用户密码正确，用户可用";
-        }
-
-        try {
-            registerHadoop(rootLocalSession);
+            registerHadoop(admin,pwd,localHostName);
         } catch (HadoopUserAddException e) {
             return e.getMessage();
         } catch (KnownHostException e) {
@@ -313,18 +193,17 @@ public class ExpansionController {
 
     /**
      * 注册hadoop用户
-     * @param rootLocalSession
      * @return
      * @throws IOException
      * @throws InterruptedException
      * @throws JSchException
      */
-    private void registerHadoop(Session rootLocalSession) throws HadoopUserAddException, KnownHostException, PasswdModifyException {
+    private void registerHadoop(String root,String password,String host) throws Exception {
 
         String localHostName = null;
         try {
             localHostName = InetAddress.getLocalHost().getHostName();
-            boolean exists = JschUtil.checkLocalUserExsits("hadoop");
+            boolean exists = JschService.checkLocalUserExsits("hadoop");
             if (!exists) {
                 File del = new File("/home/hadoop");
                 if (del.exists()) {
@@ -332,11 +211,11 @@ public class ExpansionController {
                 }
                 logger.warn("本地不存在hadoop用户，下面开始创建.....");
                 //安全起见，先创建/home目录，已存在则忽略
-                JschUtil.mkdirRemoteDir(rootLocalSession,"/home");
+                JschService.mkdirRemoteDir(root,password,host,"/home");
 
                 boolean result = false;
                 try {
-                    result = JschUtil.localUserAdd(rootLocalSession, "hadoop", "Tudou=123");
+                    result = JschService.localUserAdd(root,password, "hadoop", "Tudou=123");
                 } catch (IOException e) {
                     logger.error("error ",e);
                     throw new HadoopUserAddException("本地hadoop用户验证或创建失败，请查看系统日志，并请确认root密码，权限是否正确");
@@ -351,19 +230,17 @@ public class ExpansionController {
                 }
 
                 //修改新增用户hadoop的密码
-                if(!JschUtil.passwdUser(rootLocalSession, "hadoop", "Tudou=123")){
+                if(!JschService.localUserPasswd(root,password,localHostName, "hadoop", "Tudou=123")){
                     throw new PasswdModifyException("修改hadoop密码失败，请删除hadoop用户进行重试");
                 }
-                //获取新用户session
-                Session hadoopLocalSession = JschUtil.createSession("hadoop", "Tudou=123", localHostName);
                 //使用新用户创建.ssh目录
-                JschUtil.mkdirRemoteDir(hadoopLocalSession, "/home/hadoop/.ssh/");
+                JschService.mkdirRemoteDir("hadoop","Tudou=123",localHostName, "/home/hadoop/.ssh/");
                 //将本地设置信任列表
-                JschUtil.setRemoteKnownHosts("hadoop", "Tudou=123", localHostName);
+                JschService.setRemoteKnownHosts("hadoop", "Tudou=123", localHostName);
                 //生成本机的秘钥key
-                JschUtil.generateRemoteSshKeygen(hadoopLocalSession);
+                JschService.generateRemoteSshKeygen("hadoop","Tudou=123",localHostName);
                 //更新本机的authorized_keys
-                JschUtil.localWriteFileAppend("/home/hadoop/.ssh/id_rsa.pub",
+                JschService.localWriteFileAppend("/home/hadoop/.ssh/id_rsa.pub",
                         "/home/hadoop/.ssh/authorized_keys");
 
             }
@@ -397,7 +274,7 @@ public class ExpansionController {
             value  = "/hcmd",
             method = RequestMethod.GET
     )
-    public String remoteHadoopST(@RequestParam("key") final String key,@RequestParam("hcmd") final String hcmd) {
+    public String remoteHadoopST(@RequestParam("key") final String key,@RequestParam("hcmd") final String hcmd) throws Exception {
         LinkedHashMap<String,ExpYamlDataBase.PhysicalNode> map = ExpYamlDataBase.getNodes();
         if(StringUtils.isEmpty(hcmd) || "undefined".equals(hcmd)){
             return "请选择启动模式";
@@ -407,10 +284,9 @@ public class ExpansionController {
         }
         final ExpYamlDataBase.PhysicalNode physicalNode =  map.get(key);
         try {
-            Session session = JschUtil.createSession(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
             String path = PropertiesUtil.getProperty("yarnHadoopHome");
             String cmd = "cd /home/hadoop/expand ; sh hadoop.sh "+hcmd+" "+path;
-            String result =  JschUtil.execmd(session,cmd);
+            String result =  JschProxy.execmd(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost(),cmd);
             return "执行结果:"+result;
         } catch (JSchException e) {
             logger.error("error ",e);
@@ -442,11 +318,11 @@ public class ExpansionController {
             @Override
             public void run(){
                 try {
-                    Session session = JschUtil.createSession(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
                     String cmd = "cd /home/hadoop/expand ; sh expand.sh";
-                    boolean isInstalled = JschUtil.remoteInstallHadoop(session,cmd,key);
+
+                    boolean isInstalled = JschService.remoteInstallHadoop(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost(),cmd,key);
                     if(isInstalled){
-                        JschUtil.execmd(session,"source /etc/profile");
+                        JschProxy.execmd(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost(),"source /etc/profile");
                         physicalNode.setInstalled("已安装");
                         ExpYamlDataBase.updateNode(physicalNode);
                     }
@@ -455,6 +331,8 @@ public class ExpansionController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -472,7 +350,7 @@ public class ExpansionController {
     static String logio(@RequestParam("key") String key)
             throws IOException {
         //BufferedReader br = new BufferedReader(new FileReader("/opt/log.log"));
-        String logPath = FileUtil.getJarPath(JschUtil.class) + "/log/"+key+".log";
+        String logPath = FileUtil.getJarPath(JschService.class) + "/log/"+key+".log";
         if(!new File(logPath).exists()){
             return "";
         }
@@ -502,69 +380,64 @@ public class ExpansionController {
     public String expand(@RequestParam("rAdmin") String rAdmin,
                          @RequestParam("password") String password,
                          @RequestParam("IP") String ip,
-                         @RequestParam("host") String host) throws JSchException, IOException, InterruptedException {
-        boolean exists = JschUtil.checkLocalUserExsits("hadoop");
+                         @RequestParam("host") String host) throws Exception {
+        boolean exists = JschService.checkLocalUserExsits("hadoop");
         if(!exists){
             return "请先创建本地hadoop用户";
         }
 
         Session hadoopLocalSession = null;
         Session hadoopRemoteSession = null;
-        Session rootRemoteSession = JschUtil.createSession(rAdmin,password,host);
         try {
             List<String> data = Lists.newArrayList();
             data.add(ip + "   " + host);
             String localHostName = InetAddress.getLocalHost().getHostName();
 
             //3，清除/etc/hosts旧的匹配
-            JschUtil.delFileMatch("/etc/hosts", " " + host);
+            JschService.delFileMatch("/etc/hosts", " " + host);
             //4,更新本地/etc/hosts 加入扩展节点的hosts 和 ip映射
-            JschUtil.localWriteFileAppend(data, "/etc/hosts");
+            JschService.localWriteFileAppend(data, "/etc/hosts");
 
             //5,创建远程hadoop用户,如果存在，则不给于添加
-            boolean isRemoteUserExsits = JschUtil.checkRemoteUserExsits(rAdmin, password, host, "hadoop");
+            boolean isRemoteUserExsits = JschService.checkRemoteUserExsits(rAdmin, password, host, "hadoop");
             if (!isRemoteUserExsits) {
                 //安全起见，先创建/home目录，已存在则忽略
-                JschUtil.mkdirRemoteDir(rootRemoteSession,"/home");
+                JschService.mkdirRemoteDir(rAdmin,password,host,"/home");
                 logger.info("开始创建远程hadoop用户");
-                boolean result = JschUtil.remoteAddUser(rootRemoteSession, host, "hadoop", "Tudou=123");
+                boolean result = JschService.remoteAddUser(rAdmin,password, host, "hadoop", "Tudou=123");
                 if (!result) {
                     return "远程hadoop用户验证或创建失败，请查看系统日志，并请确认root密码，权限是否正确";
                 }
                 //修改远程用户hadoop密码
-                JschUtil.remoteUserPasswd(rAdmin, password, host, "hadoop", "Tudou=123");
+                JschService.remoteUserPasswd(rAdmin, password, host, "hadoop", "Tudou=123");
             }
-            hadoopRemoteSession = JschUtil.createSession("hadoop", "Tudou=123", host);
-
 
             //6,设置远程hosts加入本机信任列表
-            JschUtil.setRemoteKnownHosts("hadoop", "Tudou=123", host);
+            JschService.setRemoteKnownHosts("hadoop", "Tudou=123", host);
 
             //7,清空远程ssh目录
-            JschUtil.delRemoteSSHDir(hadoopRemoteSession, "hadoop");
+            JschService.delRemoteSSHDir(rAdmin,password,host, "hadoop");
             //8,连接到远程机器，生成秘钥串
-            JschUtil.generateRemoteSshKeygen(hadoopRemoteSession);
+            JschService.generateRemoteSshKeygen("hadoop","Tudou=123",host);
             //9,将远程生成的公钥传入到本地
-            String lfile = JschUtil.scpRemoteIdRsaPub(hadoopRemoteSession, "hadoop", host);
+            String lfile = JschProxy.scpRemoteIdRsaPub( "hadoop", "Tudou=123",host);
             //10,清除旧的匹配
-            JschUtil.delFileMatch("/home/hadoop/.ssh/authorized_keys", "hadoop@" + host);
-            JschUtil.localWriteFileAppend(lfile,
+            JschService.delFileMatch("/home/hadoop/.ssh/authorized_keys", "hadoop@" + host);
+            JschService.localWriteFileAppend(lfile,
                     "/home/hadoop/.ssh/authorized_keys");
             //11,将本机hosts覆盖至远程hosts                              //需做分发
-            JschUtil.updateRemoteHosts(rootRemoteSession);
+            JschService.updateRemoteHosts(rAdmin,password,host);
             //12,将本地的机器信任列表传输至远程机器上
-            JschUtil.updateRemoteKnownHosts(hadoopRemoteSession,"hadoop");   //需做分发
+            JschService.updateRemoteKnownHosts("hadoop","Tudou=123", host);   //需做分发
             //13,将本地的authorized_keys覆盖远程机器                     //需做分发
-            JschUtil.updateRemoteHostAuthorizedKeys(hadoopRemoteSession, "hadoop");
+            JschService.updateRemoteHostAuthorizedKeys("hadoop","Tudou=123", host);
             LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> list = ExpYamlDataBase.getNodes();
 
             //14,更新其他已注册的物理节点
             for (ExpYamlDataBase.PhysicalNode physicalNode : list.values()) {
-                Session sessionSend = JschUtil.createSession(physicalNode.getAdmin(), physicalNode.getAdminPassWord(), physicalNode.getHost());
-                JschUtil.updateRemoteHosts(sessionSend);
-                Session sessionUser = JschUtil.createSession(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
-                JschUtil.updateRemoteKnownHosts(sessionUser,physicalNode.getUser());
-                JschUtil.updateRemoteHostAuthorizedKeys(sessionUser, physicalNode.getUser());
+                JschService.updateRemoteHosts(physicalNode.getAdmin(), physicalNode.getAdminPassWord(), physicalNode.getHost());
+                JschService.updateRemoteKnownHosts(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
+                JschService.updateRemoteHostAuthorizedKeys(physicalNode.getUser(),physicalNode.getPassword(),physicalNode.getHost());
 
             }
 
@@ -572,10 +445,7 @@ public class ExpansionController {
             ExpYamlDataBase.addNode(host, ip, "hadoop", "Tudou=123",rAdmin,password);
             //8,将本地hadoop,jdk,安装脚本传输至远程服务器
             String expandDirectory = FileUtil.getJarPath(ExpansionController.class) + "/expand";
-            if (hadoopLocalSession == null) {
-                hadoopLocalSession = JschUtil.createSession("hadoop", "Tudou=123", localHostName);
-            }
-            JschUtil.scpLocalDirToRemote(hadoopLocalSession, "hadoop", host, "/home/hadoop", expandDirectory);
+            JschService.scpLocalDirToRemote("hadoop","Tudou=123",localHostName, "hadoop", host, "/home/hadoop", expandDirectory);
         }finally {
 
         }
@@ -594,12 +464,12 @@ public class ExpansionController {
             value="/confSyn",
             method = RequestMethod.GET
     )
-    public String confSyn(@RequestParam("key") String key) throws IOException, JSchException, InterruptedException {
+    public String confSyn(@RequestParam("key") String key) throws Exception {
         String localHostName = InetAddress.getLocalHost().getHostName();
         ExpYamlDataBase.PhysicalNode physicalNode = ExpYamlDataBase.getNodes().get(key);
         String confDir = FileUtil.getJarPath(ExpansionController.class) + "/conf/hadoop";
-        Session hadoopLocalSession = JschUtil.createSession("hadoop", "Tudou=123", localHostName);
-        JschUtil.scpLocalDirToRemote(hadoopLocalSession,physicalNode.getUser(),physicalNode.getHost(),"/home/hadoop/hadoop-2.8.0/etc/",confDir);
+        JschService.scpLocalDirToRemote("hadoop","Tudou=123",localHostName,
+                physicalNode.getUser(),physicalNode.getHost(),"/home/hadoop/hadoop-2.8.0/etc/",confDir);
         return "true";
 
     }
