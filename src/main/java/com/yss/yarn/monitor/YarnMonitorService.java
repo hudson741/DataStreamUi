@@ -64,7 +64,11 @@ public class YarnMonitorService {
     }
 
     public  List<DockerJob> getDockerJobs(){
-        return yarnThriftClient.getDockerJobs();
+        try {
+            return yarnThriftClient.getDockerJobs();
+        }catch (Throwable e){
+            return Lists.newArrayList();
+        }
     }
 
     public String yarnRestart(String jobId){

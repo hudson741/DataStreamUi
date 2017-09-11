@@ -1,0 +1,65 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link href="https://fonts.googleapis.com/css?family=Finger+Paint" rel="stylesheet">
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/app.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <!-- endbuild -->
+</head>
+<body ng-app="anotherStormUiApp">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+
+
+<!-- Add your site or application content here -->
+<div class="container" ng-controller="TabCtrl"
+     style="margin: 0 0 0 10px ; width: 99%; border: 0 0 0 10px ; ">
+    <!--style="margin: 10px 0 10px 10px ; width: 100%; border: 10px 0 10px 10px ; ">-->
+    <div class="header">
+
+        <div class="text-muted">
+            <h1>
+                <span class="title" style="font-family: 'Finger Paint', cursive;">DATA STREAM platform</span>
+            </h1>
+            <span><i></i></span></div>
+    </div>
+
+    <div class="container">
+        <section id="content">
+            <form method="post" action="logind">
+                <h1>login</h1>
+                <div>
+                    <input type="text" placeholder="Username" required="" id="username" name="username" />
+                </div>
+                <div>
+                    <input type="password" placeholder="Password" required="" id="password" name="password"/>
+                </div>
+                <div>
+                    <input type="submit" value="登录" />
+                </div>
+            </form><!-- form -->
+        </section><!-- content -->
+    </div><!-- container -->
+
+    <div class="footer">
+        <p><span class="glyphicon glyphicon-heart"></span>大禹治水</p>
+    </div>
+</div>
+
+</body>
+</html>

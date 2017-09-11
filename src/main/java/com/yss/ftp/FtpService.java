@@ -12,6 +12,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authority;
@@ -36,79 +38,54 @@ import com.yss.util.PropertiesUtil;
  */
 public class FtpService implements InitializingBean {
     private Logger    logger = LoggerFactory.getLogger(FtpService.class);
-    private FTPClient ftpClient;
-    private String    userName;
-    private String    password;
-    private String    addr;
-    private String    port;
+
+    private GenericObjectPool<FTPClient>  pool;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        userName = PropertiesUtil.getProperty("ftpUserName");
-        password = PropertiesUtil.getProperty("ftpPassword");
-        addr     = PropertiesUtil.getProperty("ftpAddr");
-        port     = PropertiesUtil.getProperty("ftpPort");
-        if(StringUtils.isEmpty(System.getProperty("ftp"))){
-            connect();
-        }
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+        poolConfig.setMaxTotal(30);
+        poolConfig.setTimeBetweenEvictionRunsMillis(1000*60);
+        poolConfig.setTestWhileIdle(true);
+        //使用非公平锁，提高并发效率
+        poolConfig.setFairness(false);
+        pool = new GenericObjectPool<FTPClient>(new FtpConnectionFactory(),poolConfig);
     }
 
     public boolean changeWorkingDirectory(String directory) {
-        boolean flag = true;
+        boolean flag = false;
+        FTPClient ftpClient = null;
 
         try {
+
+            ftpClient = pool.borrowObject(1000);
+
+            logger.info("pool now active :" + pool.getNumActive() + "  idle:"
+                    + pool.getNumIdle() + " wait: "
+                    + pool.getNumWaiters());
+
             flag = ftpClient.changeWorkingDirectory(directory);
 
+            pool.returnObject(ftpClient);
             if (flag) {
                 logger.debug("进入文件夹" + directory + " 成功！");
             } else {
                 logger.debug("进入文件夹" + directory + " 失败！");
             }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (Exception e) {
+            try {
+                pool.invalidateObject(ftpClient);
+            } catch (Exception e1) {
+                logger.error("error ",e);
+            }
+            logger.error("error ",e);
         }
 
         return flag;
     }
 
-    private void connect() {
-        try {
-            ftpClient = new FTPClient();
-            int reply;
-            ftpClient.connect(addr, Integer.parseInt(port));
-            ftpClient.login(userName, password);
-            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-            reply = ftpClient.getReplyCode();
 
-            if (!FTPReply.isPositiveCompletion(reply)) {
-                ftpClient.disconnect();
-            }
-
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.enterLocalPassiveMode();
-        }catch(Throwable e){
-            logger.error("ftp连接异常，请确认ftpServer健康状态 ",e);
-        }
-    }
-
-    public void connect(String addr, String port, String userName, String password) throws IOException {
-        ftpClient = new FTPClient();
-
-        int reply;
-
-        ftpClient.connect(addr, Integer.parseInt(port));
-        ftpClient.login(userName, password);
-        ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-        reply = ftpClient.getReplyCode();
-
-        if (!FTPReply.isPositiveCompletion(reply)) {
-            ftpClient.disconnect();
-        }
-
-        ftpClient.enterLocalPassiveMode();
-    }
-
-    public boolean createDirecroty(String remote) throws IOException {
+    public boolean createDirecroty(String remote) throws Exception {
         boolean success   = true;
         String  directory = remote + "/";
 
@@ -160,26 +137,47 @@ public class FtpService implements InitializingBean {
     }
 
     // 判断ftp服务器文件是否存在
-    public boolean existFile(String path) throws IOException {
+    public boolean existFile(String path)  {
         boolean   flag       = false;
-        FTPFile[] ftpFileArr = ftpClient.listFiles(path);
+        FTPClient ftpClient = null;
+        try {
+            ftpClient = pool.borrowObject(1000);
+            logger.info("pool now active :" + pool.getNumActive() + "  idle:"
+                    + pool.getNumIdle() + " wait: "
+                    + pool.getNumWaiters());
+            FTPFile[] ftpFileArr = ftpClient.listFiles(path);
 
-        if (ftpFileArr.length > 0) {
-            flag = true;
+            if (ftpFileArr.length > 0) {
+                flag = true;
+            }
+
+            pool.returnObject(ftpClient);
+            return flag;
+        } catch (Exception e) {
+            logger.error("error ",e);
+            try {
+                pool.invalidateObject(ftpClient);
+            } catch (Exception e1) {
+               logger.error("error ",e1);
+            }
         }
 
         return flag;
+
+
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         FtpService ftpService = new FtpService();
 
-        ftpService.connect("zhangc1", "9099", "yarn", "yarn");
-        System.out.println(ftpService.getFtpFileTimeStamp("dockershell" + Path.SEPARATOR
-                                                          + "container_e03_1499334976379_0006_01_000002/execute.sh"));
-        System.out.println(ftpService.getFileSize("/dockershell" + Path.SEPARATOR
-                                                  + "container_e03_1499334976379_0006_01_000002",
-                                                  "execute.sh"));
+//        ftpService.connect("zhangc2", "9099", "yarn", "yarn");
+        System.out.println(ftpService.createDirecroty("/test"));
+
+//        System.out.println(ftpService.getFtpFileTimeStamp("dockershell" + Path.SEPARATOR
+//                                                          + "container_e03_1499334976379_0006_01_000002/execute.sh"));
+//        System.out.println(ftpService.getFileSize("/dockershell" + Path.SEPARATOR
+//                                                  + "container_e03_1499334976379_0006_01_000002",
+//                                                  "execute.sh"));
     }
 
     // 创建目录
@@ -187,6 +185,11 @@ public class FtpService implements InitializingBean {
         boolean flag = true;
 
         try {
+            FTPClient ftpClient = pool.borrowObject(1000);
+            logger.info("pool now active :" + pool.getNumActive() + "  idle:"
+                    + pool.getNumIdle() + " wait: "
+                    + pool.getNumWaiters());
+
             flag = ftpClient.makeDirectory(dir);
 
             if (flag) {
@@ -195,96 +198,97 @@ public class FtpService implements InitializingBean {
                 logger.debug("创建文件夹" + dir + " 失败！");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("error ",e);
         }
 
         return flag;
     }
 
-    public void upload(String path, File file) throws IOException {
-        if (!ftpClient.isConnected()) {
-            connect();
+    public void upload(String path, File file) {
+        FTPClient ftpClient = null;
+        try {
+            ftpClient = pool.borrowObject(1000);
+            logger.info("pool now active :" + pool.getNumActive() + "  idle:"
+                    + pool.getNumIdle() + " wait: "
+                    + pool.getNumWaiters());
+            createDirecroty(path);
+            changeWorkingDirectory(path);
+            BufferedInputStream fiStream = new BufferedInputStream(new FileInputStream(file));
+            ftpClient.storeFile(file.getName(), fiStream);
+            fiStream.close();
+            pool.returnObject(ftpClient);
+        } catch (Exception e) {
+            logger.error("error ",e);
+            try {
+                pool.invalidateObject(ftpClient);
+            } catch (Exception e1) {
+                logger.error("error ",e);
+            }
+            logger.error("error ",e);
         }
 
-        BufferedInputStream fiStream = new BufferedInputStream(new FileInputStream(file));
-
-        createDirecroty(path);
-        changeWorkingDirectory(path);
-        ftpClient.storeFile(file.getName(), fiStream);
-        fiStream.close();
     }
 
-    public String getAddr() {
-        return addr;
-    }
 
-    public void setAddr(String addr) {
-        this.addr = addr;
-    }
-
-    public long getFileSize(String filePath, String fileName) throws IOException {
-        if (!ftpClient.isConnected()) {
-            connect();
-        }
+    public long getFileSize(String filePath, String fileName) {
 
         changeWorkingDirectory(filePath);
 
-        return ftpClient.mlistDir(filePath + "/" + fileName)[0].getSize();
-    }
+        FTPClient ftpClient = null;
+        try {
+            ftpClient = pool.borrowObject(1000);
+            logger.info("pool now active :" + pool.getNumActive() + "  idle:"
+                    + pool.getNumIdle() + " wait: "
+                    + pool.getNumWaiters());
+            long size =  ftpClient.mlistDir(filePath + "/" + fileName)[0].getSize();
+            pool.returnObject(ftpClient);
+            return size;
 
-    public FTPClient getFtpClient() {
-        return ftpClient;
-    }
-
-    public void setFtpClient(FTPClient ftpClient) {
-        this.ftpClient = ftpClient;
-    }
-
-    public long getFtpFileTimeStamp(String filePath) throws IOException {
-        if (!ftpClient.isConnected()) {
-            connect();
+        } catch (Exception e) {
+            logger.error("error ",e);
+            try {
+                pool.invalidateObject(ftpClient);
+            } catch (Exception e1) {
+                logger.error("errpr ",e1);
+            }
         }
 
-        FTPFile[] ftpFile = ftpClient.listFiles(filePath);
+        return 0l;
+    }
 
-        if ((ftpFile == null) || (ftpFile.length == 0)) {
-            return 0l;
+
+    public long getFtpFileTimeStamp(String filePath) {
+
+        FTPClient ftpClient = null;
+        try {
+            ftpClient = pool.borrowObject(1000);
+            logger.info("pool now active :" + pool.getNumActive() + "  idle:"
+                    + pool.getNumIdle() + " wait: "
+                    + pool.getNumWaiters());
+            FTPFile[] ftpFile = ftpClient.listFiles(filePath);
+
+            if ((ftpFile == null) || (ftpFile.length == 0)) {
+                return 0l;
+            }
+
+            long timeStamp = ftpFile[0].getTimestamp().getTimeInMillis();
+
+            pool.returnObject(ftpClient);
+
+            return timeStamp;
+        } catch (Exception e) {
+            try {
+                pool.invalidateObject(ftpClient);
+            } catch (Exception e1) {
+               logger.error("error ",e1);
+            }
+            logger.error("error ",e);
         }
 
-        long timeStamp = ftpFile[0].getTimestamp().getTimeInMillis();
+        return 0l;
 
-        return timeStamp;
+
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPort() {
-        return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
-    }
-
-    public String getRemoteFtpServerAddress() {
-        if (StringUtils.isNotEmpty(userName)) {
-            return "ftp://" + userName + ":" + password + "@" + addr + ":" + port;
-        }
-
-        return "ftp://" + addr + ":" + port;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
 }

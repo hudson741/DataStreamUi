@@ -64,8 +64,12 @@ public class YarnMonitorController {
             value  = "/yarnKillApp",
             method = RequestMethod.GET
     )
-    public String yarnKillApp(@RequestParam("appId") String appId) throws Exception{
-        return yarnMonitorService.killApp(appId);
+    public String yarnKillApp(@RequestParam("appId") String appId){
+        try {
+            return yarnMonitorService.killApp(appId);
+        }catch(Throwable e){
+            return "done";
+        }
     }
 
     @RequestMapping(

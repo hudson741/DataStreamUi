@@ -138,7 +138,7 @@ public class APPLaunch {
         LOG.info("Using JAVA_HOME = [" + env.get("JAVA_HOME") + "]");
         env.put("appJar", appMasterJar);
         env.put("appName", appName);
-        env.put("appId", new Integer(_appId.getId()).toString());
+        env.put("appId", _appId.toString());
         env.put("STORM_LOG_DIR", ApplicationConstants.LOG_DIR_EXPANSION_VAR);
         env.putAll(runenv);
         amContainer.setEnvironment(env);

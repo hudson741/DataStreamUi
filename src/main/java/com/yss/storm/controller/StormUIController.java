@@ -24,20 +24,6 @@ public class StormUIController {
     @Autowired
     private StormMonitorRestApiService stormMonitorRestApiService;
 
-    /**
-     * 默认首页
-     * @param model
-     * @return
-     */
-    @RequestMapping(
-            value  = "/",
-            method = RequestMethod.GET
-    )
-    public ModelAndView index(ModelMap model, HttpServletRequest httpServletRequest) {
-        //index.html全局首页
-        return new ModelAndView("index");
-    }
-
     @RequestMapping(
         value  = "/activeTopo",
         method = RequestMethod.GET

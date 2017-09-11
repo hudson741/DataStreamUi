@@ -5,13 +5,16 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
+import com.yss.Expansion.Exception.*;
 
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.Session;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * @Description
@@ -27,23 +30,18 @@ public class JschProxy {
         GenericKeyedObjectPoolConfig poolConfig = new GenericKeyedObjectPoolConfig();
 
         poolConfig.setMaxTotal(800);
-        poolConfig.setTimeBetweenEvictionRunsMillis(1000 * 60);
         poolConfig.setTestWhileIdle(true);
         poolConfig.setMaxTotalPerKey(10);
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnCreate(true);
+        poolConfig.setMaxIdlePerKey(1000);
+        poolConfig.setMinEvictableIdleTimeMillis(1000 * 60 * 5);
         // 使用非公平锁，提高并发效率
         poolConfig.setFairness(false);
         pool = new GenericKeyedObjectPool(new JschSessionObjectFactory(), poolConfig);
     }
 
     private static Logger logger = LoggerFactory.getLogger(JschProxy.class);
-
-    public void clear() {
-        logger.info("收到回调信息，清理本地无用对象");
-        pool.clear();
-    }
-
 
     public static Session getSession(JschPoolKey jschPoolKey) throws Exception {
         Session session = pool.borrowObject(jschPoolKey.Obj2Key(), 500);
@@ -54,36 +52,50 @@ public class JschProxy {
         return session;
     }
 
+    public static void clear(JschPoolKey jschPoolKey){
+        pool.clearOldest();
+        pool.clear(jschPoolKey.Obj2Key());
+
+    }
+
     public static void returnSession(JschPoolKey jschPoolKey,Session session){
         pool.returnObject(jschPoolKey.Obj2Key(),session);
     }
 
     /**
      * shell执行
-     * @param cmd
+     * @param cmds
      * @return
      * @throws JSchException
      * @throws IOException
      */
-    public static String execmd(String user,String password,String host,String cmd) throws Exception {
+    public static List<String> execmd(String user, String password, String host, String[] cmds) throws Exception {
         JschPoolKey jschPoolKey = null;
         Session session = null;
         Channel channel = null;
+
+        if(cmds == null || cmds.length ==0){
+           return Lists.newArrayList();
+        }
+
+        StringBuilder cmd = new StringBuilder();
+        for(String c:cmds){
+            cmd.append(c+";");
+        }
+
         try {
+            List<String> result = Lists.newArrayList();
             jschPoolKey = new JschPoolKey(user, password, host);
             session = JschProxy.getSession(jschPoolKey);
             channel = session.openChannel("exec");
-            ((ChannelExec) channel).setCommand(cmd);
+            ((ChannelExec) channel).setCommand(cmd.toString());
             channel.connect();
             BufferedReader br = new BufferedReader(new InputStreamReader(channel.getInputStream()));
-            StringBuffer sb = new StringBuffer();
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
-                sb.append(line + "\n");
-
+                result.add(line);
             }
-            return sb.toString();
+            return result;
 
         }catch(Exception e){
           logger.error("error ",e);
@@ -240,8 +252,7 @@ public class JschProxy {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String scpRemoteIdRsaPub(String remoteUser ,String password,String remoteHost)
-            throws Exception {
+    public static String scpRemoteIdRsaPub(String remoteUser ,String password,String remoteHost) throws ScpRemoteIdRsaPubException {
         Channel channel = null;
         Session session = null;
         JschPoolKey jschPoolKey = new JschPoolKey(remoteUser,password,remoteHost);
@@ -365,6 +376,10 @@ public class JschProxy {
                 out.write(buf, 0, 1);
                 out.flush();
             }
+        } catch(Exception e){
+            logger.error("error ",e);
+            throw new ScpRemoteIdRsaPubException(e.getMessage());
+
         } finally {
             returnSession(jschPoolKey,session);
             channel.disconnect();

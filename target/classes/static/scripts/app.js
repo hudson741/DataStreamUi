@@ -125,6 +125,9 @@ app.factory('client', ['$http', function ($http) {
     checkConnect: function(id,callback,failcallback) {
         request('checkConnect?id='+id).success(callback).error(failcallback);
     },
+    runningProcess: function(id,callback,failcallback) {
+        request('runningProcess?id='+id).success(callback).error(failcallback);
+    },
     remoteInstall: function(jobId,callback,failcallback) {
         request('remoteInstall?key='+jobId).success(callback).error(failcallback);
     },

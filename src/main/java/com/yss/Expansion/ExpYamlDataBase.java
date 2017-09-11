@@ -1,13 +1,12 @@
 package com.yss.Expansion;
 
-import com.yss.util.FileUtil;
-import com.yss.yarn.controller.ExpansionController;
+import com.yss.Expansion.Exception.YamlDataBaseException;
 import org.apache.commons.collections.MapUtils;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.LinkedHashMap;
-import java.util.UUID;
 
 import static com.yss.util.FileUtil.getJarPath;
 
@@ -17,6 +16,8 @@ import static com.yss.util.FileUtil.getJarPath;
  * @Date: 2017/8/7
  */
 public class ExpYamlDataBase {
+
+    private  static org.slf4j.Logger logger = LoggerFactory.getLogger(ExpYamlDataBase.class);
 
 
     public static void main(String[] args) throws IOException {
@@ -86,18 +87,22 @@ public class ExpYamlDataBase {
      * @param password
      * @throws IOException
      */
-    public static void addNode(String host,String ip,String user,String password,String admin,String adminPassWord) throws IOException {
-        PhysicalNode physicalNode = new PhysicalNode();
-        physicalNode.setHost(host);
-        physicalNode.setIp(ip);
-        physicalNode.setUser(user);
-        physicalNode.setPassword(password);
-        physicalNode.setAdmin(admin);
-        physicalNode.setAdminPassWord(adminPassWord);
-        String key = UUID.randomUUID().toString();
-        physicalNode.setId(key);
-        nodes.put(key,physicalNode);
-        yaml.dump(nodes,new FileWriter(fileStore));
+    public static void addNode(String host,String ip,String user,String password,String admin,String adminPassWord,String id) throws YamlDataBaseException {
+        try {
+            PhysicalNode physicalNode = new PhysicalNode();
+            physicalNode.setHost(host);
+            physicalNode.setIp(ip);
+            physicalNode.setUser(user);
+            physicalNode.setPassword(password);
+            physicalNode.setAdmin(admin);
+            physicalNode.setAdminPassWord(adminPassWord);
+            physicalNode.setId(id);
+            nodes.put(id, physicalNode);
+            yaml.dump(nodes, new FileWriter(fileStore));
+        }catch(Exception e){
+            logger.error("error ",e);
+            throw new  YamlDataBaseException(e.getMessage());
+        }
     }
 
     /**
@@ -145,8 +150,6 @@ public class ExpYamlDataBase {
 
         private String runningProcess;
 
-        private String installed ="未安装";
-
         private String admin = "";
 
         private String adminPassWord = "";
@@ -165,14 +168,6 @@ public class ExpYamlDataBase {
 
         public void setAdminPassWord(String adminPassWord) {
             this.adminPassWord = adminPassWord;
-        }
-
-        public String getInstalled() {
-            return installed;
-        }
-
-        public void setInstalled(String installed) {
-            this.installed = installed;
         }
 
         public String getRunningProcess() {

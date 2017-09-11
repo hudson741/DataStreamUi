@@ -19,7 +19,35 @@
         <input type="submit" type="button" class="btn btn-info" style="margin-bottom: 10px"/>
     </form>
 
+    <script type="text/javascript">
+        function check(form) {
 
+            if(form.IP.value=='') {
+                alert("请输入IP!");
+                form.IP.focus();
+                return false;
+            }
+            if(form.host.value==''){
+                alert("请输入host!");
+                form.host.focus();
+                return false;
+            }
+            if(form.rAdmin.value=='') {
+                alert("请输入管理员账户!");
+                form.rAdmin.focus();
+                return false;
+            }
+            if(form.password.value==''){
+                alert("请输入管理员密码!");
+                form.password.focus();
+                return false;
+            }
+
+            alert("全程包括物理节点注册，hadoop，jdk安装包的传输以及安装，以及环境变量的设置，全场大约3至5分钟左右,安装完成后，可查看部署日志");
+
+            return true;
+        }
+    </script>
 
     <h3>新注册物理服务器</h3>
     <form method="post" action="expand" enctype="multipart/form-data">
@@ -35,7 +63,7 @@
         password:<input type="text" name="password" id="password" class="form-control" placeholder="密码"
                                                       value="" maxlength="245"  style="margin-bottom: 10px" />
 
-        <input type="submit" type="button" class="btn btn-info" style="margin-bottom: 10px"/>
+        <input type="submit" type="button" class="btn btn-info" style="margin-bottom: 10px"  onclick="return check(this.form)"  />
     </form>
 
     <div class="container-fluid">
@@ -47,10 +75,9 @@
                     <th>ip</th>
                     <th>host</th>
                     <th>user</th>
-                    <th>是否完成部署</th>
                     <th>管理</th>
-                    <th>yarn启动</th>
-                    <th>已启动yarn进程</th>
+                    <th>yarn进程管理</th>
+                    <th>hdfs进程管理</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -58,14 +85,19 @@
                     <td>{{node.ip}}</td>
                     <td>{{node.host}}</td>
                     <td>{{node.user}}</td>
-                    <td>{{node.installed}}</td>
                     <td>
                         <input type="button" value="检测" ng-click='checkConnect(node.id)' class="btn btn-default">
-                        <input type="button" value="部署安装" ng-click='remoteInstall(node.id,node.ip)' class="btn btn-default">
+                        <input type="button" value="在运行hadoop进程" ng-click='runningProcess(node.id)' class="btn btn-default">
                         <input type="button" value="部署日志" ng-click='logio(node.id)' class="btn btn-default">
                         <input type="button" value="配置同步" ng-click='confSyn(node.id,node.ip)' class="btn btn-default">
                         <input type="button" value="删除" ng-click='delPNodes(node.id,node.ip)' class="btn btn-default">
 
+                    </td>
+                    <td>
+                        <select ng-model="selectedYcmd">
+                            <option ng-repeat="x in ycmds" value="{{x.cmd}}">{{x.show}}</option>
+                        </select>
+                        <input type="button" value="执行" ng-click='exehcmd(selectedYcmd,node.id)' class="btn btn-default">
                     </td>
                     <td>
                         <select ng-model="selectedHcmd">
@@ -73,10 +105,6 @@
                         </select>
                         <input type="button" value="执行" ng-click='exehcmd(selectedHcmd,node.id)' class="btn btn-default">
                     </td>
-                    <td>
-                        {{node.runningProcess}}
-                    </td>
-
                 </tr>
                 </tbody>
             </table>

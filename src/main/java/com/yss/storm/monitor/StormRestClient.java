@@ -110,6 +110,8 @@ public class StormRestClient implements InitializingBean {
             e.printStackTrace();
         } catch (HttpException e) {
             e.printStackTrace();
+        } catch (Throwable e){
+            e.printStackTrace();
         }
 
         return null;
@@ -236,7 +238,7 @@ public class StormRestClient implements InitializingBean {
             String ui = yarnThriftClient.getStormUi();
             logger.info("ui is "+ui);
             return ui;
-        } catch (TException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
         return null;

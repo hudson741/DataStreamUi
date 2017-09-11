@@ -40,6 +40,20 @@ public class JschPoolKey {
 
         String json = jschPoolKey.Obj2Key();
         System.out.println("fuck "+json);
+
+
+        JschPoolKey jschPoolKey1 = new JschPoolKey();
+        jschPoolKey1.setHost("zhangc1");
+        jschPoolKey1.setUser("root");
+        jschPoolKey1.setPassword("Tudou=123");
+
+        String json1 = jschPoolKey.Obj2Key();
+        System.out.println("fuck "+json1);
+
+        if(json1.equals(json)){
+            System.out.println("fffffff");
+        }
+
         JschPoolKey key = jschPoolKey.key2Obj(json);
         System.out.println(key.getHost()+": "+key.getPassword()+": "+key.getUser());
     }

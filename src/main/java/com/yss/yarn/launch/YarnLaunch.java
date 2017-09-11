@@ -4,17 +4,18 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.*;
 
 import com.floodCtr.generate.FloodJob;
+import com.yss.ftp.FtpConnectionFactory;
 import com.yss.util.PropertiesUtil;
 import com.yss.util.YarnUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -44,7 +45,7 @@ import com.yss.ftp.FtpService;
 import com.yss.storm.StormNodesService;
 import com.yss.storm.node.NimbusNode;
 import com.yss.util.FileUtil;
-import com.yss.yarn.Exception.JarNotExsitsException;
+import com.yss.Expansion.Exception.JarNotExsitsException;
 import com.yss.yarn.controller.YarnLaunchController;
 import com.yss.yarn.discovery.YarnThriftClient;
 
@@ -76,6 +77,14 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         uiPort = Integer.parseInt(PropertiesUtil.getProperty("uiPort"));
         defaultQueue = PropertiesUtil.getProperty("defaultQueue");
         classPath = PropertiesUtil.getProperty("appMasterClassPath");
+
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+        poolConfig.setMaxTotal(30);
+        poolConfig.setTestWhileIdle(true);
+        //使用非公平锁，提高并发效率
+        poolConfig.setFairness(false);
+
+
 
     }
 
@@ -124,6 +133,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
     }
 
     /**
+     * 暂不使用
      * 将文件写入yarn依赖的底层FTP存储系统，再封装成localResource给yarn使用
      * @param appHome
      * @param file
@@ -132,20 +142,21 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
      * @throws URISyntaxException
      */
     private LocalResource writeReturnFTPLocalResources(String appHome,File file) throws IOException, URISyntaxException {
-        long size = file.length();
+//        long size = file.length();
+//
+//        ftpService.upload(appHome, file);
+//
+//        long          timeStamp     = ftpService.getFtpFileTimeStamp(Path.SEPARATOR +appHome + Path.SEPARATOR  + file.getName());
+//        LocalResource localResource = LocalResource.newInstance(
+//                org.apache.hadoop.yarn.api.records.URL.fromURI(
+//                        new URI(FtpConnectionFactory.getRemoteFtpServerAddress()+Path.SEPARATOR +appHome+Path.SEPARATOR +file.getName())),
+//                LocalResourceType.FILE,
+//                LocalResourceVisibility.APPLICATION,
+//                size,
+//        timeStamp);
+//        return localResource;
 
-        ftpService.upload(appHome, file);
-
-        long          timeStamp     = ftpService.getFtpFileTimeStamp(Path.SEPARATOR +appHome + Path.SEPARATOR  + file.getName());
-        LocalResource localResource = LocalResource.newInstance(
-                org.apache.hadoop.yarn.api.records.URL.fromURI(
-                        new URI(ftpService.getRemoteFtpServerAddress()+Path.SEPARATOR +appHome+Path.SEPARATOR +file.getName())),
-                LocalResourceType.FILE,
-                LocalResourceVisibility.APPLICATION,
-                size,
-                timeStamp);
-        return localResource;
-
+        return null;
     }
 
 
@@ -199,10 +210,10 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         }else if(FS_SYSTEM.startsWith("ftp")){
              localResource = writeReturnFTPLocalResources(appHome,file);
              fs="ftp";
-             env.put("ftpAddr",ftpService.getAddr());
-             env.put("ftpPort",ftpService.getPort());
-             env.put("ftpUserName",ftpService.getUserName());
-             env.put("ftpPassword",ftpService.getPassword());
+             env.put("ftpAddr",FtpConnectionFactory.getAddr());
+             env.put("ftpPort",FtpConnectionFactory.getPort());
+             env.put("ftpUserName",FtpConnectionFactory.getUserName());
+             env.put("ftpPassword",FtpConnectionFactory.getPassword());
         }
 
         localResources.put(file.getName(), localResource);
@@ -223,6 +234,12 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         env.put("fs",fs);
         env.put("appId", new Integer(appId.getId()).toString());
         env.putAll(runenv);
+
+        //set hadoopUser password
+
+        env.put("hadoopUser",PropertiesUtil.getProperty("hadoopUser"));
+        env.put("hadoopUserPd",PropertiesUtil.getProperty("hadoopUserPd"));
+
         amContainer.setEnvironment(env);
 
         Vector<String> vargs = new Vector<String>();
@@ -309,12 +326,13 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             String nimbusSeedsArray = buildNimbusHostsArrays();
 
             dockerArgs = dockerArgs + " -c nimbus.seeds=" + nimbusSeedsArray;
+            String priority = StringUtils.isEmpty(node)?FloodJob.PRIORITY.LOW.getCode()+"":FloodJob.PRIORITY.HIGH.getCode()+"";
             yarnThriftClient.addDockerComponent("storm",
                                                 containerName,
                                                 StringUtils.isEmpty(node)?null:node,
                                                 dockerIp,
                                                 process,
-                    FloodJob.PRIORITY.HIGH.getCode()+"",
+                                                priority,
                                                 dockerArgs,
                                                 null,
                                                 host,

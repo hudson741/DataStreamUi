@@ -36,6 +36,15 @@ app.controller('nodeManager',['$scope','$location',"client",function($scope,$loc
         });
     }
 
+    $scope.runningProcess = function(id){
+        client.runningProcess(id,function(result){
+            alert(result);
+
+        },function(){
+            defaultFail($scope)
+        });
+    }
+
     $scope.remoteInstall = function(jobId,ip){
         if(jobId){
             if(!confirm('确认部署hadoop-yarn至'+ip+"?")){
@@ -64,11 +73,19 @@ app.controller('nodeManager',['$scope','$location',"client",function($scope,$loc
         });
     }
 
+    $scope.ycmds = [
+        {cmd : "rstart" , show : "启动yarn主节点"},
+        {cmd : "nstart" , show : "启动yarn从节点"},
+        {cmd : "rstop" ,  show : "停止yarn主节点"},
+        {cmd : "nstop" , show : "停止yarn从节点"}
+    ];
+
     $scope.hcmds = [
-        {cmd : "rstart" , show : "作为主节点启动"},
-        {cmd : "nstart" , show : "作为从节点启动"},
-        {cmd : "rstop" ,  show : "停止主节点"},
-        {cmd : "nstop" , show : "停止从节点"}
+        {cmd : "hinit" , show : "格式化namenode"},
+        {cmd : "hnstart" , show : "启动namenode"},
+        {cmd : "hdstart" , show : "启动datanode"},
+        {cmd : "hnstop" , show : "停止namenode"},
+        {cmd : "dnstop" , show : "停止datanode"}
     ];
 
     $scope.exehcmd = function(hcmd,key){
