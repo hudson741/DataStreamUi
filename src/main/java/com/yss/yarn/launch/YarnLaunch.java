@@ -46,7 +46,7 @@ import com.yss.storm.StormNodesService;
 import com.yss.storm.node.NimbusNode;
 import com.yss.util.FileUtil;
 import com.yss.Expansion.Exception.JarNotExsitsException;
-import com.yss.yarn.controller.YarnLaunchController;
+import com.yss.yarn.controller.StormDockerController;
 import com.yss.yarn.discovery.YarnThriftClient;
 
 /**
@@ -269,7 +269,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             throw new JarNotExsitsException("需要指定运行的jar不存在");
         }
 
-        String targetPath = FileUtil.getJarPath(YarnLaunchController.class) + "/dockerpubjar";
+        String targetPath = FileUtil.getJarPath(StormDockerController.class) + "/dockerpubjar";
 
         targetPath = targetPath.replace("file:", "");
 
@@ -290,7 +290,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             throw new JarNotExsitsException("需要指定运行的jar不存在");
         }
 
-        String targetPath = FileUtil.getJarPath(YarnLaunchController.class) + "/dockerpubjar";
+        String targetPath = FileUtil.getJarPath(StormDockerController.class) + "/dockerpubjar";
 
 
         String target = FileUtil.copy(new FileInputStream(sourceJar), targetPath, sourceJar.getName());

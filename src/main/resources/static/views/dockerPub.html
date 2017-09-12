@@ -1,5 +1,4 @@
-<div style="margin-bottom: 10px">
-
+<div style="margin-bottom: 10px" ng-controller="dockerm">
 
     <form method="post" action="dockerPub" enctype="multipart/form-data">
         <input type="file" name="file" class="form-control" placeholder="127.0.0.1:9090" ng-trim="true"
@@ -12,8 +11,10 @@
         netUrl:<input type="text" name="netUrl" id="netUrl" class="form-control" placeholder="所连接的docker网络环境标识"
                      maxlength="245"  style="margin-bottom: 10px" />
 
-        配置类型:<input type="text" name="cm" id="cm" class="form-control" placeholder="高配---->(8core,16G),标准---->(4core,8G)"
-                      maxlength="245"  style="margin-bottom: 10px" />
+        配置类型:
+        <select name="stormDockerConf" ng-init="stormDockerConf = confd[1]" ng-model="stormDockerConf" class="form-control" maxlength="245"  style="margin-bottom: 10px">
+            <option ng-repeat="x in confd" value="{{x.cid}}">{{x.show}}</option>
+        </select>
 
         uiIp:<input type="text" name="uiIp" id="uiIp" class="form-control" placeholder="storm-ui,dockerIp.与netUrl设定有关.例: 192.168.10.5"
                   maxlength="245"  style="margin-bottom: 10px" />
@@ -22,11 +23,9 @@
                   maxlength="245"  style="margin-bottom: 10px" />
 
 
-        <!--类执行路径<input type="text" name="launchMainClass" id="launchMainClass" class="form-control" placeholder="请输入上述jar的执行类路径" ng-trim="true"-->
-               <!--maxlength="245" ng-model="dockerPubURL" style="margin-bottom: 10px" />-->
-
         <input type="submit" type="button" class="btn btn-info" style="margin-bottom: 10px"/>
     </form>
+
 
     <div ng-show="showMessage">
         <alert type="info" style="margin-bottom: 10px">dockerPubURL url updated to <b>{{dockerPubURL}}</b></alert>

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.yss.config.Conf;
-import com.yss.storm.controller.StormTopologySubmitController;
 import com.yss.util.FileUtil;
 import com.yss.yarn.launch.YarnLaunchService;
 
@@ -28,8 +27,8 @@ import com.yss.yarn.launch.YarnLaunchService;
  * @Date: 2017/6/19
  */
 @RestController
-public class YarnLaunchController {
-    private Logger            logger = LoggerFactory.getLogger(YarnLaunchController.class);
+public class StormDockerController {
+    private Logger            logger = LoggerFactory.getLogger(StormDockerController.class);
     @Autowired
     private YarnLaunchService yarnLaunchService;
 
@@ -40,7 +39,7 @@ public class YarnLaunchController {
     public String dockerPub(@RequestParam("file") MultipartFile file,
                             @RequestParam("appName") String appName,
                             @RequestParam("netUrl") String netUrl,
-                            @RequestParam("cm") String cm,
+                            @RequestParam("stormDockerConf") String stormDockerConf,
                             @RequestParam("uiIp") String uiIp,
                             @RequestParam("nimbusSeeds") String nimbusSeeds,
                             HttpServletRequest httpServletRequest)
@@ -67,7 +66,7 @@ public class YarnLaunchController {
         Map<String, String> env = new HashMap<>();
 
         env.put("netUrl", netUrl);
-        env.put("cm", cm);
+        env.put("cm", stormDockerConf);
         env.put("zk", zk);
         env.put("uiIp", uiIp);
         env.put("nimbusSeeds", nimbusSeeds);

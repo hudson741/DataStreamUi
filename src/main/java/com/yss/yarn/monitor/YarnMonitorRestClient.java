@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yss.config.Conf;
 import com.yss.util.HttpUtilManager;
-import com.yss.yarn.controller.YarnLaunchController;
+import com.yss.yarn.controller.StormDockerController;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.HttpClient;
@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 public class YarnMonitorRestClient {
 
-    private Logger logger = LoggerFactory.getLogger(YarnLaunchController.class);
+    private Logger logger = LoggerFactory.getLogger(StormDockerController.class);
 
     private static PoolingClientConnectionManager ccm    = new PoolingClientConnectionManager();
     private static HttpClient client = new DefaultHttpClient(ccm);
