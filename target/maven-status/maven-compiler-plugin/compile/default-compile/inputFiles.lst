@@ -18,7 +18,6 @@
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/Exception/RemoteConnectionException.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/Exception/ScpRemoteIdRsaPubException.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/model/SlotStatus.java
-/Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/controller/StormPubController.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/Exception/KnownHostException.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/ftp/FtpConnectionFactory.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/submit/StormRemoteJarSubmiter.java
@@ -29,6 +28,7 @@
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/model/Rebalance.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/JschProxy.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/discovery/ThriftClientObjectFactory.java
+/Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/controller/StormDockerController.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/ftp/SofaFtpServer.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/launch/APPLaunch.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/TestMain.java
@@ -43,7 +43,6 @@
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/JschService.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/Exception/HadoopUserAddException.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/Exception/JarNotExsitsException.java
-/Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/yarn/controller/YarnLaunchController.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/Expansion/Exception/LocalHostException.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/config/SettingsController.java
 /Users/zhangchi/sourceCode/DataStreamUi/src/main/java/com/yss/storm/submit/StormSubmiter.java

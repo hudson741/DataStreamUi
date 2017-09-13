@@ -11,11 +11,6 @@
         netUrl:<input type="text" name="netUrl" id="netUrl" class="form-control" placeholder="所连接的docker网络环境标识"
                      maxlength="245"  style="margin-bottom: 10px" />
 
-        配置类型:
-        <select name="stormDockerConf" ng-init="stormDockerConf = confd[1]" ng-model="stormDockerConf" class="form-control" maxlength="245"  style="margin-bottom: 10px">
-            <option ng-repeat="x in confd" value="{{x.cid}}">{{x.show}}</option>
-        </select>
-
         uiIp:<input type="text" name="uiIp" id="uiIp" class="form-control" placeholder="storm-ui,dockerIp.与netUrl设定有关.例: 192.168.10.5"
                   maxlength="245"  style="margin-bottom: 10px" />
 

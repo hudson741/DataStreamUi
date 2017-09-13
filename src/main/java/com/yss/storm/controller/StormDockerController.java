@@ -1,25 +1,23 @@
-package com.yss.yarn.controller;
-
-import java.net.URI;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.yss.storm.StormNodesService;
-import org.apache.commons.lang.StringUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+package com.yss.storm.controller;
 
 import com.yss.config.Conf;
+import com.yss.storm.StormNodesService;
 import com.yss.util.FileUtil;
+import com.yss.util.PropertiesUtil;
 import com.yss.yarn.launch.YarnLaunchService;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Description
@@ -39,7 +37,6 @@ public class StormDockerController {
     public String dockerPub(@RequestParam("file") MultipartFile file,
                             @RequestParam("appName") String appName,
                             @RequestParam("netUrl") String netUrl,
-                            @RequestParam("stormDockerConf") String stormDockerConf,
                             @RequestParam("uiIp") String uiIp,
                             @RequestParam("nimbusSeeds") String nimbusSeeds,
                             HttpServletRequest httpServletRequest)
@@ -66,11 +63,18 @@ public class StormDockerController {
         Map<String, String> env = new HashMap<>();
 
         env.put("netUrl", netUrl);
-        env.put("cm", stormDockerConf);
         env.put("zk", zk);
         env.put("uiIp", uiIp);
         env.put("nimbusSeeds", nimbusSeeds);
+        //set hadoopUser password
 
+        env.put("hadoopUser", PropertiesUtil.getProperty("hadoopUser"));
+        env.put("hadoopUserPd",PropertiesUtil.getProperty("hadoopUserPd"));
+
+        //set nimbus ui dockerImage
+        env.put("nimbusUIDockerImage" , PropertiesUtil.getProperty("NOMALDockerImage"));
+
+        
         if (file != null) {
             String filePath = httpServletRequest.getServletContext().getRealPath("/");
 
@@ -83,6 +87,31 @@ public class StormDockerController {
 
         return "上传成功";
     }
+
+    @PostMapping("/stormdockerPub")
+    public String stormdockerPub(@RequestParam("dockerIp") String dockerIp,
+                                 @RequestParam("process") String process,
+                                 @RequestParam("stormDockerConf") String cm,
+                                 @RequestParam(value = "node" , required = false) String node,
+                                 @RequestParam(value = "host",required=false) String host) throws Exception {
+
+
+        Map<String,String> hostMap = new HashMap<>();
+        if(StringUtils.isNotEmpty(host)) {
+            String[] hostArray = host.split(",");
+            for (String hostEntry : hostArray) {
+                String[] hostMapArray = hostEntry.split(":");
+                hostMap.put(hostMapArray[0], hostMapArray[1]);
+            }
+        }
+
+        yarnLaunchService.launchStormDockerComponent(process+"-"+System.currentTimeMillis(),
+                dockerIp,process,node,cm,hostMap);
+
+
+        return "发布成功";
+    }
+
 
 
 }

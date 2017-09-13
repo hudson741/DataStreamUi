@@ -31,7 +31,6 @@ Test.class
 com/floodCtr/generate/FloodJobRunningState$RUNNING_STATE.class
 com/yss/yarn/model/YarnApps.class
 com/floodCtr/generate/StormThriftService$restartDocker_args$restartDocker_argsStandardSchemeFactory.class
-com/yss/storm/controller/StormPubController.class
 com/floodCtr/generate/StormThriftService$stopDocker_result.class
 com/floodCtr/generate/StormThriftService$stopDocker_args$_Fields.class
 com/yss/config/Conf.class
@@ -72,7 +71,6 @@ com/yss/yarn/discovery/ThriftClientProxy$1.class
 com/floodCtr/generate/StormThriftService$getStormUi_args.class
 com/yss/Expansion/Exception/SudoRemoteHadoopException.class
 com/yss/yarn/model/YarnApp.class
-com/yss/yarn/controller/YarnLaunchController.class
 com/floodCtr/generate/StormThriftService$AsyncProcessor$addDockerComponent.class
 com/floodCtr/generate/StormThriftService$stopDocker_result$stopDocker_resultStandardScheme.class
 com/floodCtr/generate/StormThriftService$Processor$getStormNimbus.class
@@ -191,6 +189,7 @@ com/yss/Expansion/Exception/RemoteKnownHostsSetException.class
 com/yss/Expansion/JschService$MyUserInfo.class
 com/yss/util/YarnUtil$1.class
 com/floodCtr/generate/StormThriftService$addDockerComponent_args$addDockerComponent_argsTupleSchemeFactory.class
+com/yss/storm/controller/StormDockerController.class
 com/floodCtr/generate/StormThriftService$stopDocker_result$_Fields.class
 com/floodCtr/generate/StormThriftService$getAllDockerJob_result.class
 com/yss/Expansion/Exception/JarNotExsitsException.class

@@ -17,6 +17,7 @@
                         <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;"><strong>Running / Total apps</strong></th>
                         <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;"><strong>Used / Total VCPUs</strong></th>
                         <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;"><strong>Used / Total RAM (GB))</strong></th>
+                        <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;"><strong>hadoop内置监控界面</strong></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -25,6 +26,7 @@
                         <td class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;">{{yarn.cluster.appsRunning}} / {{yarn.cluster.appsSubmitted}}</td>
                         <td class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;">{{yarn.cluster.allocatedVirtualCores}} / {{yarn.cluster.totalVirtualCores}}</td>
                         <td class="sorting_disabled" rowspan="1" colspan="1" style="width: 264px;">{{yarn.cluster.allocateGB}} / {{yarn.cluster.totalGB}}</td>
+                        <td class="sorting_disabled" rowspan="1" colspan="1" ng-click='locateMonitor(yarn.href)' style="width: 264px;">{{yarn.href}}</td>
                     </tr>
                     </tbody>
                 </table>

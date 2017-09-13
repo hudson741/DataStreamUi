@@ -27,6 +27,10 @@ app.controller('yarnManage',['$scope','$location',"client",function($scope,$loca
         });
     }
 
+    $scope.locateMonitor = function(href){
+        window.open(href)
+    }
+
     $scope.yarnKillApp = function(appId){
         if(appId){
             if(!confirm('确认kill'+appId+"?")){

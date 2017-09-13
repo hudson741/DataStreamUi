@@ -89,9 +89,9 @@ public class YarnThriftClient implements StormThriftService.Iface{
 
 
     @Override
-    public void addDockerComponent(String imageName, String containerName, String runIp, String dockerIp, String businessTag, String priority, String dockerArgs, String netUrl, Map<String, String> host, Map<String, String> port) throws TException {
+    public void addDockerComponent(String imageName, String containerName, String runIp, String dockerIp, String businessTag, String priority, String dockerArgs, String netUrl, String cm,Map<String, String> host, Map<String, String> port) throws TException {
         StormThriftService.Iface client =(StormThriftService.Iface)thriftClientProxy.getProxyClient();
-        client.addDockerComponent(imageName, containerName,runIp, dockerIp, businessTag,priority,dockerArgs, netUrl, host, port);
+        client.addDockerComponent(imageName, containerName,runIp, dockerIp, businessTag,priority,dockerArgs, netUrl,cm, host, port);
     }
 
     public List<DockerJob> getDockerJobs(){

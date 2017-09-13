@@ -1,4 +1,4 @@
-<div style="margin-bottom: 10px">
+<div style="margin-bottom: 10px" ng-controller="dockerm">
 
 
     <form method="post" action="stormdockerPub" enctype="multipart/form-data">
@@ -10,6 +10,11 @@
 
         process:<input type="text" name="process" id="process" class="form-control" placeholder="启动的storm组件名称"
                         maxlength="245"  style="margin-bottom: 10px" />
+
+        配置类型:
+        <select name="stormDockerConf" ng-init="stormDockerConf = confd[1]" ng-model="stormDockerConf" class="form-control" maxlength="245"  style="margin-bottom: 10px">
+            <option ng-repeat="x in confd" value="{{x.cid}}">{{x.show}}</option>
+        </select>
 
         node(非必填，指定启动节点):<input type="text" name="node" id="node" class="form-control" placeholder="指定启动节点地址"
                        maxlength="245"  style="margin-bottom: 10px" />

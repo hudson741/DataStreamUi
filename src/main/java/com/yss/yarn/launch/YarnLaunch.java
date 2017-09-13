@@ -11,6 +11,7 @@ import java.util.*;
 
 import com.floodCtr.generate.FloodJob;
 import com.yss.ftp.FtpConnectionFactory;
+import com.yss.storm.controller.StormDockerController;
 import com.yss.util.PropertiesUtil;
 import com.yss.util.YarnUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,7 +47,6 @@ import com.yss.storm.StormNodesService;
 import com.yss.storm.node.NimbusNode;
 import com.yss.util.FileUtil;
 import com.yss.Expansion.Exception.JarNotExsitsException;
-import com.yss.yarn.controller.StormDockerController;
 import com.yss.yarn.discovery.YarnThriftClient;
 
 /**
@@ -232,13 +232,8 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         logger.info("YARN CLASSPATH = [" + yarn_class_path + "]");
         env.put("appName", appName);
         env.put("fs",fs);
-        env.put("appId", new Integer(appId.getId()).toString());
+        env.put("appId", appId.toString());
         env.putAll(runenv);
-
-        //set hadoopUser password
-
-        env.put("hadoopUser",PropertiesUtil.getProperty("hadoopUser"));
-        env.put("hadoopUserPd",PropertiesUtil.getProperty("hadoopUserPd"));
 
         amContainer.setEnvironment(env);
 
@@ -300,7 +295,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
 
     @Override
     public void launchStormDockerComponent(String containerName, String dockerIp, String process,String node,
-                                           Map<String, String> host) {
+                                           String cm, Map<String, String> host) {
         try {
 
             // 调用服务
@@ -327,7 +322,17 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
 
             dockerArgs = dockerArgs + " -c nimbus.seeds=" + nimbusSeedsArray;
             String priority = StringUtils.isEmpty(node)?FloodJob.PRIORITY.LOW.getCode()+"":FloodJob.PRIORITY.HIGH.getCode()+"";
-            yarnThriftClient.addDockerComponent("storm",
+
+            String imageName = "";
+            if(cm.equals(3)){
+                imageName = PropertiesUtil.getProperty("H2DockerImage");
+            }else if(cm.equals("2")){
+                imageName = PropertiesUtil.getProperty("H1DockerImage");
+            }else{
+                imageName = PropertiesUtil.getProperty("NOMALDockerImage");
+            }
+
+            yarnThriftClient.addDockerComponent(imageName,
                                                 containerName,
                                                 StringUtils.isEmpty(node)?null:node,
                                                 dockerIp,
@@ -335,6 +340,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
                                                 priority,
                                                 dockerArgs,
                                                 null,
+                                                cm,
                                                 host,
                                                 port);
         } catch (TTransportException e) {

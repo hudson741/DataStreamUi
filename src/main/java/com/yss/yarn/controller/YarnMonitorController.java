@@ -2,6 +2,7 @@ package com.yss.yarn.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yss.config.Conf;
 import com.yss.yarn.model.DockerJob;
 import com.yss.yarn.monitor.YarnMonitorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class YarnMonitorController {
         yarn.put("cluster",yarnCluster);
         yarn.put("apps",yarnApp);
         yarn.put("nodes",yarnNodes);
+        yarn.put("href", Conf.getYarnResourceUiAddress());
 
         List<DockerJob> jobs = yarnMonitorService.getDockerJobs();
 
