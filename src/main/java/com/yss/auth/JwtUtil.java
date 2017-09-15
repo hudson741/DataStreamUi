@@ -23,7 +23,7 @@ public class JwtUtil {
         if(null != map && !map.isEmpty()) {
             try {
                 new Base64(true);
-                JWTSigner signer = new JWTSigner(Base64.decodeBase64("ldjYWNdcek"));
+                JWTSigner signer = new JWTSigner(Base64.decodeBase64(clientSecretCode));
                 String token = signer.sign(map);
                 return token;
             } catch (Exception var3) {
@@ -37,7 +37,7 @@ public class JwtUtil {
     public static Map<String, Object> verify(String token) {
         try {
             new Base64(true);
-            JWTVerifier jwtVerifier = new JWTVerifier(Base64.decodeBase64("ldjYWNdcek"));
+            JWTVerifier jwtVerifier = new JWTVerifier(Base64.decodeBase64(clientSecretCode));
             Map<String, Object> decodedPayload = jwtVerifier.verify(token);
             return decodedPayload;
         } catch (Exception var3) {

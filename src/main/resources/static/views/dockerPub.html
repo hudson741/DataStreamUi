@@ -1,6 +1,7 @@
 <div style="margin-bottom: 10px" ng-controller="dockerm">
 
     <form method="post" action="dockerPub" enctype="multipart/form-data">
+
         <input type="file" name="file" class="form-control" placeholder="127.0.0.1:9090" ng-trim="true"
                maxlength="255"  style="margin-bottom: 10px" />
 
@@ -17,6 +18,8 @@
         nimbusSeeds:<input type="text" name="nimbusSeeds" id="nimbusSeeds" class="form-control" placeholder="storm nimbus主节点dockerIp地址，与netUrl设定有关.例：192.168.10.3,192.168.10.4"
                   maxlength="245"  style="margin-bottom: 10px" />
 
+        drpcServers:<input type="text" name="drpcServers" id="drpcServers" class="form-control" placeholder="storm drpc主节点dockerIp地址，与netUrl设定有关.例：192.168.10.7,如果集群不提供drpc服务，可以忽略"
+                           maxlength="245"  style="margin-bottom: 10px" />
 
         <input type="submit" type="button" class="btn btn-info" style="margin-bottom: 10px"/>
     </form>

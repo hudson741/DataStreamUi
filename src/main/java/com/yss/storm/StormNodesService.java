@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yss.storm.node.DrpcNode;
 import com.yss.yarn.discovery.YarnThriftClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -119,6 +120,26 @@ public class StormNodesService {
 
     public void setNimbusHosts(List<String> nimbusHosts) {
         this.nimbusHosts = nimbusHosts;
+    }
+
+    public List<DrpcNode> getDrpcNodeList(){
+        List<DrpcNode> list = Lists.newArrayList();
+        try {
+            String json = yarnThriftClient.getStormDrpc();
+            if(StringUtils.isEmpty(json)){
+                return Lists.newArrayList();
+            }
+            List<String> array = JSONObject.parseArray(json,String.class);
+            for(String dprcNode:array){
+                String[] drpc = dprcNode.split(":");
+                DrpcNode drpcNode = new DrpcNode(drpc[0],drpc[1],drpc[2],Integer.parseInt(drpc[3]));
+                list.add(drpcNode);
+            }
+
+        } catch (TException e) {
+            logger.error("error ",e);
+        }
+        return list;
     }
 
     public List<NimbusNode> getNimbusNodeList() {

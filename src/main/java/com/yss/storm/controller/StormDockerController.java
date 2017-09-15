@@ -34,11 +34,12 @@ public class StormDockerController {
     private StormNodesService stormNodesService;
 
     @PostMapping("/dockerPub")
-    public String dockerPub(@RequestParam("file") MultipartFile file,
+    public String dockerPub(@RequestParam(value = "file", required = false) MultipartFile file,
                             @RequestParam("appName") String appName,
                             @RequestParam("netUrl") String netUrl,
                             @RequestParam("uiIp") String uiIp,
                             @RequestParam("nimbusSeeds") String nimbusSeeds,
+                            @RequestParam(value = "drpcServers",required = false) String drpcServers,
                             HttpServletRequest httpServletRequest)
             throws Exception {
         String zk = Conf.getSTORM_ZK();
@@ -62,19 +63,19 @@ public class StormDockerController {
 
         Map<String, String> env = new HashMap<>();
 
+        logger.info("drpc  is "+drpcServers);
         env.put("netUrl", netUrl);
         env.put("zk", zk);
         env.put("uiIp", uiIp);
         env.put("nimbusSeeds", nimbusSeeds);
-        //set hadoopUser password
+        if(StringUtils.isNotEmpty(drpcServers)) {
+            env.put("drpc", drpcServers);
+        }
 
         env.put("hadoopUser", PropertiesUtil.getProperty("hadoopUser"));
         env.put("hadoopUserPd",PropertiesUtil.getProperty("hadoopUserPd"));
-
-        //set nimbus ui dockerImage
         env.put("nimbusUIDockerImage" , PropertiesUtil.getProperty("NOMALDockerImage"));
 
-        
         if (file != null) {
             String filePath = httpServletRequest.getServletContext().getRealPath("/");
 
@@ -106,7 +107,7 @@ public class StormDockerController {
         }
 
         yarnLaunchService.launchStormDockerComponent(process+"-"+System.currentTimeMillis(),
-                dockerIp,process,node,cm,hostMap);
+                dockerIp,process,node,cm,null,hostMap);
 
 
         return "发布成功";

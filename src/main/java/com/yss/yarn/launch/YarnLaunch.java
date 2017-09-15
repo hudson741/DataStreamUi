@@ -12,6 +12,7 @@ import java.util.*;
 import com.floodCtr.generate.FloodJob;
 import com.yss.ftp.FtpConnectionFactory;
 import com.yss.storm.controller.StormDockerController;
+import com.yss.storm.node.DrpcNode;
 import com.yss.util.PropertiesUtil;
 import com.yss.util.YarnUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -85,6 +86,32 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         poolConfig.setFairness(false);
 
 
+
+    }
+
+    private String buildDRPCHostsArrays() {
+
+        List<DrpcNode> list = stormNodesService.getDrpcNodeList();
+
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+
+        List<String> drpcNodesList = Lists.newArrayList();
+
+        for (DrpcNode drpcNode : list) {
+            drpcNodesList.add(drpcNode.getDockerIp());
+        }
+
+        String dprcArray = "[";
+
+        for (Object drpc : drpcNodesList) {
+            dprcArray = dprcArray + "\\\"" + drpc + "\\\"" + ",";
+        }
+
+        dprcArray = dprcArray.substring(0, dprcArray.length() - 1) + "]";
+
+        return dprcArray;
 
     }
 
@@ -295,7 +322,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
 
     @Override
     public void launchStormDockerComponent(String containerName, String dockerIp, String process,String node,
-                                           String cm, Map<String, String> host) {
+                                           String cm, String appId,Map<String, String> host) {
         try {
 
             // 调用服务
@@ -321,6 +348,12 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             String nimbusSeedsArray = buildNimbusHostsArrays();
 
             dockerArgs = dockerArgs + " -c nimbus.seeds=" + nimbusSeedsArray;
+
+            String drpcArray = buildDRPCHostsArrays();
+            if(StringUtils.isNotEmpty(drpcArray)) {
+                dockerArgs = dockerArgs + " -c drpc.servers=" + drpcArray;
+            }
+
             String priority = StringUtils.isEmpty(node)?FloodJob.PRIORITY.LOW.getCode()+"":FloodJob.PRIORITY.HIGH.getCode()+"";
 
             String imageName = "";
@@ -341,6 +374,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
                                                 dockerArgs,
                                                 null,
                                                 cm,
+                                                appId,
                                                 host,
                                                 port);
         } catch (TTransportException e) {

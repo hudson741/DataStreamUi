@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.yss.config.Conf;
 import com.yss.yarn.model.DockerJob;
 import com.yss.yarn.monitor.YarnMonitorService;
+import org.apache.storm.utils.DRPCClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +61,18 @@ public class YarnMonitorController {
     public String yarnRestart(@RequestParam("jobId") String jobId) throws  Exception{
 
         return yarnMonitorService.yarnRestart(jobId);
+
+    }
+
+    @RequestMapping(
+            value  = "/drpc",
+            method = RequestMethod.GET
+    )
+    public String drpc(@RequestParam("host") String host,@RequestParam("func") String func,@RequestParam("msg") String msg) throws  Exception{
+
+        DRPCClient client = new DRPCClient(new HashMap(),host, 3772);
+        String result = client.execute(func, msg);
+        return result;
 
     }
 

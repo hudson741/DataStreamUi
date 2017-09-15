@@ -3,8 +3,11 @@ package com.yss.yarn.monitor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yss.config.Conf;
+import com.yss.util.DateUtil;
 import com.yss.util.HttpUtilManager;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -13,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Date;
 
 
 /**
@@ -39,7 +43,7 @@ public class YarnMonitorRestClient {
      * @return
      */
     public JSONArray getYarnApps(){
-        String jsonStr =  getApiData("apps");
+        String jsonStr =  getApiData("apps?limit=10");
         if(StringUtils.isEmpty(jsonStr)){
             return null;
         }
@@ -57,9 +61,19 @@ public class YarnMonitorRestClient {
         for(int i=0;i<jsonArray.size();i++){
             JSONObject jsonObject1 =  jsonArray.getJSONObject(i);
             String state = jsonObject1.getString("state");
+            String startTimeStamp = jsonObject1.getString("startedTime");
+            String dateStr = "";
+            try {
+                dateStr = DateUtil.format(new Date(Long.parseLong(startTimeStamp)));
+            }catch(Throwable e){
+                logger.error("error ",e);
+            }
+            jsonObject1.put("startedTime",dateStr);
+
             String noShowKill = state.equals("RUNNING")?"false":"true";
             jsonObject1.put("noShowKill",noShowKill);
         }
+
         return jsonArray;
 
 

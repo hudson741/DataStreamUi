@@ -85,11 +85,6 @@ public class APPLaunch {
         _appId = app.getApplicationId();
         LOG.debug("_appId:" + _appId);
 
-        if (amMB > app.getMaximumResourceCapability().getMemory()) {
-
-            amMB = app.getMaximumResourceCapability().getMemory();
-        }
-
         ApplicationSubmissionContext appContext = Records.newRecord(ApplicationSubmissionContext.class);
 
         appContext.setApplicationId(app.getApplicationId());
@@ -118,9 +113,7 @@ public class APPLaunch {
 
         Apps.addToEnvironment(env, Environment.CLASSPATH.name(), "./AppMaster.jar");
 
-        // Make sure that AppMaster has access to all YARN JARs
         List<String>   yarn_classpath_cmd = java.util.Arrays.asList("yarn", "classpath");
-        ProcessBuilder pb                 = new ProcessBuilder(yarn_classpath_cmd);
 
         LOG.info("YARN CLASSPATH COMMAND = [" + yarn_classpath_cmd + "]");
 
@@ -152,10 +145,8 @@ public class APPLaunch {
             vargs.add("java");
         }
 
-//        vargs.add("-Dstorm.home=./storm/" + stormHomeInZip + "/");
         vargs.add("-Dlogfile.name=" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/master.log");
 
-        // vargs.add("-verbose:class");
         vargs.add(lanchMainClass);
         vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout");
         vargs.add("2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr");
@@ -166,7 +157,6 @@ public class APPLaunch {
 
         Resource capability = Records.newRecord(Resource.class);
 
-//        capability.setMemory(amMB);
         appContext.setResource(capability);
         appContext.setAMContainerSpec(amContainer);
         appContext.setApplicationName(appName);

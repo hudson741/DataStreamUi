@@ -55,13 +55,26 @@ public class AuthConfig {
     }
 
     public static Auth login(String user,String password){
-        if(user.equals(sAdmin) && password.equals(sAdminPd)){
+        Map<String,Object> map = new HashMap<>();
+        map.put("passwd",password);
+        map.put("token","yss666");
+        String token = JwtUtil.sign(map);
+        if(user.equals(sAdmin) && token.equals(sAdminPd)){
             return Auth.SUPER;
-        }else if(user.equals(AuthConfig.user) && password.equals(uPd)) {
+        }else if(user.equals(AuthConfig.user) && token.equals(uPd)) {
             return Auth.USER;
         }else{
             return Auth.NULL;
         }
+    }
+
+
+    public static void main(String[] args){
+        Map<String,Object> map = new HashMap<>();
+        map.put("passwd","Tudou=123");
+        map.put("token","yss666");
+        String token = JwtUtil.sign(map);
+        System.out.println(token);
     }
 
     public enum Auth{
