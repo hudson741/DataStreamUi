@@ -79,6 +79,16 @@ public class YarnMonitorService {
         }
     }
 
+    public String removeDockerJob(String jobId){
+        try {
+            String signal =  yarnThriftClient.removeDocker(jobId);
+            return signal;
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+        return "删除失败，请刷新配置并重试";
+    }
+
     public String killApp(String appId){
             return yarnThriftClient.killApplication(appId);
     }

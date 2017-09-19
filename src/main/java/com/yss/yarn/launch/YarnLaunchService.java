@@ -1,5 +1,8 @@
 package com.yss.yarn.launch;
 
+import com.yss.yarn.exception.NoNimbusException;
+import com.yss.yarn.exception.ZKConfException;
+
 import java.util.Map;
 
 /**
@@ -24,7 +27,7 @@ public interface YarnLaunchService {
     /**
      * 发布storm
      */
-    void launchStormDockerComponent(String containerName, String dockerIp, String process, String node,String cm,String appId,Map<String, String> host);
+    void launchStormDockerComponent(String containerName, String dockerIp, String process, String node,String cm,String appId,Map<String, String> host) throws NoNimbusException, ZKConfException;
 
     /**
      * 更新

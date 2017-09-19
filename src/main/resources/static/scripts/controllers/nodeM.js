@@ -77,8 +77,7 @@ app.controller('nodeManager',['$scope','$location',"client",function($scope,$loc
         {cmd : "rstart" , show : "启动yarn主节点"},
         {cmd : "nstart" , show : "启动yarn从节点"},
         {cmd : "rstop" ,  show : "停止yarn主节点"},
-        {cmd : "nstop" , show : "停止yarn从节点"},
-        {cmd : "allstop" , show: "停止所有yarn节点"}
+        {cmd : "nstop" , show : "停止yarn从节点"}
     ];
 
     $scope.hcmds = [

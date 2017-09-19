@@ -5,28 +5,14 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css(.) styles/vendor.css -->
-    <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link href="https://fonts.googleapis.com/css?family=Finger+Paint" rel="stylesheet">
-    <!-- endbower -->
-    <!-- endbuild -->
-    <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/app.css">
-    <!-- endbuild -->
 </head>
 <body ng-app="anotherStormUiApp">
-<!--[if lt IE 7]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
-    your browser</a> to improve your experience.</p>
-<![endif]-->
-
-<!-- Add your site or application content here -->
 <div class="container" ng-controller="TabCtrl"
      style="margin: 0 0 0 10px ; width: 99%; border: 0 0 0 10px ; ">
-    <!--style="margin: 10px 0 10px 10px ; width: 100%; border: 10px 0 10px 10px ; ">-->
     <div class="header">
         <ul class="nav nav-pills pull-right">
             <li ng-repeat="tab in tabs"
@@ -79,6 +65,7 @@
 <script src="scripts/controllers/streamManager.js"></script>
 <script src="scripts/controllers/yarn.js"></script>
 <script src="scripts/controllers/nodeM.js"></script>
+<script src="scripts/controllers/login.js"></script>
 <!-- endbuild -->
 
 <!-- Flowchart code. -->

@@ -1,0 +1,200 @@
+html
+{
+    height:90%;
+    margin:0;
+}
+body
+{
+    height:100%;
+    margin:0;
+    background-image: url(/images/z.png);
+    background-repeat:no-repeat;
+    background-size:130% 130%;
+    -moz-background-size:130% 130%;
+}
+.input-inset-wrap {
+    width: 180px;
+    height: 30px;
+}
+.input-inset {
+    width: 83%;
+    height: 96%;
+    padding-left: 6px;
+    border: 1px solid #ccc;
+    outline: 0;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+.input-inset:focus {
+    border-color: #0e8fe9;
+}
+.input-info {
+    position: relative;
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 25px;
+    border: 1px solid #ccc;
+}
+.input-info:before {
+    content: "";
+    float: left;
+    position: absolute;
+    margin-top: -7px;
+    top: 50%;
+    margin-left: -15px;
+    border: 7px solid transparent;
+    overflow: hidden;
+    border-right-color: #ccc;
+}
+.input-info:after {
+    content: "";
+    float: left;
+    position: absolute;
+    top: 50%;
+    margin-top: -7px;
+    left: -13.5px;
+    border: 7px solid transparent;
+    overflow: hidden;
+    border-right-color: #fff;
+}
+.input-info i {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    margin-top: -7px;
+    margin-left: 3px;
+    width: 14px;
+    height: 14px;
+    vertical-align: bottom;
+}
+.input-info .input-info-icon {
+    background: url(images/icons/helpb.png) no-repeat;
+    background-size: 100%;
+}
+.input-info .input-info-close {
+    float: right;
+    margin-top: -6px;
+    right: 8px;
+    background: url(images/icons/close.png) no-repeat;
+    background-size: 14px;
+    cursor: pointer;
+}
+.input-info-txt {
+    line-height: 22px;
+    padding-left: 22px;
+    margin-right: 28px;
+    /*color: #888;*/
+}
+
+.user-module {
+}
+.user-module .login-resign-wrap {
+    padding: 100px 0 49px 0;
+    font-family: "Microsoft YaHei";
+    min-width: 900px;
+    background-size: cover;
+}
+.user-module .login-resign-content {
+    position: relative;
+    width: 400px;
+    height: 100%;
+    margin: 0 auto;
+    color: #fff;
+    text-align: center;
+}
+.user-module .login-resign-content .moojnn-logo {
+    margin: 50px auto 20px;
+    width: 188px;
+}
+.user-module .login-resign-content input::-webkit-input-placeholder {
+    color: #fff;
+}
+.user-module .login-resign-content input::-moz-placeholder {
+    color: #fff;
+}
+.user-module .login-resign-content input:-ms-input-placeholder {
+    color: #fff;
+}
+.user-module .login-resign-content a {
+    text-decoration: none;
+}
+.user-module .login-resign-content a:link {
+    text-decoration: none;
+}
+.user-module .login-resign-content a:visited {
+    text-decoration: none;
+}
+.user-module .login-resign-content a:hover {
+    text-decoration: none;
+}
+.user-module .login-resign-content a:active {
+    text-decoration: none;
+}
+.user-module .login-resign-content a {
+    color: #fff;
+}
+.user-module .login-resign-content .is-check {
+    color: #0E8FE9;
+}
+.user-module .input-inset-wrap {
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 400px;
+    height: 49px;
+}
+.user-module .loginer-bg-wrap {
+    position: absolute;
+    margin-left: 15px;
+    margin-top: -48px;
+    height: 100%;
+    width: 36px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.user-module .loginer-bg-wrap.loginer-zhanghu {
+    background-image: url(images/zhanghu.png);
+}
+.user-module .loginer-bg-wrap.loginer-mima {
+    background-image: url(images/mima.png);
+}
+.user-module .loginer-bg-wrap.resigner-shouji {
+    background-image: url(images/shouji.png);
+}
+.user-module .loginer-bg-wrap.resigner-email {
+    background-image: url(images/email.png);
+}
+.user-module .loginer-bg-wrap.resigner-gongsi {
+    background-image: url(images/gongsi.png);
+}
+.user-module .loginer-bg-wrap.resigner-lianxiren {
+    background-image: url(images/lianxiren.png);
+}
+.user-module .loginer-bg-wrap.resigner-jym {
+    /*width: 118px;*/
+    background-image: url(images/jym.png);
+}
+.user-module .input-login-resign {
+    /*color: #190303;*/
+    color: #fff;
+    font-size: 16px;
+    font-family: "Microsoft YaHei";
+    padding-left: 65px;
+    background-color: rgba(115, 111, 111, 0.55);
+}
+.user-module .input-login-resign.input-wram-color {
+    background-color: rgba(247, 229, 163, 0.55);
+    border: 1px solid #F7E5A3;
+}
+.user-module .input-wram-color {
+    background-color: rgba(247, 229, 163, 0.55);
+    border: 1px solid #F7E5A3;
+}
+.user-module .checkbox-wrap {
+    margin: -7px auto 13px;
+    font-size: 15px;
+    width: 399px;
+    text-align: left;
+}

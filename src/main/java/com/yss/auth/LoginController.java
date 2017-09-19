@@ -43,7 +43,7 @@ public class LoginController {
     )
     public ModelAndView stormIndex(ModelMap model, HttpServletRequest httpServletRequest) {
         //index.html全局首页
-        return new ModelAndView("login");
+        return new ModelAndView("login2");
     }
 
     /**
@@ -104,6 +104,7 @@ public class LoginController {
 
         if(auth == AuthConfig.Auth.NULL){
             response.sendRedirect("/");
+            return null;
         }
 
         if(auth == AuthConfig.Auth.SUPER){
@@ -114,4 +115,20 @@ public class LoginController {
 
         return null;
     }
+
+
+    @RequestMapping(
+            value = "/logout",
+            method = RequestMethod.GET
+    )
+    public String logout( HttpServletResponse response ) throws IOException {
+        AuthConfig.Auth auth = AuthConfig.Auth.NULL;
+        Map<String,Object> map = new HashMap<>();
+        map.put("sessionId",auth.getCode());
+        map.put("timeStamp",System.currentTimeMillis()+"");
+        String token = JwtUtil.sign(map);
+        response.addCookie(new Cookie("sessionId",token));
+        return "已登出";
+    }
+
 }

@@ -4,6 +4,8 @@ import com.yss.config.Conf;
 import com.yss.storm.StormNodesService;
 import com.yss.util.FileUtil;
 import com.yss.util.PropertiesUtil;
+import com.yss.yarn.exception.NoNimbusException;
+import com.yss.yarn.exception.ZKConfException;
 import com.yss.yarn.launch.YarnLaunchService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -94,7 +96,7 @@ public class StormDockerController {
                                  @RequestParam("process") String process,
                                  @RequestParam("stormDockerConf") String cm,
                                  @RequestParam(value = "node" , required = false) String node,
-                                 @RequestParam(value = "host",required=false) String host) throws Exception {
+                                 @RequestParam(value = "host",required=false) String host) {
 
 
         Map<String,String> hostMap = new HashMap<>();
@@ -106,8 +108,14 @@ public class StormDockerController {
             }
         }
 
-        yarnLaunchService.launchStormDockerComponent(process+"-"+System.currentTimeMillis(),
-                dockerIp,process,node,cm,null,hostMap);
+        try {
+            yarnLaunchService.launchStormDockerComponent(process+"-"+System.currentTimeMillis(),
+                    dockerIp,process,node,cm,null,hostMap);
+        } catch (NoNimbusException e) {
+            return "请先配置nimbus节点";
+        } catch (ZKConfException e) {
+            return "请配置storm的zookeeper连接地址";
+        }
 
 
         return "发布成功";

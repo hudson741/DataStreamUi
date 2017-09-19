@@ -15,6 +15,8 @@ import com.yss.storm.controller.StormDockerController;
 import com.yss.storm.node.DrpcNode;
 import com.yss.util.PropertiesUtil;
 import com.yss.util.YarnUtil;
+import com.yss.yarn.exception.NoNimbusException;
+import com.yss.yarn.exception.ZKConfException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -119,7 +121,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         List<NimbusNode> list = stormNodesService.getNimbusNodeList();
 
         if (CollectionUtils.isEmpty(list)) {
-            throw new RuntimeException("请刷新配置");
+            return "";
         }
 
         List<String> nimbusSeedsList = Lists.newArrayList();
@@ -221,7 +223,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         Map<String, LocalResource> localResources = new HashMap<String, LocalResource>();
 
         logger.info("Copy App Master jar from local filesystem and add to local environment");
-        logger.info("fuck  " + appMasterJar);
+        logger.info("load  " + appMasterJar);
 
         File file = new File(appMasterJar);
         String     appHome = YarnUtil.getApplicationHomeForId(appId.toString());
@@ -322,7 +324,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
 
     @Override
     public void launchStormDockerComponent(String containerName, String dockerIp, String process,String node,
-                                           String cm, String appId,Map<String, String> host) {
+                                           String cm, String appId,Map<String, String> host) throws NoNimbusException, ZKConfException {
         try {
 
             // 调用服务
@@ -338,7 +340,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             }
 
             if (StringUtils.isEmpty(Conf.getSTORM_ZK())) {
-                return;
+                throw new ZKConfException("请确保zk配置正确");
             }
 
             String zkHostsArrays = buildZkHostsArrays(Conf.getSTORM_ZK());
@@ -346,8 +348,12 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             dockerArgs = dockerArgs + " -c storm.zookeeper.servers=" + zkHostsArrays;
 
             String nimbusSeedsArray = buildNimbusHostsArrays();
+            if(StringUtils.isEmpty(nimbusSeedsArray) && !process.equals("nimbus")){
+                throw new NoNimbusException("请先配置nimbus");
 
-            dockerArgs = dockerArgs + " -c nimbus.seeds=" + nimbusSeedsArray;
+            }
+
+            dockerArgs = dockerArgs + " -c nimbus.seeds=" + (StringUtils.isEmpty(nimbusSeedsArray)?"["+"\\\""+dockerIp+"\\\""+"]":nimbusSeedsArray);
 
             String drpcArray = buildDRPCHostsArrays();
             if(StringUtils.isNotEmpty(drpcArray)) {

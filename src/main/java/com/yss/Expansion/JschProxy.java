@@ -99,18 +99,23 @@ public class JschProxy {
 
         }catch(Exception e){
           logger.error("error ",e);
-          session.disconnect();
-          pool.invalidateObject(jschPoolKey.Obj2Key(),session);
+          if(session!=null) {
+              pool.invalidateObject(jschPoolKey.Obj2Key(), session);
+          }
           throw e;
         } finally {
-            if(channel!=null) {
+            if(channel!=null && channel.isConnected()) {
                 channel.disconnect();
             }
-            if(session.isConnected()) {
-                JschProxy.returnSession(jschPoolKey, session);
-            }else{
-                pool.invalidateObject(jschPoolKey.Obj2Key(),session);
+            if(session!=null){
+                if(session.isConnected()){
+                    JschProxy.returnSession(jschPoolKey, session);
+                }else{
+                    pool.invalidateObject(jschPoolKey.Obj2Key(),session);
+
+                }
             }
+
         }
     }
 
@@ -367,7 +372,7 @@ public class JschProxy {
                 fos = null;
 
                 if (checkAck(in) != 0) {
-                    throw new RuntimeException("fuck");
+                    throw new RuntimeException("error");
 
                 }
 

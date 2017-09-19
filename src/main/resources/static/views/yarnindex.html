@@ -129,15 +129,11 @@
             <td>
                 <input ng-disabled="{{job.noShowStop}}" type="button" value="停止" ng-click='yarnStopDockerJob(job.jobId)' class="btn btn-default">
                 <input ng-disabled="{{job.noShowRestart}}" type="button" value="重启" ng-click='yarnRestart(job.jobId)' class="btn btn-default">
+                <input type="button" value="移除" ng-click='removeDocker(job.jobId)' class="btn btn-default">
             </td>
         </tr>
         </tbody>
     </table>
 </div>
 </div>
-    <!--<div ng-include="'partials/progress_popover.html'"></div>-->
-    <!--<div ng-include="'partials/name_link.html'"></div>-->
-    <!--<div ng-include="'partials/progress_container.html'"></div>-->
-    <!--<div ng-include="'partials/progress.html'"></div>-->
-
 </div>

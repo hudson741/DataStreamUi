@@ -356,6 +356,8 @@ public class ExpansionController {
                                             "/home/" + hadoopUser,
                                             expandDirectory);
 
+            logger.info("开始解压hadoop压缩包,此过程相对时间较长");
+
             // 添加至已注册物理节点信息
             pw.println("远程安装hadoop,jdk,此过程相对时间较长");
             pw.flush();
@@ -369,17 +371,22 @@ public class ExpansionController {
             pw.println("设置远程机器环境变量");
             pw.flush();
 
+            logger.info("开始设置远程机器环境变量");
+
             boolean envSet = JschService.remoteEnvSet(rAdmin, password, host, id);
 
             if (!envSet) {
                 return "远程环境变量设置失败";
             }
 
+            logger.info("落地存储新增节点");
             pw.println("落地存储新增节点");
             pw.flush();
             ExpYamlDataBase.addNode(host, ip, hadoopUser, hadoopUserPd, rAdmin, password, id);
 
             try {
+
+                logger.info("程执行 source /etc/profile ,使得环境变量立即生效");
                 pw.println("远程执行 source /etc/profile ,使得环境变量立即生效");
                 pw.flush();
                 JschProxy.execmd(rAdmin, password, host, new String[] { "source /etc/profile" });
@@ -387,10 +394,13 @@ public class ExpansionController {
                 logger.error("error :", e);
             }
 
+
+
             // 执行配置同步
             String confDir = null;
 
             try {
+                logger.info("正在同步hadoop配置文件至远程......");
                 confDir = FileUtil.getJarPath(ExpansionController.class) + "/conf/hadoop";
                 JschService.scpLocalDirToRemote(hadoopUser,
                                                 hadoopUserPd,
@@ -593,7 +603,6 @@ public class ExpansionController {
                                                  "/home/" + hadoopUser + "/.ssh/authorized_keys");
             }
 
-            logger.info("已创建hadoop用户，无需再创建");
         } catch (UnknownHostException e) {
             logger.error("e ", e);
 
@@ -617,7 +626,7 @@ public class ExpansionController {
         value  = "/registerRoot",
         method = RequestMethod.POST
     )
-    public String registerRoot(@RequestParam("admin") String admin, @RequestParam("pwd") String pwd) throws Exception {
+    public String registerRoot(@RequestParam("admin") String admin, @RequestParam("pwd") String pwd)  {
         String localHostName = null;
 
         try {
@@ -636,6 +645,8 @@ public class ExpansionController {
             return e.getMessage();
         } catch (PasswdModifyException e) {
             return e.getMessage();
+        } catch (Exception e) {
+           return "注册失败";
         }
 
         return "注册成功";
@@ -652,8 +663,7 @@ public class ExpansionController {
         value  = "/hcmd",
         method = RequestMethod.GET
     )
-    public String remoteHadoopST(@RequestParam("key") final String key, @RequestParam("hcmd") final String hcmd)
-            throws Exception {
+    public String remoteHadoopST(@RequestParam("key") final String key, @RequestParam("hcmd") final String hcmd){
         LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> map = ExpYamlDataBase.getNodes();
 
         if (StringUtils.isEmpty(hcmd) || "undefined".equals(hcmd)) {
@@ -683,6 +693,8 @@ public class ExpansionController {
             e.printStackTrace();
         } catch (IOException e) {
             logger.error("errpr ", e);
+        } catch (Exception e) {
+            logger.error("errpr ", e);
         }
 
         return "启动失败,请查看系统日志";
@@ -699,8 +711,7 @@ public class ExpansionController {
         value  = "/remoteInstall",
         method = RequestMethod.GET
     )
-    public String remoteInstallHadoop(@RequestParam("key") final String key)
-            throws IOException, JSchException, InterruptedException {
+    public String remoteInstallHadoop(@RequestParam("key") final String key){
         LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> map          = ExpYamlDataBase.getNodes();
         final ExpYamlDataBase.PhysicalNode                  physicalNode = map.get(key);
 
@@ -731,13 +742,13 @@ public class ExpansionController {
                         }
                     }
                 } catch (JSchException e) {
-                    e.printStackTrace();
+                    logger.error("error ",e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("error ",e);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("error ",e);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("error ",e);
                 }
             }
         }.start();
@@ -749,13 +760,18 @@ public class ExpansionController {
         value  = "/runningProcess",
         method = RequestMethod.GET
     )
-    public String runningProcess(@RequestParam("id") String id) throws Exception {
+    public String runningProcess(@RequestParam("id") String id)  {
         LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> map          = ExpYamlDataBase.getNodes();
         ExpYamlDataBase.PhysicalNode                        physicalNode = map.get(id);
-        Map<String, Boolean>                                result       =
-            JschService.isHadoopProcessRunning(physicalNode.getUser(),
+        Map<String, Boolean>                                result       = null;
+        try {
+            result = JschService.isHadoopProcessRunning(physicalNode.getUser(),
                                                physicalNode.getPassword(),
                                                physicalNode.getHost());
+        } catch (Exception e) {
+            logger.error("error ",e);
+            return "连接失败";
+        }
         StringBuilder resultBuilder = new StringBuilder();
 
         if (result.get("rm")) {

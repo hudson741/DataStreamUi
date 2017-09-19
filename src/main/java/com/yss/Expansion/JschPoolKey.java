@@ -39,7 +39,7 @@ public class JschPoolKey {
         jschPoolKey.setPassword("Tudou=123");
 
         String json = jschPoolKey.Obj2Key();
-        System.out.println("fuck "+json);
+        System.out.println("json "+json);
 
 
         JschPoolKey jschPoolKey1 = new JschPoolKey();

@@ -45,7 +45,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String url = request.getRequestURI();
 
         // URL:login.jsp是公开的;这个demo是除了login.jsp是可以公开访问的，其它的URL都进行拦截控制
-        System.out.println("fuck  " + url);
+        System.out.println("url  " + url);
 
         if ((url.indexOf("logind") >= 0)
                 || url.equals("/")
@@ -53,7 +53,11 @@ public class LoginInterceptor implements HandlerInterceptor {
                 || (url.indexOf("js") >= 0)
                 || (url.indexOf(".woff") >=0)
                 || (url.indexOf(".ico") >=0)
-                || (url.indexOf("error") >=0)) {
+                || (url.indexOf("error") >=0)
+                || (url.indexOf("gif") >= 0)
+                || (url.indexOf("jpg") >= 0)
+                || (url.indexOf("png") >=0)
+                ) {
             return true;
         }
 
@@ -68,7 +72,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        logger.info("fuck  " + url);
+        logger.info("url  " + url);
         if(StringUtils.isEmpty(token)){
             return false;
         }

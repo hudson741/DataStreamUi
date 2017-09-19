@@ -95,7 +95,7 @@ public class APPLaunch {
         Map<String, LocalResource> localResources = new HashMap<String, LocalResource>();
 
         LOG.info("Copy App Master jar from local filesystem and add to local environment");
-        LOG.info("fuck  " + appMasterJar);
+        LOG.info("load  " + appMasterJar);
 
         FileSystem fs      = FileSystem.get(_hadoopConf);
         Path       src     = new Path(appMasterJar);

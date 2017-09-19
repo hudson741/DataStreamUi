@@ -27,6 +27,22 @@ app.controller('yarnManage',['$scope','$location',"client",function($scope,$loca
         });
     }
 
+    $scope.removeDocker = function(jobId){
+        if(jobId){
+            if(!confirm('确认删除'+jobId+"?")){
+                return false;
+            }
+        }
+
+        client.removeDocker(jobId,function(result){
+            alert(result);
+            window.location.reload();
+
+        },function(){
+            defaultFail($scope)
+        });
+    }
+
     $scope.locateMonitor = function(href){
         window.open(href)
     }

@@ -53,13 +53,6 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
             }
 
             Map<String, Object>    stormConf     = buildConf();
-            StormTopology          stormTopology = zcBuilder.getTopology();
-            Map<String, Bolt>      map           = stormTopology.get_bolts();
-            Map<String, SpoutSpec> map1          = stormTopology.get_spouts();
-
-            for (Bolt bolt : map.values()) {
-                bolt.get_common().set_parallelism_hint(2);
-            }
 
             System.setProperty("storm.jar", new File(uri).toString());
             StormSubmitter.submitTopology("zc" + System.currentTimeMillis() + "", stormConf, zcBuilder.getTopology());
@@ -73,7 +66,6 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
     private Map<String, Object> buildConf() throws TException, UnknownHostException {
         Map stormConf = Utils.readStormConfig();
 
-        // Create a builder and configurations.
         Config           config      = new Config();
         List<NimbusNode> nimbusNodes = stormNodesService.getNimbusNodeList();
 
@@ -108,7 +100,6 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         config.put(Config.NIMBUS_SEEDS, nimbusHosts);
         config.put(Config.NIMBUS_THRIFT_PORT, nimbusPort);
         config.put(Config.STORM_ZOOKEEPER_SERVERS,  Arrays.asList(Conf.getSTORM_ZK().split(",")));
-//        config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(remoteZKServer.split(",")));
         config.put(Config.STORM_ZOOKEEPER_PORT, Conf.getStormZkPort());
 
 //      Map<String, Object> hbConf = new HashMap<String, Object>();

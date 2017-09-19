@@ -22,14 +22,15 @@ function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "settings", tabId: "settings", tabLink: "/conf"},
-      {tabName: "物理资源管理",tabId: "物理资源管理",tabLink: "/nodeM"},
-      {tabName: "资源监控", tabId: "资源监控", tabLink: "/yarnindex"},
+      {tabName: "docker管理",tabId: "docker管理",tabLink: "/nodeM"},
+      {tabName: "集群监控", tabId: "集群监控", tabLink: "/yarnindex"},
       {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
       {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
       {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
       {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
-      {tabName: "Host", tabId: "Host", tabLink: "/host"}
+      {tabName: "Host", tabId: "Host", tabLink: "/host"},
+      {tabName: "登出",tabId: "登出",tabLink: "/logout"}
   ];
 }
 
@@ -50,12 +51,13 @@ function updateTabs($rootScope, topos, status) {
       {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
       {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
       {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
-      {tabName: "Host", tabId: "Host", tabLink: "/host"}
+      {tabName: "Host", tabId: "Host", tabLink: "/host"},
+      {tabName: "登出",tabId: "登出",tabLink: "/logout"}
   ];
 
   for (var i = 0; i < topos.length; i++) {
     console.log("added" + topos[i].name);
-    $rootScope.tabs.push({tabName: topos[i].name, tabId: topos[i].id, tabLink: "/topo"});
+    // $rootScope.tabs.push({tabName: topos[i].name, tabId: topos[i].id, tabLink: "/topo"});
   }
 }
 
@@ -113,6 +115,9 @@ app.factory('client', ['$http', function ($http) {
     yarnRestart: function (jobId,callback,failcallback) {
       request('yarnRestart?jobId=' + jobId).success(callback).error(failcallback);
     },
+    removeDocker: function(jobId,callback,failcallback) {
+      request('removeDockerJob?jobId=' + jobId).success(callback).error(failcallback);
+    },
     yarnKillApp: function (appId,callback,failcallback) {
       request('yarnKillApp?appId=' + appId).success(callback).error(failcallback);
     },
@@ -139,6 +144,9 @@ app.factory('client', ['$http', function ($http) {
     },
     logio: function(jobId,callback,failcallback) {
         request('logio?key='+jobId).success(callback).error(failcallback);
+    },
+    logout: function(callback,failcallback) {
+        request('logout').success(callback).error(failcallback);
     }
 
   };
@@ -174,11 +182,11 @@ app.config(function ($routeProvider) {
       })
       .when('/streamManager', {
           templateUrl: 'views/streamManager.html',
-          controller: 'StreamManagerCtrl'
+          controller:  'StreamManagerCtrl'
       })
     .when('/topo', {
       templateUrl: 'views/topo.html',
-      controller: 'TopoCtrl'
+      controller:  'TopoCtrl'
     })
       .when('/topom',{
           templateUrl: 'views/topom.html',
@@ -193,6 +201,9 @@ app.config(function ($routeProvider) {
     }).when('/download',{
       templateUrl: 'views/download.html',
       controller: 'DownloadCtrl'
+    }).when('/logout',{
+      templateUrl: 'views/conf.html',
+      controller: 'logoutCtr'
     }).otherwise({
       redirectTo: '/'
     });

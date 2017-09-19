@@ -65,6 +65,14 @@ public class YarnMonitorController {
     }
 
     @RequestMapping(
+            value = "/removeDockerJob",
+            method = RequestMethod.GET
+    )
+    public String removeDockerJob(@RequestParam("jobId") String jobId) throws Exception {
+        return yarnMonitorService.removeDockerJob(jobId);
+    }
+
+    @RequestMapping(
             value  = "/drpc",
             method = RequestMethod.GET
     )
