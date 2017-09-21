@@ -97,6 +97,7 @@ com/yss/yarn/model/DockerJob.class
 com/floodCtr/generate/StormThriftService$AsyncClient$getAllDockerJob_call.class
 com/yss/Expansion/Exception/DelRemoteSSHDirException.class
 com/yss/Expansion/JschPoolKey.class
+com/yss/storm/exception/StormRmoteSubException.class
 com/yss/Expansion/JschSessionObjectFactory.class
 com/floodCtr/generate/StormThriftService$addDockerComponent_result$addDockerComponent_resultStandardScheme.class
 com/yss/Expansion/Exception/WriteFileException.class
@@ -213,6 +214,7 @@ com/yss/storm/submit/StormRemoteJarSubmiter.class
 com/yss/yarn/launch/YarnLaunchService.class
 com/floodCtr/generate/FloodJobRunningState.class
 com/yss/config/MvcConfigurer.class
+com/yss/storm/exception/ZKConfException.class
 com/floodCtr/generate/StormThriftService$getStormNimbus_result$getStormNimbus_resultStandardSchemeFactory.class
 com/yss/util/PropertiesUtil.class
 com/yss/storm/submit/StormSubmiter.class

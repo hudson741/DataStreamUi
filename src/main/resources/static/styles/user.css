@@ -154,28 +154,7 @@ body
     background-repeat: no-repeat;
     background-position: center;
 }
-.user-module .loginer-bg-wrap.loginer-zhanghu {
-    background-image: url(images/zhanghu.png);
-}
-.user-module .loginer-bg-wrap.loginer-mima {
-    background-image: url(images/mima.png);
-}
-.user-module .loginer-bg-wrap.resigner-shouji {
-    background-image: url(images/shouji.png);
-}
-.user-module .loginer-bg-wrap.resigner-email {
-    background-image: url(images/email.png);
-}
-.user-module .loginer-bg-wrap.resigner-gongsi {
-    background-image: url(images/gongsi.png);
-}
-.user-module .loginer-bg-wrap.resigner-lianxiren {
-    background-image: url(images/lianxiren.png);
-}
-.user-module .loginer-bg-wrap.resigner-jym {
-    /*width: 118px;*/
-    background-image: url(images/jym.png);
-}
+
 .user-module .input-login-resign {
     /*color: #190303;*/
     color: #fff;

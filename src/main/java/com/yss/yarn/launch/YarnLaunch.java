@@ -62,6 +62,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
     private int               appMasterPort ;
     private int               nimbusPort   ;
     private int               uiPort        ;
+    private int               drpcPort      ;
     private YarnClient        yarnClient;
     private YarnConfiguration yarnConf;
     private String            defaultQueue;
@@ -78,6 +79,7 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
         appMasterPort = Integer.parseInt(PropertiesUtil.getProperty("appMasterPort"));
         nimbusPort = Integer.parseInt(PropertiesUtil.getProperty("nimbusPort"));
         uiPort = Integer.parseInt(PropertiesUtil.getProperty("uiPort"));
+        drpcPort = Integer.parseInt(PropertiesUtil.getProperty("drpcPort"));
         defaultQueue = PropertiesUtil.getProperty("defaultQueue");
         classPath = PropertiesUtil.getProperty("appMasterClassPath");
 
@@ -337,6 +339,8 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
                 port.put(nimbusPort + "", nimbusPort + "");
             } else if (process.equals("ui")) {
                 port.put(uiPort + "", uiPort + "");
+            } else if (process.equals("drpc")) {
+                port.put(drpcPort + "" , drpcPort + "");
             }
 
             if (StringUtils.isEmpty(Conf.getSTORM_ZK())) {
@@ -359,6 +363,10 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
             if(StringUtils.isNotEmpty(drpcArray)) {
                 dockerArgs = dockerArgs + " -c drpc.servers=" + drpcArray;
             }
+            if(StringUtils.isEmpty(drpcArray) && process.equals("drpc")){
+                dockerArgs = dockerArgs + " -c drpc.servers=" +"["+"\\\""+dockerIp+"\\\""+"]";
+            }
+
 
             String priority = StringUtils.isEmpty(node)?FloodJob.PRIORITY.LOW.getCode()+"":FloodJob.PRIORITY.HIGH.getCode()+"";
 
@@ -444,6 +452,15 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
 
     public void setUiPort(int uiPort) {
         this.uiPort = uiPort;
+    }
+
+
+    public int getDrpcPort() {
+        return drpcPort;
+    }
+
+    public void setDrpcPort(int drpcPort) {
+        this.drpcPort = drpcPort;
     }
 
 }

@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.map.HashedMap;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -45,28 +46,24 @@ public class JwtUtil {
         }
     }
 
-    public static String getRandomStringByLength(int length) {
-        String base = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-        StringBuffer sb = new StringBuffer();
+    public static String signPassWord(String password){
+        Map<String,Object> map = new HashMap<>();
+        map.put("passwd",password);
+        String token = JwtUtil.sign(map);
+        return token;
 
-        for(int i = 0; i < length; ++i) {
-            int number = random.nextInt(base.length());
-            sb.append(base.charAt(number));
-        }
-
-        return sb.toString();
     }
 
-    public static void main(String[] args) {
-        Map<String, Object> claims = new HashedMap();
-        claims.put("userId", "dsdsdsssd");
-        claims.put("timeStamp", System.currentTimeMillis());
-        String sign = sign(claims);
-        System.out.println(sign);
+    public static String getPassWord(String token){
+        Map<String,Object> map = verify(token);
+        return (String)map.get("passwd");
+    }
 
-        Map<String,Object> map = verify(sign);
-        System.out.println(map.get("timeStamp"));
+
+    public static void main(String[] args) {
+        System.out.println(signPassWord("Tudou=123"));
+        String token = signPassWord("Tudou=123");
+        System.out.println(getPassWord(token));
     }
 
 

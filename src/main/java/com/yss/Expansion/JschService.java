@@ -553,12 +553,13 @@ public class JschService {
             String resultStr = list2String(result);
 
             if (resultStr.contains("1")) {
+                file.delete();
                 return true;
             }
 
             logger.warn("修改远程用户hadoop密码失败");
-            file.delete();
 
+            file.delete();
             return false;
         } catch (Exception e) {
             logger.error("error ", e);

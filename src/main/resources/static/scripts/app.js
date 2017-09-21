@@ -22,7 +22,7 @@ function updateTabsOnFail($rootScope) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "settings", tabId: "settings", tabLink: "/conf"},
-      {tabName: "docker管理",tabId: "docker管理",tabLink: "/nodeM"},
+      {tabName: "远程部署",tabId: "远程部署",tabLink: "/nodeM"},
       {tabName: "集群监控", tabId: "集群监控", tabLink: "/yarnindex"},
       {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
       {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
@@ -44,8 +44,8 @@ function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
       {tabName: "settings", tabId: "settings", tabLink: "/conf"},
-      {tabName: "物理资源管理",tabId: "物理资源管理",tabLink: "/nodeM"},
-      {tabName: "资源监控", tabId: "资源监控", tabLink: "/yarnindex"},
+      {tabName: "远程部署",tabId: "远程部署",tabLink: "/nodeM"},
+      {tabName: "集群监控", tabId: "集群监控", tabLink: "/yarnindex"},
       {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
       {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
       {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},

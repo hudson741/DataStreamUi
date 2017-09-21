@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.yss.storm.exception.StormRmoteSubException;
+import com.yss.storm.exception.ZKConfException;
 import com.yss.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +39,28 @@ public class StormTopologySubmitController {
     private TestHandler                testHandler;
 
     @PostMapping("/fileu")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) throws Exception {
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest)  {
         String filePath = httpServletRequest.getServletContext().getRealPath("/");
 
         logger.info(" file tmp is " + filePath);
 
-        URI path = FileUtil.store(filePath + "stormComputeJarDir", file);
+        URI path = null;
+        try {
+            path = FileUtil.store(filePath + "stormComputeJarDir", file);
+        } catch (Exception e) {
+            logger.error("error ",e);
+           return "存取上传的topoly失败，请查看后台系统日志";
+        }
 
-        stormSubmiter.SubmitStormTopology(path);
+        try {
+            stormSubmiter.SubmitStormTopology(path);
+        } catch (StormRmoteSubException e) {
+            logger.error("error ",e);
+            return "发布失败，请查看后台系统日志";
+        } catch (ZKConfException e) {
+            logger.error("error ",e);
+            return "获取nimbus节点失败，请刷新Zookeeper配置，并重试";
+        }
 
         return "上传成功";
     }

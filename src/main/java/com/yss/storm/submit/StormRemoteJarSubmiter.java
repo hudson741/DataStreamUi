@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.yss.config.Conf;
+import com.yss.storm.exception.StormRmoteSubException;
+import com.yss.storm.exception.ZKConfException;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.Bolt;
@@ -44,7 +46,7 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
     private int               remoteZKPort;
 
     @Override
-    public void SubmitStormTopology(URI uri) {
+    public void SubmitStormTopology(URI uri) throws StormRmoteSubException, ZKConfException {
         try {
             Builder zcBuilder = loadBuilder(uri);
 
@@ -56,14 +58,16 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
 
             System.setProperty("storm.jar", new File(uri).toString());
             StormSubmitter.submitTopology("zc" + System.currentTimeMillis() + "", stormConf, zcBuilder.getTopology());
+        } catch(ZKConfException e){
+            throw new ZKConfException(e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new StormRmoteSubException(e.getMessage());
         } finally {
             FileSystemUtils.deleteRecursively(new File(uri));
         }
     }
 
-    private Map<String, Object> buildConf() throws TException, UnknownHostException {
+    private Map<String, Object> buildConf() throws TException, UnknownHostException, ZKConfException {
         Map stormConf = Utils.readStormConfig();
 
         Config           config      = new Config();
@@ -76,6 +80,10 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
         List<String> nimbusHosts = Lists.newArrayList();
 
         List<String> list       = stormNodesService.getNimbusHosts();
+
+        if(CollectionUtils.isEmpty(list)){
+            throw new ZKConfException("请刷新zk地址");
+        }
 
         int nimbusPort = 0;
 

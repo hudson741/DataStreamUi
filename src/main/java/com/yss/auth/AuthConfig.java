@@ -55,10 +55,7 @@ public class AuthConfig {
     }
 
     public static Auth login(String user,String password){
-        Map<String,Object> map = new HashMap<>();
-        map.put("passwd",password);
-        map.put("token","yss666");
-        String token = JwtUtil.sign(map);
+        String token = JwtUtil.signPassWord(password);
         if(user.equals(sAdmin) && token.equals(sAdminPd)){
             return Auth.SUPER;
         }else if(user.equals(AuthConfig.user) && token.equals(uPd)) {
@@ -70,11 +67,6 @@ public class AuthConfig {
 
 
     public static void main(String[] args){
-        Map<String,Object> map = new HashMap<>();
-        map.put("passwd","Tudou=123");
-        map.put("token","yss666");
-        String token = JwtUtil.sign(map);
-        System.out.println(token);
     }
 
     public enum Auth{

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.yss.auth.JwtUtil;
 import org.apache.commons.lang.StringUtils;
 
 import org.assertj.core.util.Lists;
@@ -74,7 +75,7 @@ public class ExpansionController {
     public String checkConnect(@RequestParam("id") String id) throws IOException, InterruptedException {
         LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> map          = ExpYamlDataBase.getNodes();
         String                                              hadoopUser   = PropertiesUtil.getProperty("hadoopUser");
-        String                                              hadoopUserPd = PropertiesUtil.getProperty("hadoopUserPd");
+        String                                              hadoopUserPd = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
         ExpYamlDataBase.PhysicalNode                        physicalNode = map.get(id);
         boolean                                             result       = JschService.checkConnect(hadoopUser,
                                                                                                     hadoopUserPd,
@@ -104,7 +105,7 @@ public class ExpansionController {
         String                       confDir       = FileUtil.getJarPath(ExpansionController.class) + "/conf/hadoop";
 
         String lUser = PropertiesUtil.getProperty("hadoopUser");
-        String lpassword = PropertiesUtil.getProperty("hadoopUserPd");
+        String lpassword =JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
 
         String yarnhome = PropertiesUtil.getProperty("yarnHadoopHome");
 
@@ -189,7 +190,7 @@ public class ExpansionController {
         Session     hadoopLocalSession  = null;
         Session     hadoopRemoteSession = null;
         String      hadoopUser          = PropertiesUtil.getProperty("hadoopUser");
-        String      hadoopUserPd        = PropertiesUtil.getProperty("hadoopUserPd");
+        String      hadoopUserPd        = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
         String      id                  = UUID.randomUUID().toString();
         PrintWriter pw                  = null;
 
@@ -548,7 +549,7 @@ public class ExpansionController {
 
         try {
             String hadoopUser   = PropertiesUtil.getProperty("hadoopUser");
-            String hadoopUserPd = PropertiesUtil.getProperty("hadoopUserPd");
+            String hadoopUserPd = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
 
             localHostName = InetAddress.getLocalHost().getHostName();
 
@@ -721,7 +722,7 @@ public class ExpansionController {
             public void run() {
                 try {
                     String  hadoopUser   = PropertiesUtil.getProperty("hadoopUser");
-                    String  hadoopUserPd = PropertiesUtil.getProperty("hadoopUserPd");
+                    String  hadoopUserPd = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
                     boolean isUntar      = JschService.remoteInstallHadoop(hadoopUser,
                                                                            hadoopUserPd,
                                                                            physicalNode.getHost(),

@@ -189,7 +189,7 @@ app.config(function ($routeProvider) {
             templateUrl: 'views/download.html',
             controller: 'DownloadCtrl'
         }).when('/logout',{
-            templateUrl: 'login2.html',
+            templateUrl: 'views/conf.html',
             controller: 'logoutCtr'
         }).otherwise({
             redirectTo: '/'

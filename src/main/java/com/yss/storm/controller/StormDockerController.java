@@ -1,5 +1,6 @@
 package com.yss.storm.controller;
 
+import com.yss.auth.JwtUtil;
 import com.yss.config.Conf;
 import com.yss.storm.StormNodesService;
 import com.yss.util.FileUtil;
@@ -68,6 +69,7 @@ public class StormDockerController {
         logger.info("drpc  is "+drpcServers);
         env.put("netUrl", netUrl);
         env.put("zk", zk);
+        env.put("stormZkPort",PropertiesUtil.getProperty("stormZkPort"));
         env.put("uiIp", uiIp);
         env.put("nimbusSeeds", nimbusSeeds);
         if(StringUtils.isNotEmpty(drpcServers)) {
@@ -75,8 +77,11 @@ public class StormDockerController {
         }
 
         env.put("hadoopUser", PropertiesUtil.getProperty("hadoopUser"));
-        env.put("hadoopUserPd",PropertiesUtil.getProperty("hadoopUserPd"));
+        env.put("hadoopUserPd", JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd")));
         env.put("nimbusUIDockerImage" , PropertiesUtil.getProperty("NOMALDockerImage"));
+        env.put("nimbusPort",PropertiesUtil.getProperty("nimbusPort"));
+        env.put("uiPort",PropertiesUtil.getProperty("uiPort"));
+        env.put("drpcPort",PropertiesUtil.getProperty("drpcPort"));
 
         if (file != null) {
             String filePath = httpServletRequest.getServletContext().getRealPath("/");
@@ -88,7 +93,7 @@ public class StormDockerController {
             yarnLaunchService.launchApp(appName ,env);
         }
 
-        return "上传成功";
+        return "发布成功";
     }
 
     @PostMapping("/stormdockerPub")

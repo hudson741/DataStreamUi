@@ -17,7 +17,7 @@ public class StormDRPCTest {
 
     public static void main(String[] args) throws TException {
         Map config = Utils.readDefaultConfig();
-        DRPCClient client = new DRPCClient(config,"zhangc5", 3772);
+        DRPCClient client = new DRPCClient(config,"zhangc4", 3772);
         String result = client.execute("echo", "hello");
         System.out.println(result);
 
