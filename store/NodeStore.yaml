@@ -1,0 +1,3 @@
+c8301cb3-bb6b-4f9b-b3ff-cf4cb1269e22: !!com.yss.Expansion.ExpYamlDataBase$PhysicalNode {
+  admin: root, adminPassWord: Tudou=123, host: zhangc3, id: c8301cb3-bb6b-4f9b-b3ff-cf4cb1269e22,
+  ip: 192.168.0.2, password: Tudou=123, runningProcess: null, user: hadoop}

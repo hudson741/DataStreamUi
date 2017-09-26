@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,9 +14,6 @@ import com.alibaba.fastjson.JSON;
 import com.yss.storm.model.Host;
 import com.yss.storm.model.Topology;
 import com.yss.storm.monitor.StormMonitorRestApiService;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class StormUIController {

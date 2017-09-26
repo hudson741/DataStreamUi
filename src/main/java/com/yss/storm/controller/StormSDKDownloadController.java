@@ -12,9 +12,8 @@ import java.io.*;
 /**
  * Project Name:DataStreamUi
  * File Name:StormSDKDownloadController.java
- * Author:llduo
+ * Author:zhangc
  * Date:2017年5月24日下午5:16:26
- * Copyright (c) 2017, xglguan@163.com All Rights Reserved.
  *
  */
 @RestController

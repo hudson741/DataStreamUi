@@ -101,7 +101,6 @@
     <table class="table table-hover table-condensed">
         <thead>
         <tr>
-            <th>jobId</th>
             <th>address</th>
             <th>netUrl</th>
             <th>iPBind</th>
@@ -116,7 +115,6 @@
         </thead>
         <tbody>
         <tr ng-repeat="job in yarn.dockerjobs" class="active">
-            <td>{{job.jobId}}</td>
             <td>{{job.runIp}}</td>
             <td>{{job.netUrl}}</td>
             <td>{{job.iPBind}}</td>

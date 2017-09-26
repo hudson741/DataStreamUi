@@ -18,7 +18,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 @Configuration
 @EnableAutoConfiguration
-//@ImportResource(value = { "classpath:conf/applicationContext-*.xml", "classpath*:conf/applicationContext-config" })
 @ImportResource(value = { "classpath:conf/act-sofa.xml"})
 @ComponentScan(basePackages = { "com.yss" })
 @SpringBootApplication
@@ -33,7 +32,6 @@ public class Application extends SpringBootServletInitializer {
                 System.setProperty("ftp","1");
                 ApplicationContext factory = new ClassPathXmlApplicationContext(new String[]{"classpath:conf/act-ftp.xml"});
         }else {
-            System.out.println("not ftp");
             SpringApplication.run(Application.class, args);
         }
 

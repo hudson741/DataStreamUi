@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import org.assertj.core.util.Lists;
 import org.slf4j.*;
 
 import com.jcraft.jsch.*;
@@ -210,9 +211,10 @@ public class JschService {
     public static void generateRemoteSshKeygen(String user, String password, String host)
             throws GenerateRemoteSSHkeyException {
         try {
-            String command = "ssh-keygen -t rsa -N \"\" -f ~/.ssh/id_rsa\n";
+            String[] commands = {"rm -rf /home/" + user + "/.ssh/*",
+                    "ssh-keygen -t rsa -N \"\" -f ~/.ssh/id_rsa\n"};
 
-            JschProxy.execmd(user, password, host, new String[] { command });
+            JschProxy.execmd(user, password, host,commands);
             logger.info("生成远程 " + host + " sshkey");
             Thread.currentThread().sleep(1500);
         } catch (Exception e) {

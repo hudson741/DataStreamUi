@@ -2,16 +2,11 @@ package com.yss.storm.monitor;
 
 import java.io.IOException;
 
-import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSONObject;
-import com.floodCtr.generate.FloodJobRunningState;
 import com.yss.yarn.discovery.YarnThriftClient;
 
 import org.apache.http.HttpException;
-import org.apache.thrift.TException;
-import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;

@@ -18,6 +18,7 @@ import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -170,6 +171,22 @@ public class ExpansionController {
     )
     public String expand(@RequestParam("rAdmin") String rAdmin, @RequestParam("password") String password,
                          @RequestParam("IP") String ip, @RequestParam("host") String host) {
+
+
+//        String      hadoopUser1          = PropertiesUtil.getProperty("hadoopUser");
+//        String      id1                  = UUID.randomUUID().toString();
+//        String      hadoopUserPd1        = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
+//
+//        try {
+//            ExpYamlDataBase.addNode(host, ip, hadoopUser1, hadoopUserPd1, rAdmin, password, id1);
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//
+//        if(StringUtils.isNotEmpty(hadoopUser1)) {
+//            return "true";
+//        }
+
         boolean exists = false;
 
         try {
@@ -187,8 +204,6 @@ public class ExpansionController {
             return "请先创建本地hadoop用户";
         }
 
-        Session     hadoopLocalSession  = null;
-        Session     hadoopRemoteSession = null;
         String      hadoopUser          = PropertiesUtil.getProperty("hadoopUser");
         String      hadoopUserPd        = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
         String      id                  = UUID.randomUUID().toString();
@@ -281,13 +296,9 @@ public class ExpansionController {
             pw.println("设置远程hosts加入本机信任列表");
             pw.flush();
 
-            // 7,清空远程ssh目录
-            JschService.delRemoteSSHDir(rAdmin, password, host, hadoopUser);
-            pw.println("清空远程/home/hadoop/.ssh目录");
-            pw.flush();
-
-            // 8,连接到远程机器，生成秘钥串
+            // 7,清空远程ssh目录,连接到远程机器，生成秘钥串
             JschService.generateRemoteSshKeygen(hadoopUser, hadoopUserPd, host);
+            pw.println("清空远程/home/hadoop/.ssh目录");
             pw.println("生成远程hadoop秘钥");
             pw.flush();
 
@@ -439,11 +450,6 @@ public class ExpansionController {
             pw.flush();
 
             return "设置远程knownHosts失败，请查看系统错误日志并重试";
-        } catch (DelRemoteSSHDirException e) {
-            pw.println(e);
-            pw.flush();
-
-            return "删除远程.ssh目录失败，请查看系统错误日志并重试";
         } catch (GenerateRemoteSSHkeyException e) {
             pw.println(e);
             pw.flush();
