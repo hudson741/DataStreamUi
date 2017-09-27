@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.dao.SparkJobDao">
+  <resultMap id="BaseResultMap" type="com.yss.entity.SparkJobEntity">
+    <id column="job_id" jdbcType="BIGINT" property="jobId" />
+    <result column="job_name" jdbcType="VARCHAR" property="jobName" />
+    <result column="job_descript" jdbcType="VARCHAR" property="jobDescript" />
+    <result column="jar_file_name" jdbcType="VARCHAR" property="jarFileName" />
+    <result column="main_class" jdbcType="VARCHAR" property="mainClass" />
+    <result column="class_args" jdbcType="VARCHAR" property="classArgs" />
+    <result column="driver_docker_type" jdbcType="INTEGER" property="driverDockerType" />
+    <result column="executor_docker_type" jdbcType="INTEGER" property="executorDockerType" />
+    <result column="executor_num" jdbcType="INTEGER" property="executorNum" />
+    <result column="spark_conf" jdbcType="VARCHAR" property="sparkConf" />
+    <result column="cron_expression" jdbcType="VARCHAR" property="cronExpression" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    job_id, job_name, job_descript, jar_file_name, main_class, class_args, driver_docker_type,
+    executor_docker_type, executor_num, spark_conf, cron_expression, status, user_id,
+    create_time, last_update_time
+  </sql>
+
+  <insert id="save" parameterType="com.yss.entity.SparkJobEntity" useGeneratedKeys="true" keyProperty="jobId">
+    insert into spark_job (job_name, job_descript,
+    jar_file_name, main_class, class_args,
+    driver_docker_type, executor_docker_type, executor_num,
+    spark_conf, cron_expression, status,
+    user_id, create_time, last_update_time
+    )
+    values (#{jobName,jdbcType=VARCHAR}, #{jobDescript,jdbcType=VARCHAR},
+    #{jarFileName,jdbcType=VARCHAR}, #{mainClass,jdbcType=VARCHAR}, #{classArgs,jdbcType=VARCHAR},
+    #{driverDockerType,jdbcType=INTEGER}, #{executorDockerType,jdbcType=INTEGER}, #{executorNum,jdbcType=INTEGER},
+    #{sparkConf,jdbcType=VARCHAR}, #{cronExpression,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+    #{userId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{lastUpdateTime,jdbcType=TIMESTAMP}
+    )
+  </insert>
+
+  <select id="queryList" resultType="com.yss.entity.SparkJobEntity" >
+    select * from spark_job
+    <if test="offset != null and limit != null ">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <select id="queryTotal" resultType="int">
+    select count(1) from spark_job
+  </select>
+
+  <select id="queryObject" resultType="com.yss.entity.SparkJobEntity" >
+    select * from spark_job where job_id = #{value}
+  </select>
+
+  <update id="update" parameterType="com.yss.entity.SparkJobEntity">
+    update spark_job
+    <set>
+      <if test="jobName != null">`job_name` = #{jobName}, </if>
+      <if test="jobDescript != null">`job_descript` = #{jobDescript}, </if>
+      <if test="jarFileName != null">`jar_file_name` = #{jarFileName}, </if>
+      <if test="mainClass != null">`main_class` = #{mainClass}, </if>
+      <if test="classArgs != null">`class_args` = #{classArgs}, </if>
+      <if test="driverDockerType != null">`driver_docker_type` = #{driverDockerType}, </if>
+      <if test="executorDockerType != null">`executor_docker_type` = #{executorDockerType}, </if>
+      <if test="executorNum != null">`executor_num` = #{executorNum}, </if>
+      <if test="sparkConf != null">`spark_conf` = #{sparkConf}, </if>
+      <if test="cronExpression != null">`cron_expression` = #{cronExpression}, </if>
+    </set>
+    where job_id = #{jobId}
+  </update>
+
+  <delete id="deleteBatch">
+    delete from spark_job where job_id in
+    <foreach item="jobId" collection="array" open="(" separator="," close=")">
+      #{jobId}
+    </foreach>
+  </delete>
+
+  <!-- 批量更新状态 -->
+  <update id="updateBatch">
+    update spark_job set status = #{status} where job_id in
+    <foreach item="jobId" collection="list"  open="(" separator="," close=")">
+      #{jobId}
+    </foreach>
+  </update>
+
+
+</mapper>

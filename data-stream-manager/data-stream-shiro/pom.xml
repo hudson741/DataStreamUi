@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.yss</groupId>
+		<artifactId>data-stream-manager</artifactId>
+		<version>${data-stream-version}</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>data-stream-shiro</artifactId>
+	<packaging>jar</packaging>
+    <description>权限模块</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.yss</groupId>
+			<artifactId>data-stream-common</artifactId>
+			<version>${data-stream-version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+</project>

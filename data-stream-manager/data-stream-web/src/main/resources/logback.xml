@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property resource="logback-variables.properties" />     <!-- 得到APP_NAME log_path的值 -->
+
+	<appender name="normalLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH:-/opt/data/${APP_NAME:-APPNAME}}/${APP_NAME:-APPNAME}-debug.log</file>     <!-- 配置今天日志的文件的 名称 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH:-/opt/data/${APP_NAME:-APPNAME}}/${APP_NAME:-APPNAME}-%d{yyyy-MM-dd}.log
+			</fileNamePattern>  <!-- 配置到期以后文件名及路径 -->
+			<MaxHistory>90</MaxHistory>       <!-- 最多保存30天 -->
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>[%d{YYYY-MM-dd HH:mm:ss}] [%thread] [%-5level] %msg%n
+			</Pattern>   <!-- 配置日志格式 -->
+		</layout>
+	</appender>
+	
+   <appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH:-/opt/data/${APP_NAME:-APPNAME}}/${APP_NAME:-APPNAME}-error.log</file>     <!-- 配置今天日志的文件的 名称 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH:-/opt/data/${APP_NAME:-APPNAME}}/${APP_NAME:-APPNAME}-error-%d{yyyy-MM-dd}.log
+			</fileNamePattern>  <!-- 配置到期以后文件名及路径 -->
+			<MaxHistory>90</MaxHistory>       <!-- 最多保存30天 -->
+		</rollingPolicy>
+	    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+		  <level>ERROR</level>
+		  <onMatch>ACCEPT</onMatch>
+		  <onMismatch>DENY</onMismatch>
+	    </filter>   
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>[%d{YYYY-MM-dd HH:mm:ss}] [%thread] [%-5level] %msg%n</Pattern>   <!-- 配置日志格式 -->
+		</layout>
+	</appender>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+  	<appender name ="ASYNC" class= "ch.qos.logback.classic.AsyncAppender">  
+            <discardingThreshold >0</discardingThreshold>   
+            <queueSize>512</queueSize>  
+            <appender-ref ref ="normalLog"/>
+     </appender>    
+
+  	<appender name ="ASYNC2" class= "ch.qos.logback.classic.AsyncAppender">  
+            <discardingThreshold >0</discardingThreshold>   
+            <queueSize>512</queueSize>  
+            <appender-ref ref ="errorLog"/>  
+	</appender>
+
+	<appender name ="ASYNC3" class= "ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold >0</discardingThreshold>
+		<queueSize>512</queueSize>
+		<appender-ref ref ="STDOUT"/>
+	</appender>
+     
+	<root level="info">                    <!-- 设置日志级别 -->
+		<appender-ref ref="ASYNC" />
+		<appender-ref ref="ASYNC2"/>
+		<appender-ref ref="ASYNC3"/>
+	</root>
+	
+</configuration>

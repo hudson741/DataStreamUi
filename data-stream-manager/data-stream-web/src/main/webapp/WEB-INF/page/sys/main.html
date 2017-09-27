@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    #parse("sys/header.html")
+    <link rel="stylesheet" href="${rc.contextPath}/statics/css/style.min.css">
+</head>
+<body>
+<div class="panel panel-default">
+    <div style="padding: 10px 0 20px 10px;">
+        <h3>集群仪表盘</h3>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="mini-stat clearfix bx-shadow bg-info">
+            <span class="mini-stat-icon"><i class="fa fa-quote-right" aria-hidden="true"></i></span>
+            <div class="mini-stat-info text-right">
+                活动节点数量<span class="counter">3</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="mini-stat clearfix bg-success bx-shadow">
+            <span class="mini-stat-icon"><i class="fa fa-comments-o" aria-hidden="true"></i></span>
+            <div class="mini-stat-info text-right">
+                成功运行应用<span class="counter">0</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="mini-stat clearfix bg-danger bx-shadow">
+            <span class="mini-stat-icon"><i class="fa fa-cloud-upload" aria-hidden="true"></i></span>
+            <div class="mini-stat-info text-right">
+                失败任务<span class="counter">0</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="mini-stat clearfix bg-primary bx-shadow">
+            <span class="mini-stat-icon"><i class="fa fa-link" aria-hidden="true"></i></span>
+            <div class="mini-stat-info text-right">
+                HDFS使用量<span class="counter">10%</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

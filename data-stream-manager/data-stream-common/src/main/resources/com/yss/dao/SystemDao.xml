@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.dao.SystemDao">
+    <resultMap id="BaseResultMap" type="com.yss.entity.SystemEntity">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="display_nm" jdbcType="VARCHAR" property="displayNm"/>
+        <result column="add_user_id" jdbcType="INTEGER" property="addUserId"/>
+        <result column="user" jdbcType="VARCHAR" property="user"/>
+        <result column="host" jdbcType="VARCHAR" property="host"/>
+        <result column="port" jdbcType="INTEGER" property="port"/>
+        <result column="authorized_keys" jdbcType="VARCHAR" property="authorizedKeys"/>
+        <result column="status_cd" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, display_nm, add_user_id, user, host, port, authorized_keys, status_cd, last_update_time
+</sql>
+
+    <select id="queryList" resultMap="BaseResultMap">
+    select *
+    from system
+</select>
+
+
+    <insert id="save" parameterType="com.yss.entity.SystemEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into system
+        (
+        `display_nm`,
+        `add_user_id`,
+        `user`,
+        `host`,
+        `port`,
+        `authorized_keys`,
+        `status_cd`
+        )
+        values
+        (
+        #{displayNm},
+        #{addUserId},
+        #{user},
+        #{host},
+        #{port},
+        #{authorizedKeys},
+        #{statusCd}
+        )
+    </insert>
+
+
+    <select id="queryObject" resultType="com.yss.entity.SystemEntity">
+        select * from system where id = #{value}
+    </select>
+
+    <update id="update" parameterType="com.yss.entity.SystemEntity">
+        update system
+        <set>
+            <if test="displayNm != null">`display_nm` = #{displayNm}, </if>
+            <if test="addUserId != null">`add_user_id` = #{addUserId}, </if>
+            <if test="user != null">`user` = #{user}, </if>
+            <if test="host != null">`host` = #{host}, </if>
+            <if test="port != null">`port` = #{port}, </if>
+            <if test="authorizedKeys != null">`authorized_keys` = #{authorizedKeys}, </if>
+            <if test="statusCd != null">`status_cd` = #{statusCd}, </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from system where id = #{value}
+    </delete>
+
+
+</mapper>

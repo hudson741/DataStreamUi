@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.dao.SparkJobLogDao">
+  <resultMap id="BaseResultMap" type="com.yss.entity.SparkJobLogEntity">
+    <id column="log_id" jdbcType="BIGINT" property="logId" />
+    <result column="job_id" jdbcType="BIGINT" property="jobId" />
+    <result column="job_name" jdbcType="VARCHAR" property="jobName" />
+    <result column="yarn_app_id" jdbcType="VARCHAR" property="yarnAppId" />
+    <result column="app_name" jdbcType="VARCHAR" property="appName" />
+    <result column="main_class" jdbcType="VARCHAR" property="mainClass" />
+    <result column="params" jdbcType="VARCHAR" property="params" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="tracking_ui" jdbcType="VARCHAR" property="trackingUi" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    log_id, job_id, job_name, yarn_app_id, app_name, main_class, params, status, tracking_ui,
+    start_time, end_time, last_update_time
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from spark_job_log
+    where log_id = #{logId,jdbcType=BIGINT}
+  </select>
+
+  <insert id="save" parameterType="com.yss.entity.SparkJobLogEntity" useGeneratedKeys="true" keyProperty="logId">
+    insert into spark_job_log (job_id, job_name,
+      yarn_app_id, app_name, main_class,
+      params, status, tracking_ui,
+      start_time, end_time
+      )
+    values ( #{jobId,jdbcType=BIGINT}, #{jobName,jdbcType=VARCHAR},
+      #{yarnAppId,jdbcType=VARCHAR}, #{appName,jdbcType=VARCHAR}, #{mainClass,jdbcType=VARCHAR},
+      #{params,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{trackingUi,jdbcType=VARCHAR},
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="update" parameterType="com.yss.entity.SparkJobLogEntity">
+    update spark_job_log
+    <set>
+      <if test="jobId != null">
+        job_id = #{jobId,jdbcType=BIGINT},
+      </if>
+      <if test="jobName != null">
+        job_name = #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="yarnAppId != null">
+        yarn_app_id = #{yarnAppId,jdbcType=VARCHAR},
+      </if>
+      <if test="appName != null">
+        app_name = #{appName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainClass != null">
+        main_class = #{mainClass,jdbcType=VARCHAR},
+      </if>
+      <if test="params != null">
+        params = #{params,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="trackingUi != null">
+        tracking_ui = #{trackingUi,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where log_id = #{logId,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryList" resultType="com.yss.entity.SparkJobLogEntity" >
+    select * from spark_job_log
+    <if test="status != null">
+      where status = #{status}
+    </if>
+    order by log_id desc
+    <if test="offset != null and limit != null ">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <select id="queryTotal" resultType="int" >
+    select count(1) from spark_job_log
+    <if test="status != null">
+      where status = #{status}
+    </if>
+  </select>
+
+</mapper>

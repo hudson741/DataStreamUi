@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>定时任务</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <div class="grid-btn" style="height:34px;">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.jobName" @keyup.enter="query" placeholder="任务名称">
+            </div>
+            <a class="btn btn-default" @click="query">查询</a>
+            #if($shiro.hasPermission("sys:spark:save"))
+            <a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+            #end
+            #if($shiro.hasPermission("sys:spark:update"))
+            <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+            #end
+            #if($shiro.hasPermission("sys:spark:delete"))
+            <a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+            #end
+            #if($shiro.hasPermission("sys:spark:pause"))
+            <a class="btn btn-primary" @click="pause"><i class="fa fa-pause"></i>&nbsp;暂停</a>
+            #end
+            #if($shiro.hasPermission("sys:spark:resume"))
+            <a class="btn btn-primary" @click="resume"><i class="fa fa-play"></i>&nbsp;恢复</a>
+            #end
+            #if($shiro.hasPermission("sys:spark:run"))
+            <a class="btn btn-primary" @click="runOnce"><i class="fa fa-arrow-circle-right"></i>&nbsp;立即执行</a>
+            #end
+            #if($shiro.hasPermission("sys:spark:log"))
+            <a class="btn btn-danger" style="float:right;" href="schedule_log.html">调度日志列表</a>
+            #end
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">任务名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.jobName" placeholder="spark 任务名称，如：testTask"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">任务描述</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.jobDescript" placeholder="任务描述"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">文件名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.jarFileName" placeholder="jar文件名"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">用户主类class</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.mainClass" placeholder="用户主类"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">主类参数</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.classArgs" placeholder="主类参数"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">driverDocker规格</label>
+                <select name="driverDockerType" class="form-control col-sm-10" v-model="schedule.driverDockerType">
+                    <option value="0">1 core 2G</option>
+                    <option value="1">2 core 4G</option>
+                    <option value="2">4 core 8G</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">executorDocker规格</label>
+                <select name="executorDockerType" class="form-control col-sm-10" v-model="schedule.executorDockerType">
+                    <option value="0">1 core 2G</option>
+                    <option value="1">2 core 4G</option>
+                    <option value="2">4 core 8G</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">executor数量</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.executorNum" placeholder="executor数量"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">spark配置</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.sparkConf" placeholder="spark配置，多个配置用;分割"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">cron表达式</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.cronExpression" placeholder="如：0 0 12 * * ?"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/schedule.js?_${date.systemTime}"></script>
+</body>
+</html>
+

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>应用监控</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <table class="table table-striped">
+            <caption>Cluster Matrics</caption>
+            <thead>
+            <tr>
+                <th>Apps<br>Submits</th>
+                <th>Apps<br>Pending</th>
+                <th>Apps<br>Running</th>
+                <th>Apps<br>Completed</th>
+                <th>Container<br>Runing</th>
+                <th>Memory<br>Used</th>
+                <th>Memory<br>Total</th>
+                <th>Memory<br>Reserved</th>
+                <th>VCores<br>Used</th>
+                <th>VCores<br>Total</th>
+                <th>VCores<br>Reserved</th>
+                <th>Active<br>Nodes</th>
+                <th>Decommissioned<br>Nodes</th>
+                <th>Lost<br>Nodes</th>
+                <th>Unhealthy<br>Nodes</th>
+                <th>Rebooted<br>Nodes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{clusterMetrics.appsSubmitted}}</td>
+                <td>{{clusterMetrics.appsPending}}</td>
+                <td>{{clusterMetrics.appsRunning}}</td>
+                <td>{{clusterMetrics.appsCompleted}}</td>
+                <td>{{clusterMetrics.containersAllocated}}</td>
+                <td>{{clusterMetrics.allocatedMB}}M</td>
+                <td>{{clusterMetrics.totalMB}}M</td>
+                <td>{{clusterMetrics.reservedMB}}M</td>
+                <td>{{clusterMetrics.allocatedVirtualCores}}</td>
+                <td>{{clusterMetrics.totalVirtualCores}}</td>
+                <td>{{clusterMetrics.reservedVirtualCores}}</td>
+                <td>{{clusterMetrics.activeNodes}}</td>
+                <td>{{clusterMetrics.decommissionedNodes}}</td>
+                <td>{{clusterMetrics.lostNodes}}</td>
+                <td>{{clusterMetrics.unhealthyNodes}}</td>
+                <td>{{clusterMetrics.rebootedNodes}}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-bottom: 10px">
+            <span>Yarn Applications</span>
+            <a class="btn btn-success" style="position:relative;left: 80%" @click="reload">Refresh</a>
+            <div style="position: relative; left: 20%; display: inline">
+                <span>Filter: </span>
+                <label class="radio-inline"><input name="filter" type="radio" value="ALL" v-model="filterStatus" @click="reload" checked="checked" />ALL</label>
+                <label class="radio-inline"><input name="filter" type="radio" value="ACCEPT" v-model="filterStatus" @click="reload"/>ACCEPT</label>
+                <label class="radio-inline"><input name="filter" type="radio" value="RUNNING" v-model="filterStatus" @click="reload"/>RUNNING</label>
+                <label class="radio-inline"><input name="filter" type="radio" value="SUCCEEDED" v-model="filterStatus" @click="reload"/>SUCCEEDED</label>
+                <label class="radio-inline"><input name="filter" type="radio" value="FAILED" v-model="filterStatus" @click="reload"/>FAILED</label>
+                <label class="radio-inline"><input name="filter" type="radio" value="KILLED" v-model="filterStatus" @click="reload"/>KILLED</label>
+            </div>
+        </div>
+
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/app_monitor.js?_${date.systemTime}"></script>
+</body>
+</html>

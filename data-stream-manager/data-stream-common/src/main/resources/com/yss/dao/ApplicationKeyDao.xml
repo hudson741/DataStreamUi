@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.dao.ApplicationKeyDao">
+  <resultMap id="BaseResultMap" type="com.yss.entity.ApplicationKeyEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="private_key" jdbcType="VARCHAR" property="privateKey" />
+    <result column="public_key" jdbcType="VARCHAR" property="publicKey" />
+    <result column="passphrase" jdbcType="VARCHAR" property="passphrase" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, private_key, public_key, passphrase
+  </sql>
+
+
+  <select id="queryList" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from application_key
+  </select>
+
+
+  <insert id="save" parameterType="com.yss.entity.ApplicationKeyEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into application_key
+    (
+    `private_key`,
+    `public_key`,
+    `passphrase`
+    )
+    values
+    (
+    #{privateKey},
+    #{publicKey},
+    #{passphrase}
+    )
+  </insert>
+
+
+
+
+</mapper>

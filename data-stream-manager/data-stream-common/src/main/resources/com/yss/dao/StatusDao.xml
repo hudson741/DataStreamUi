@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.dao.StatusDao">
+  <resultMap id="BaseResultMap" type="com.yss.entity.StatusEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="status_cd" jdbcType="VARCHAR" property="statusCd" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, status_cd
+  </sql>
+
+  <insert id="save" parameterType="com.yss.entity.StatusEntity">
+    insert into status (id, user_id, status_cd
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}
+      )
+  </insert>
+
+
+  <delete id="delete">
+    delete from status where user_id = #{user_id}
+  </delete>
+
+  <select id="queryList" resultType="com.yss.entity.StatusEntity">
+    select * from status
+    <where>
+      (status_cd like #{INITIAL_STATUS}
+      or status_cd like #{AUTH_FAIL_STATUS}
+      or status_cd like #{KEYAUTHFAIL})
+      <if test="userId != null">
+        AND user_id=#{userId}
+      </if>
+      <if test="id != null">
+        AND id=#{id}
+      </if>
+    </where>
+      order by id asc
+  </select>
+
+  <select id="queryObject" resultType="com.yss.entity.StatusEntity">
+    select * from status where id = #{value}
+  </select>
+
+  <update id="update" parameterType="com.yss.entity.StatusEntity">
+      update status
+      <set>
+        <if test="userId != null">`user_id` = #{userId}, </if>
+        <if test="statusCd != null">`status_cd` = #{statusCd}, </if>
+      </set>
+      where id = #{id}
+  </update>
+
+
+</mapper>

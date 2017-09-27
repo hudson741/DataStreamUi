@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>单次任务</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp">
+    <div  class="panel panel-default">
+        <div class="panel-heading">单次任务</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">任务名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.beanName" placeholder="spark 任务名称，如：testTask"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">任务描述</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.methodName" placeholder="任务描述"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">文件名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.params" placeholder="jar文件名"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">用户主类class</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.params" placeholder="用户主类"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">主类参数</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.params" placeholder="主类参数"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">driver Docker规格</label>
+                <select name="driverDockerType" class="form-control col-sm-10">
+                    <option value="0">1 core 2G</option>
+                    <option value="1">2 core 4G</option>
+                    <option value="2">4 core 8G</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">executor Docker规格</label>
+                <select name="executorDockerType" class="form-control col-sm-10">
+                    <option value="0">1 core 2G</option>
+                    <option value="1">2 core 4G</option>
+                    <option value="2">4 core 8G</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">executor数量</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.params" placeholder="executor数量"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">spark配置</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="schedule.params" placeholder="spark配置，多个配置用;分割"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" id="submit" class="btn btn-primary"  value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning"  value="立即执行"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/temptask.js?_${date.systemTime}"></script>
+</body>
+</html>
