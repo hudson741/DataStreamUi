@@ -22,6 +22,7 @@ import com.yss.storm.StormNodesService;
 import com.yss.storm.monitor.StormMonitorRestApiService;
 import com.yss.storm.node.NimbusNode;
 import com.yss.storm.submit.StormSubmiter;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Created by zhangchi on 2017/5/17.
@@ -38,8 +39,8 @@ public class StormTopologySubmitController {
     @Autowired
     private TestHandler                testHandler;
 
-    @PostMapping("/fileu")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest)  {
+    @PostMapping("/stormTopoPub")
+    public ModelAndView stormTopoPub(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest)  {
         String filePath = httpServletRequest.getServletContext().getRealPath("/");
 
         logger.info(" file tmp is " + filePath);
@@ -49,20 +50,17 @@ public class StormTopologySubmitController {
             path = FileUtil.store(filePath + "stormComputeJarDir", file);
         } catch (Exception e) {
             logger.error("error ",e);
-           return "存取上传的topoly失败，请查看后台系统日志";
         }
 
         try {
             stormSubmiter.SubmitStormTopology(path);
         } catch (StormRmoteSubException e) {
             logger.error("error ",e);
-            return "发布失败，请查看后台系统日志";
         } catch (ZKConfException e) {
             logger.error("error ",e);
-            return "获取nimbus节点失败，请刷新Zookeeper配置，并重试";
         }
 
-        return "上传成功";
+        return new ModelAndView("/index");
     }
 
 

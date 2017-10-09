@@ -32,6 +32,7 @@ import com.jcraft.jsch.Session;
 import com.yss.util.FileUtil;
 import com.yss.util.PropertiesUtil;
 import com.yss.Expansion.Exception.*;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description
@@ -172,21 +173,6 @@ public class ExpansionController {
     public String expand(@RequestParam("rAdmin") String rAdmin, @RequestParam("password") String password,
                          @RequestParam("IP") String ip, @RequestParam("host") String host) {
 
-
-//        String      hadoopUser1          = PropertiesUtil.getProperty("hadoopUser");
-//        String      id1                  = UUID.randomUUID().toString();
-//        String      hadoopUserPd1        = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
-//
-//        try {
-//            ExpYamlDataBase.addNode(host, ip, hadoopUser1, hadoopUserPd1, rAdmin, password, id1);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//
-//        if(StringUtils.isNotEmpty(hadoopUser1)) {
-//            return "true";
-//        }
-
         boolean exists = false;
 
         try {
@@ -204,47 +190,44 @@ public class ExpansionController {
             return "请先创建本地hadoop用户";
         }
 
+
+
         String      hadoopUser          = PropertiesUtil.getProperty("hadoopUser");
         String      hadoopUserPd        = JwtUtil.getPassWord(PropertiesUtil.getProperty("hadoopUserPd"));
         String      id                  = UUID.randomUUID().toString();
         PrintWriter pw                  = null;
 
+
         try {
             String logPath = null;
 
-            //先看远程服务器是否有安装docker daemon
-            if(!JschService.checkIsDockerInstalled(rAdmin,password,host)){
-                return "请预先安装docker运行环境,并创建好overlay网络环境";
+            logPath = FileUtil.getJarPath(JschService.class) + "/log";
+
+            File logDir = new File(logPath);
+
+            if (!logDir.exists()) {
+                logDir.mkdir();
             }
 
-            try {
-                logPath = FileUtil.getJarPath(JschService.class) + "/log";
+            String logFile = (logPath + "/" + id + ".log").replace("file:", "");
+            File   file    = new File(logFile);
 
-                File logDir = new File(logPath);
-
-                if (!logDir.exists()) {
-                    logDir.mkdir();
-                }
-
-                String logFile = (logPath + "/" + id + ".log").replace("file:", "");
-                File   file    = new File(logFile);
-
-                if (file.exists()) {
-                    file.delete();
-                }
-
-                FileWriter fileWritter = new FileWriter(logFile, true);
-
-                pw = new PrintWriter(fileWritter);
-            } catch (IOException e) {
-                return "创建本地log文件失败，请查看系统错误日志并重试";
+            if (file.exists()) {
+                file.delete();
             }
+
+            FileWriter fileWritter = new FileWriter(logFile, true);
+
+            pw = new PrintWriter(fileWritter);
+        } catch (IOException e) {
+            return "创建本地log文件失败，请查看系统错误日志并重试";
+        }
+
+        try {
 
             List<String> data = Lists.newArrayList();
 
             data.add(ip + "   " + host);
-
-            String localHostName = getLocalHostName();
 
             // 3，清除/etc/hosts旧的匹配
             JschService.delFileMatch("/etc/hosts", " " + host);
@@ -255,6 +238,18 @@ public class ExpansionController {
             JschService.localWriteFileAppend(data, "/etc/hosts");
             pw.println("更新本地/etc/hosts 加入扩展节点" + host + " " + ip + "的映射");
             pw.flush();
+
+
+            //先看远程服务器是否有安装docker daemon
+            if(!JschService.checkIsDockerInstalled(rAdmin,password,host)){
+                return "请预先安装docker运行环境,并创建好overlay网络环境";
+            }
+
+
+
+
+            String localHostName = getLocalHostName();
+
 
             // 5,创建远程hadoop用户,如果存在，则不给于添加
             boolean isRemoteUserExsits = JschService.checkRemoteUserExsits(rAdmin, password, host, hadoopUser);
@@ -429,66 +424,31 @@ public class ExpansionController {
                 return "远程安装已完成，执行配置同步时出错，请手动执行配置同步";
             }
         } catch (DelFileMatchException e) {
-            pw.println(e);
-            pw.flush();
-
-            return e.getMessage();
+            logger.error("error ",e);
+            return "扩建失败，请查看后台系统日志";
         } catch (LocalHostException e) {
-            pw.println(e);
-            pw.flush();
-
             return "请确认本地hosts配置正确";
         } catch (SudoRemoteHadoopException e) {
             return "为远程hadoop用户添加sudo权限失败，请查看系统错误日志并重试";
         } catch (WriteFileException e) {
-            pw.println(e);
-            pw.flush();
-
             return e.getMessage();
         } catch (RemoteKnownHostsSetException e) {
-            pw.println(e);
-            pw.flush();
-
             return "设置远程knownHosts失败，请查看系统错误日志并重试";
         } catch (GenerateRemoteSSHkeyException e) {
-            pw.println(e);
-            pw.flush();
-
             return "远程生成sshkey失败，请查看系统错误日志并重试";
         } catch (ScpRemoteIdRsaPubException e) {
-            pw.println(e);
-            pw.flush();
-
             return "传输远程hadoop的rsa_pub至本地失败，请查看系统错误日志并重试";
         } catch (RemoteHostsUpdateException e) {
-            pw.println(e);
-            pw.flush();
-
             return "覆盖远程/etc/hosts失败，请查看系统错误日志并重试";
         } catch (RemoteKnownHostsUpdateException e) {
-            pw.println(e);
-            pw.flush();
-
             return "更新远程hadoop的KnownHosts失败，请查看系统错误日志并重试";
         } catch (RemoteHostsAuthorizedKeysUpdateException e) {
-            pw.println(e);
-            pw.flush();
-
             return "更新远程hadoop的AuthorizedKeys失败，请查看系统错误日志并重试";
         } catch (LocalDirScpException e) {
-            pw.println(e);
-            pw.flush();
-
             return "传输本地文件夹至远程失败，请查看系统错误日志并重试";
         } catch (YamlDataBaseException e) {
-            pw.println(e);
-            pw.flush();
-
             return "本地yaml存储失败,请删除yaml文件并重试";
         } catch (RemoteConnectionException e) {
-            pw.println(e);
-            pw.flush();
-
             return "连接远程"+host+"失败，请确认超管用户名密码正确，并查看系统日志";
         }
 
@@ -850,6 +810,40 @@ public class ExpansionController {
         jsonObject.put("nodes", nodes);
 
         return jsonObject.toJSONString();
+    }
+
+    /**
+     * 获取已注册的物理节点信息
+     * @return
+     */
+    @RequestMapping(
+            value  = "/nodeM2",
+            method = RequestMethod.GET
+    )
+    public ModelAndView getPhysicalNodes2() {
+        LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> map   = ExpYamlDataBase.getNodes();
+        List<ExpYamlDataBase.PhysicalNode>                  nodes = Lists.newArrayList();
+
+        for (String id : map.keySet()) {
+            StringBuilder                runningProcess = new StringBuilder();
+            ExpYamlDataBase.PhysicalNode physicalNode   = map.get(id);
+
+            physicalNode.setId(id);
+
+            try {
+                logger.info("host : " + physicalNode.getHost());
+                physicalNode.setRunningProcess(runningProcess.toString());
+            } catch (Throwable e) {
+                logger.error("error ", e);
+                runningProcess.append("节点连接异常,请重新进行配置");
+            }
+
+            nodes.add(physicalNode);
+        }
+        ModelAndView modelAndView = new ModelAndView("/nodes/nodeM");
+        modelAndView.addObject("nodes",nodes);
+
+        return modelAndView;
     }
 
     /**

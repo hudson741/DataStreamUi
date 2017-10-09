@@ -43,16 +43,16 @@ function defaultFail($scope) {
 function updateTabs($rootScope, topos, status) {
   $rootScope.tabs = [];
   $rootScope.tabs = [
-      {tabName: "settings", tabId: "settings", tabLink: "/conf"},
-      {tabName: "远程部署",tabId: "远程部署",tabLink: "/nodeM"},
-      {tabName: "集群监控", tabId: "集群监控", tabLink: "/yarnindex"},
-      {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "/dockerPub"},
-      {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "/stormPub"},
-      {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "/overview"},
-      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "/stormUpload"},
-      {tabName: "stream管理",tabId: "stream管理",tabLink:"/streamManager"},
-      {tabName: "Host", tabId: "Host", tabLink: "/host"},
-      {tabName: "登出",tabId: "登出",tabLink: "/logout"}
+      {tabName: "settings", tabId: "settings", tabLink: "#/conf"},
+      {tabName: "远程部署",tabId: "远程部署",tabLink: "#/nodeM"},
+      {tabName: "集群监控", tabId: "集群监控", tabLink: "#/yarnindex"},
+      {tabName: "storm集群初始化", tabId: "storm集群初始化", tabLink: "#/dockerPub"},
+      {tabName: "storm单容器发布", tabId: "storm单容器发布", tabLink: "#/stormPub"},
+      {tabName: "storm集群监控", tabId: "storm集群监控", tabLink: "#/overview"},
+      {tabName: "拓扑发布", tabId: "拓扑发布", tabLink: "#/stormUpload"},
+      {tabName: "stream管理",tabId: "stream管理",tabLink:"#/streamManager"},
+      {tabName: "Host", tabId: "Host", tabLink: "#/host"},
+      {tabName: "登出",tabId: "登出",tabLink: "#/logout"}
   ];
 
   for (var i = 0; i < topos.length; i++) {
@@ -159,50 +159,50 @@ app.config(function ($routeProvider) {
       redirectTo: '/conf'
     })
       .when('/overview', {
-      templateUrl: 'views/overview.html',
+      templateUrl: 'views/overview.ftl',
       controller: 'OverviewCtrl'
     })
       .when('/conf', {
-          templateUrl: 'views/conf.html',
+          templateUrl: 'views/conf.ftl',
           controller: 'SettingsCtrl'
       })
       .when('/nodeM',{
-          templateUrl: 'views/nodeM.html',
+          templateUrl: 'views/nodeM.ftl',
           controller: 'NodeMCtrl'
       })
       .when('/yarnindex',{
-          templateUrl: 'views/yarnindex.html',
+          templateUrl: 'views/yarnindex.ftl',
           controller: 'YarnIndexCtrl'
       })
       .when('/dockerPub',{
-       templateUrl: 'views/dockerPub.html'
+       templateUrl: 'views/dockerPub.ftl'
       })
       .when('/stormPub',{
-          templateUrl: 'views/stormPub.html'
+          templateUrl: 'views/stormPub.ftl'
       })
       .when('/streamManager', {
-          templateUrl: 'views/streamManager.html',
+          templateUrl: 'views/streamManager.ftl',
           controller:  'StreamManagerCtrl'
       })
     .when('/topo', {
-      templateUrl: 'views/topo.html',
+      templateUrl: 'views/topo.ftl',
       controller:  'TopoCtrl'
     })
       .when('/topom',{
-          templateUrl: 'views/topom.html',
+          templateUrl: 'views/topom.ftl',
           controller: 'TopoMCtrl'
     })
       .when('/host', {
       templateUrl: 'views/host.html',
       controller: 'HostCtrl'
     }).when('/stormUpload', {
-      templateUrl: 'views/stormUpload.html',
+      templateUrl: 'views/stormUpload.ftl',
       controller: 'StormUploadCtrl'
     }).when('/download',{
-      templateUrl: 'views/download.html',
+      templateUrl: 'views/download.ftl',
       controller: 'DownloadCtrl'
     }).when('/logout',{
-      templateUrl: 'views/conf.html',
+      templateUrl: 'views/conf.ftl',
       controller: 'logoutCtr'
     }).otherwise({
       redirectTo: '/'

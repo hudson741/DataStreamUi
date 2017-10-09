@@ -97,6 +97,12 @@ public class StormMonitorRestApiService implements StormMonitor {
         }
         return JSON.parseObject(json, Map.class);
     }
+    public static Map<String, String> toMapString(String json) {
+        if(StringUtils.isEmpty(json)){
+            return new HashMap<>();
+        }
+        return JSON.parseObject(json, Map.class);
+    }
 
     private List<ExecutorStatus> getAllExecutorStatus() {
         Topology[]           topos         = getTopologiesSummary();
@@ -129,6 +135,10 @@ public class StormMonitorRestApiService implements StormMonitor {
 
     public Map<String, Object> getClusterConfig() {
         return toMaps(stormRestClient.getClusterConfig());
+    }
+
+    public Map<String, String> getClusterConfigStr() {
+        return toMapString(stormRestClient.getClusterConfig());
     }
 
     public Map<String, Object> getClusterSummary() throws IOException {

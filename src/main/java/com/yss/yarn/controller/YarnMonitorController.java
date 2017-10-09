@@ -7,11 +7,15 @@ import com.yss.yarn.model.DockerJob;
 import com.yss.yarn.monitor.YarnMonitorService;
 import org.apache.storm.utils.DRPCClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +58,83 @@ public class YarnMonitorController {
         return yarn.toJSONString();
     }
 
+    private int numPercent(int a,int b){
+        try {
+            double f1 = new BigDecimal((float) a / b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            return (int) (f1 * 100);
+        }catch (Throwable e){
+            return 0;
+        }
+    }
+
+    /**
+     * storm 单容器
+     * @param model
+     * @return
+     */
+    @RequestMapping(
+            value  = "/dockerindexftl",
+            method = RequestMethod.GET
+    )
+    public ModelAndView dockerindexftl(ModelMap model, HttpServletRequest httpServletRequest) {
+        //index.html全局首页
+
+        List<DockerJob> jobs = yarnMonitorService.getDockerJobs();
+
+        JSONObject yarn = new JSONObject();
+
+        yarn.put("dockerjobs",jobs);
+
+        ModelAndView modelAndView = new ModelAndView("/nodes/docker");
+
+        modelAndView.addObject("yarn",yarn);
+
+        return modelAndView;
+    }
+
+
+    @RequestMapping(
+            value  = "/yarnindexftl",
+            method = RequestMethod.GET
+    )
+    public ModelAndView yarnIndexftl() throws Exception {
+        ModelAndView modelAndView = new ModelAndView("/yarn/yindex");
+
+        JSONObject yarnCluster = yarnMonitorService.getCluster();
+
+        JSONArray yarnApp = yarnMonitorService.getApps();
+
+        Map<String,Object> yarnNodes = yarnMonitorService.getNodes();
+
+        JSONObject yarn = new JSONObject();
+
+        yarn.put("cluster",yarnCluster);
+        yarn.put("apps",yarnApp);
+        yarn.put("nodes",yarnNodes);
+        yarn.put("href", Conf.getYarnResourceUiAddress());
+
+
+
+        if(yarnCluster!=null) {
+            int active2total = numPercent(yarnCluster.getInteger("activeNodes") , yarnCluster.getInteger("totalNodes"));
+            int appRun2appT = numPercent(yarnCluster.getInteger("appsRunning") ,yarnCluster.getInteger("appsSubmitted"));
+            int vc2tc = numPercent(yarnCluster.getInteger("allocatedVirtualCores") , yarnCluster.getInteger("totalVirtualCores"));
+            int ag2tg = numPercent(yarnCluster.getInteger("allocateGB") , yarnCluster.getInteger("totalGB"));
+
+            modelAndView.addObject("active2total",active2total);
+            modelAndView.addObject("appRun2appT",appRun2appT);
+            modelAndView.addObject("vc2tc",vc2tc);
+            modelAndView.addObject("ag2tg",ag2tg);
+        }
+
+
+        modelAndView.addObject("yarn",yarn);
+        return modelAndView;
+    }
+
     @RequestMapping(
             value  = "/yarnRestart",
-            method = RequestMethod.GET
+            method = RequestMethod.POST
     )
     public String yarnRestart(@RequestParam("jobId") String jobId) throws  Exception{
 
@@ -66,7 +144,7 @@ public class YarnMonitorController {
 
     @RequestMapping(
             value = "/removeDockerJob",
-            method = RequestMethod.GET
+            method = RequestMethod.POST
     )
     public String removeDockerJob(@RequestParam("jobId") String jobId) throws Exception {
         return yarnMonitorService.removeDockerJob(jobId);
@@ -98,7 +176,7 @@ public class YarnMonitorController {
 
     @RequestMapping(
             value  = "/yarnStopDockerJob",
-            method = RequestMethod.GET
+            method = RequestMethod.POST
     )
     public String yarnStopDockerJob(@RequestParam("jobId") String jobId) throws Exception{
         return yarnMonitorService.stopDockerJob(jobId);

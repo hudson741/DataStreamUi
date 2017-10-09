@@ -15,6 +15,7 @@ import com.jcraft.jsch.Session;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description
@@ -23,19 +24,36 @@ import java.util.List;
  */
 public class JschProxy {
 
+    public static void main(String[] args) throws Exception {
+        JschPoolKey jschPoolKey = new JschPoolKey();
+        jschPoolKey.setUser("root");
+        jschPoolKey.setPassword("Tudou=123");
+        jschPoolKey.setHost("zhangc6");
+        Session session = null;
+        for(int i=0;i<35;i++) {
+            try {
+                session = getSession(jschPoolKey);
+                Thread.currentThread().sleep(1000);
+            }finally {
+
+            }
+        }
+
+    }
+
 
     private static GenericKeyedObjectPool<String, Session> pool;
 
     static {
         GenericKeyedObjectPoolConfig poolConfig = new GenericKeyedObjectPoolConfig();
 
-        poolConfig.setMaxTotal(800);
+        poolConfig.setMaxTotal(1000);
         poolConfig.setTestWhileIdle(true);
-        poolConfig.setMaxTotalPerKey(10);
+        poolConfig.setMaxTotalPerKey(50);
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnCreate(true);
-        poolConfig.setMaxIdlePerKey(1000);
-        poolConfig.setMinEvictableIdleTimeMillis(1000 * 60 * 5);
+        poolConfig.setMaxIdlePerKey(100);
+        poolConfig.setMinEvictableIdleTimeMillis(1000 * 10 );
         // 使用非公平锁，提高并发效率
         poolConfig.setFairness(false);
         pool = new GenericKeyedObjectPool(new JschSessionObjectFactory(), poolConfig);
@@ -44,7 +62,7 @@ public class JschProxy {
     private static Logger logger = LoggerFactory.getLogger(JschProxy.class);
 
     public static Session getSession(JschPoolKey jschPoolKey) throws Exception {
-        Session session = pool.borrowObject(jschPoolKey.Obj2Key(), 500);
+        Session session = pool.borrowObject(jschPoolKey.Obj2Key(), 1500);
 
         logger.info("pool now active :" + pool.getNumActive() + "  idle:" + pool.getNumIdle() + " wait: "
                     + pool.getNumWaiters());
@@ -53,9 +71,8 @@ public class JschProxy {
     }
 
     public static void clear(JschPoolKey jschPoolKey){
-        pool.clearOldest();
-        pool.clear(jschPoolKey.Obj2Key());
 
+        pool.clear(jschPoolKey.Obj2Key());
     }
 
     public static void returnSession(JschPoolKey jschPoolKey,Session session){

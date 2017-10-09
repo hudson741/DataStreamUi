@@ -40,6 +40,7 @@ public class LoginController {
     public ModelAndView stormIndex(ModelMap model, HttpServletRequest httpServletRequest) {
         //index.html全局首页
         return new ModelAndView("login");
+//        return new ModelAndView("/pages/examples/login");
     }
 
     /**
@@ -66,8 +67,24 @@ public class LoginController {
             method = RequestMethod.GET
     )
     public ModelAndView Index(ModelMap model, HttpServletRequest httpServletRequest) {
+        ModelAndView modelAndView = new ModelAndView("index");
         //index.html全局首页
-        return new ModelAndView("index");
+        return modelAndView;
+    }
+
+
+    /**
+     * 超管首页
+     * @param model
+     * @return
+     */
+    @RequestMapping(
+            value  = "/sindez",
+            method = RequestMethod.GET
+    )
+    public ModelAndView sindez(ModelMap model, HttpServletRequest httpServletRequest) {
+        //index.html全局首页
+        return new ModelAndView("indexzz");
     }
 
     /**

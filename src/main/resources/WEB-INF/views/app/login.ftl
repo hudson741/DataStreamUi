@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link href="https://fonts.googleapis.com/css?family=Finger+Paint" rel="stylesheet">
+    <link rel="stylesheet" href="styles/user.css?v=1495101086124">
+</head>
+<body class="user-module">
+
+    <div class="login-resign-wrap" id="loginInPage">
+        <div class="login-resign-content">
+            <form user-manage="loginIn" method="post" class="loginer-form-1"  id="loginIn" autocomplete="off"  action="logind">
+                <div class="input-inset-wrap">
+                    <input type="text" class="input-inset input-login-resign" placeholder="用户名" name ="username" id="username" autocomplete="off"/>
+                    <!--<div class=" loginer-bg-wrap loginer-zhanghu"></div>-->
+                </div>
+
+                <div class="input-inset-wrap">
+                    <input type="password" class="input-inset input-login-resign" placeholder="密码" id="password" name ="password" autocomplete="off"/>
+                    <div class=" loginer-bg-wrap loginer-mima"></div>
+                </div>
+
+                <div>
+                    <input class="btn btn-rect btn-primary btn-long login-resign-btn" type="submit" value="登&nbsp;&nbsp;&nbsp;录"/>
+                </div>
+
+            </form>
+        </div>
+
+</div>
+</body>
+</html>

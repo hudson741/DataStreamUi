@@ -43,7 +43,7 @@ public class YarnMonitorRestClient {
      * @return
      */
     public JSONArray getYarnApps(){
-        String jsonStr =  getApiData("apps?limit=10");
+        String jsonStr =  getApiData("apps?state=running");
         if(StringUtils.isEmpty(jsonStr)){
             return null;
         }

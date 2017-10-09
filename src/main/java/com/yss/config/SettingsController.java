@@ -7,6 +7,7 @@ import com.yss.yarn.discovery.ServerAddressDiscovery;
 import com.yss.yarn.launch.YarnLaunchService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 
 import com.yss.storm.StormNodesService;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Description
@@ -48,6 +52,28 @@ public class SettingsController {
     }
 
     @RequestMapping(
+            value  = "/confView",
+            method = RequestMethod.GET
+    )
+    public ModelAndView confView(ModelMap modelMap) throws Exception {
+        Map<String, String> data = new HashMap();
+
+        data.put("test","this is test");
+        data.put("stormZk", Conf.getSTORM_ZK());
+        data.put("hdfs", Conf.getFS_DEFAULT_FS());
+        data.put("yarn", Conf.getYARN_RESOURCEMANAGER_ADDREES());
+        data.put("yarns", Conf.getYARN_RESOURCEMANAGER_SCHEDULER_ADDRESS());
+        data.put("yarnui", Conf.getYarnResourceUiAddress());
+        data.put("yarnJavaHome", Conf.getYarnJavaHome());
+        data.put("yarnHadoopHome",Conf.getYarnHadoopHome());
+        ModelAndView modelAndView = new ModelAndView("/settings/conf");
+        modelAndView.addObject("time","2018");
+        modelMap.put("time","2018");
+        modelAndView.addAllObjects(data);
+        return modelAndView;
+    }
+
+    @RequestMapping(
         value  = "/settingsSet",
         method = RequestMethod.POST
     )
@@ -65,7 +91,8 @@ public class SettingsController {
         serverAddressDiscovery.refresh();
         stormNodesService.refresh();
         yarnLaunchService.refresh();
+        return "修改成功";
 
-        return JSON.toJSONString("已更新");
+
     }
 }
