@@ -10,17 +10,17 @@ import com.yss.util.PropertiesUtil;
  */
 public class Conf {
 
-    private static volatile String STORM_ZK ="10.186.58.13";
+    private static volatile String STORM_ZK ="192.168.103.188";
 
     private static volatile int STORM_ZK_PORT = Integer.parseInt(PropertiesUtil.getProperty("stormZkPort"));
 
-    private static volatile String FS_DEFAULT_FS = "hdfs://zhangc1:9000" ;
+    private static volatile String FS_DEFAULT_FS = "hdfs://yss1:9000" ;
 
-    private static volatile String YARN_RESOURCEMANAGER_ADDREES ="zhangc1:8032";
+    private static volatile String YARN_RESOURCEMANAGER_ADDREES ="yss2:8032";
 
-    private static volatile String YARN_RESOURCEMANAGER_SCHEDULER_ADDRESS ="zhangc1:8030";
+    private static volatile String YARN_RESOURCEMANAGER_SCHEDULER_ADDRESS ="yss2:8030";
 
-    private static volatile String YARN_RESOURCE_UI_ADDRESS ="zhangc1:8088";
+    private static volatile String YARN_RESOURCE_UI_ADDRESS ="yss2:8088";
 
     private static volatile String YARN_JAVA_HOME = PropertiesUtil.getProperty("yarnJavaHome");
 

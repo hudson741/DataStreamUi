@@ -1,5 +1,6 @@
 package com.yss.auth;
 
+import com.yss.util.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.ModelMap;
@@ -57,55 +58,12 @@ public class LoginController {
         return new ModelAndView("login");
     }
 
-    /**
-     * 超管首页
-     * @param model
-     * @return
-     */
-    @RequestMapping(
-            value  = "/sindex",
-            method = RequestMethod.GET
-    )
-    public ModelAndView Index(ModelMap model, HttpServletRequest httpServletRequest) {
-        ModelAndView modelAndView = new ModelAndView("index");
-        //index.html全局首页
-        return modelAndView;
-    }
-
-
-    /**
-     * 超管首页
-     * @param model
-     * @return
-     */
-    @RequestMapping(
-            value  = "/sindez",
-            method = RequestMethod.GET
-    )
-    public ModelAndView sindez(ModelMap model, HttpServletRequest httpServletRequest) {
-        //index.html全局首页
-        return new ModelAndView("indexzz");
-    }
-
-    /**
-     * 普通用户首页
-     * @param model
-     * @return
-     */
-    @RequestMapping(
-            value  = "/indexl",
-            method = RequestMethod.GET
-    )
-    public ModelAndView Indexl(ModelMap model, HttpServletRequest httpServletRequest) {
-        //index.html全局首页
-        return new ModelAndView("indexl");
-    }
 
     @RequestMapping(
         value = "/logind",
         method = RequestMethod.POST
     )
-    public ModelAndView login( HttpServletResponse response, @RequestParam("username") String username, @RequestParam("password") String password ) throws IOException {
+    public R login( HttpServletResponse response,HttpServletRequest request, @RequestParam("username") String username, @RequestParam("password") String password ) throws IOException {
 
         AuthConfig.Auth auth = AuthConfig.login(username,password);
 
@@ -116,17 +74,21 @@ public class LoginController {
         response.addCookie(new Cookie("sessionId",token));
 
         if(auth == AuthConfig.Auth.NULL){
-            response.sendRedirect("/");
-            return null;
+            return R.error(200, "用户名或密码错误");
         }
 
         if(auth == AuthConfig.Auth.SUPER){
-            response.sendRedirect("/sindex");
+            response.addCookie(new Cookie("auth", ""+1));
         }else{
-            response.sendRedirect("/indexl");
+            response.addCookie(new Cookie("auth", ""+0));
         }
+        return R.ok();
 
-        return null;
+    }
+
+    @RequestMapping(value = "/index")
+    public ModelAndView index(){
+        return new ModelAndView("index");
     }
 
 
@@ -134,14 +96,14 @@ public class LoginController {
             value = "/logout",
             method = RequestMethod.GET
     )
-    public String logout( HttpServletResponse response ) throws IOException {
+    public ModelAndView logout( HttpServletResponse response ) throws IOException {
         AuthConfig.Auth auth = AuthConfig.Auth.NULL;
         Map<String,Object> map = new HashMap<>();
         map.put("sessionId",auth.getCode());
         map.put("timeStamp",System.currentTimeMillis()+"");
         String token = JwtUtil.sign(map);
         response.addCookie(new Cookie("sessionId",token));
-        return "已登出";
+        return new ModelAndView("login");
     }
 
 }

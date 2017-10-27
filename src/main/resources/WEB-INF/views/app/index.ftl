@@ -15,11 +15,9 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
 
+  <link rel="stylesheet" href="dist/css/bee.css">
 
-  <!-- AdminLTE Skins. Choose a skin from the css/skins
-       folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
-<!-- 以上为公共css -->
 
   <!-- daterange picker -->
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
@@ -54,8 +52,11 @@
   <!-- jvectormap -->
   <link rel="stylesheet" href="plugins/jvectormap/jquery-jvectormap-1.2.2.css">
 
+  <link rel="stylesheet" href="http://www.jq22.com/demo/jQuerySweetAlert220160627/dist/sweetalert2.min.css">
 
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -92,51 +93,25 @@ ifm.height = subWeb.body.scrollHeight;
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-          <!-- Messages: style can be found in dropdown.less-->
-          <li class="dropdown messages-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-envelope-o"></i>
-              <span class="label label-success">4</span>
-            </a>
-          </li>
-          <!-- Control Sidebar Toggle Button -->
           <li>
             <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
           </li>
+            <li>
+                <a href="/logout"><i class="fa fa-fw fa-reply"></i></a>
+            </li>
         </ul>
       </div>
     </nav>
   </header>
+
+<#assign auth>${Request["cookies.auth"]?default("-1")}</#assign>
   <!-- Left side column. contains the logo and sidebar -->
   <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
-      <!-- Sidebar user panel -->
-      <!--<div class="user-panel">-->
-        <!--<div class="pull-left image">-->
-          <!--<img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">-->
-        <!--</div>-->
-        <!--<div class="pull-left info">-->
-          <!--<p>龙果一号</p>-->
-          <!--<a href="#"><i class="fa fa-circle text-success"></i> 在线</a>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!-- search form -->
-      <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-        </div>
-      </form>
-      <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
         <li class="header">主导航</li>
-
-
         <li class="treeview">
           <a target="navTab" href="/confView?">
             <i class="fa fa-files-o"></i>
@@ -144,6 +119,7 @@ ifm.height = subWeb.body.scrollHeight;
           </a>
         </li>
 
+      <#if auth=="1">
           <li>
               <a target="navTab" href="/hrc?">
                   <i class="fa fa-th"></i>
@@ -160,19 +136,22 @@ ifm.height = subWeb.body.scrollHeight;
           </li>
 
           <li class="treeview">
+              <a target="navTab" href="/dockerindexftl?">
+                  <i class="fa fa-laptop"></i>
+                  <span>docker节点管理</span>
+              </a>
+          </li>
+      </#if>
+
+          <li class="treeview">
               <a target="navTab" href="/yarnindexftl?">
                   <i class="fa fa-pie-chart"></i>
                   <span>集群监控</span>
               </a>
           </li>
 
-          <li class="treeview">
-              <a target="navTab" href="/dockerindexftl?">
-                  <i class="fa fa-laptop"></i>
-                  <span>docker节点管理</span>
-              </a>
-          </li>
 
+      <#if auth=="1">
           <li class="treeview">
               <a href="javascript:void(0);">
                   <i class="fa fa-share"></i> <span>storm发布</span>
@@ -185,10 +164,11 @@ ifm.height = subWeb.body.scrollHeight;
                   <li><a target="navTab" href="/stormsingle?"><i class="fa fa-circle-o"></i> storm单容器发布</a></li>
               </ul>
           </li>
+      </#if>
 
           <li class="treeview">
               <a href="javascript:void(0);">
-                  <i class="fa fa-share"></i> <span>storm监控管理</span>
+                  <i class="fa fa-fw fa-desktop"></i> <span>storm监控管理</span>
                   <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -201,143 +181,6 @@ ifm.height = subWeb.body.scrollHeight;
               </ul>
           </li>
 
-        <#--<li class="active treeview">-->
-          <#--<a href="#">-->
-            <#--<i class="fa fa-dashboard"></i> <span>面板</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<i class="fa fa-angle-left pull-right"></i>-->
-            <#--</span>-->
-          <#--</a>-->
-          <#--<ul class="treeview-menu">-->
-            <#--<li class="active"><a target="navTab" href="/dashboard?"><i class="fa fa-circle-o"></i> 面板 v1</a></li>-->
-            <#--<li><a target="navTab" href="/dashboard2?"><i class="fa fa-circle-o"></i> 面板 v2</a></li>-->
-          <#--</ul>-->
-        <#--</li>-->
-        <#--<li class="treeview">-->
-          <#--<a target="navTab" href="/layout?">-->
-            <#--<i class="fa fa-files-o"></i>-->
-            <#--<span>界面布局</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<span class="label label-primary pull-right">4</span>-->
-            <#--</span>-->
-          <#--</a>-->
-        <#--</li>-->
-
-        <#--<li>-->
-          <#--<a target="navTab" href="/layout2?">-->
-            <#--<i class="fa fa-th"></i> <span>窗口小部件</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<small class="label pull-right bg-green">new</small>-->
-            <#--</span>-->
-          <#--</a>-->
-        <#--</li>-->
-
-        <#--<li class="treeview">-->
-          <#--<a href="#">-->
-            <#--<i class="fa fa-pie-chart"></i>-->
-            <#--<span>图表</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<i class="fa fa-angle-left pull-right"></i>-->
-            <#--</span>-->
-          <#--</a>-->
-          <#--<ul class="treeview-menu">-->
-            <#--<li><a target="navTab" href="/chart1?"><i class="fa fa-circle-o"></i> ChartJS</a></li>-->
-            <#--<li><a target="navTab" href="/chart2?"><i class="fa fa-circle-o"></i> Morris</a></li>-->
-            <#--<li><a target="navTab" href="/chart3?"><i class="fa fa-circle-o"></i> Flot</a></li>-->
-            <#--<li><a target="navTab" href="/chart4?"><i class="fa fa-circle-o"></i> Inline charts</a></li>-->
-          <#--</ul>-->
-        <#--</li>-->
-        <#--<li class="treeview">-->
-          <#--<a href="#">-->
-            <#--<i class="fa fa-laptop"></i>-->
-            <#--<span>UI 元素</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<i class="fa fa-angle-left pull-right"></i>-->
-            <#--</span>-->
-          <#--</a>-->
-          <#--<ul class="treeview-menu">-->
-            <#--<li><a target="navTab" href="/ui1?"><i class="fa fa-circle-o"></i> 一般</a></li>-->
-            <#--<li><a target="navTab" href="/ui2?"><i class="fa fa-circle-o"></i> 图标</a></li>-->
-            <#--<li><a target="navTab" href="/ui3?"><i class="fa fa-circle-o"></i> 按钮</a></li>-->
-            <#--<li><a target="navTab" href="/ui4?"><i class="fa fa-circle-o"></i> 滑块</a></li>-->
-            <#--<li><a target="navTab" href="/ui5?"><i class="fa fa-circle-o"></i> 时间表</a></li>-->
-            <#--<li><a target="navTab" href="/ui6?"><i class="fa fa-circle-o"></i> 动态提示</a></li>-->
-          <#--</ul>-->
-        <#--</li>-->
-        <#--<li class="treeview">-->
-          <#--<a href="#">-->
-            <#--<i class="fa fa-edit"></i> <span>表单</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<i class="fa fa-angle-left pull-right"></i>-->
-            <#--</span>-->
-          <#--</a>-->
-          <#--<ul class="treeview-menu">-->
-            <#--<li><a target="navTab" href="/forms1"><i class="fa fa-circle-o"></i> 一般元素 </a></li>-->
-            <#--<li><a target="navTab" href="/forms2"><i class="fa fa-circle-o"></i> 高级元素</a></li>-->
-            <#--<li><a target="navTab" href="/forms3"><i class="fa fa-circle-o"></i> 编辑</a></li>-->
-          <#--</ul>-->
-        <#--</li>-->
-        <#--<li class="treeview">-->
-          <#--<a href="#">-->
-            <#--<i class="fa fa-table"></i> <span>表格</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<i class="fa fa-angle-left pull-right"></i>-->
-            <#--</span>-->
-          <#--</a>-->
-          <#--<ul class="treeview-menu">-->
-            <#--<li><a target="navTab" href="/menutable1?"><i class="fa fa-circle-o"></i> 简单表格</a></li>-->
-            <#--<li><a target="navTab" href="/menutable2?"><i class="fa fa-circle-o"></i> 数据表格</a></li>-->
-            <#--<li><a target="navTab" href="/menutable3?"><i class="fa fa-circle-o"></i> DIY表格</a></li>-->
-          <#--</ul>-->
-        <#--</li>-->
-        <#--<li>-->
-          <#--<a target="navTab" href="/calendar?">-->
-            <#--<i class="fa fa-calendar"></i> <span>日历</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<small class="label pull-right bg-red">3</small>-->
-              <#--<small class="label pull-right bg-blue">17</small>-->
-            <#--</span>-->
-          <#--</a>-->
-        <#--</li>-->
-        <#--<li>-->
-          <#--<a target="navTab" href="/mail?">-->
-            <#--<i class="fa fa-envelope"></i> <span>邮箱</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<small class="label pull-right bg-yellow">12</small>-->
-              <#--<small class="label pull-right bg-green">16</small>-->
-              <#--<small class="label pull-right bg-red">5</small>-->
-            <#--</span>-->
-          <#--</a>-->
-        <#--</li>-->
-        <#--<li class="treeview">-->
-          <#--<a href="#">-->
-            <#--<i class="fa fa-folder"></i> <span>实例</span>-->
-            <#--<span class="pull-right-container">-->
-              <#--<i class="fa fa-angle-left pull-right"></i>-->
-            <#--</span>-->
-          <#--</a>-->
-          <#--<ul class="treeview-menu">-->
-            <#--<li><a target="navTab" href="/lizi1?"><i class="fa fa-circle-o"></i> Invoice</a></li>-->
-            <#--<li><a target="navTab" href="/lizi2?"><i class="fa fa-circle-o"></i> Profile</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/login.html"><i class="fa fa-circle-o"></i> Login</a></li>-->
-            <#--<li><a target="_blank" href="/pages/examples/login1.html"><i class="fa fa-circle-o"></i> Login1</a></li>-->
-            <#--<li><a target="_blank" href="/pages/examples/login2.html"><i class="fa fa-circle-o"></i> Login2</a></li>-->
-            <#--<li><a target="_blank" href="/pages/examples/login3.html"><i class="fa fa-circle-o"></i> Login3</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/register.html"><i class="fa fa-circle-o"></i> Register</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/lockscreen.html"><i class="fa fa-circle-o"></i> Lockscreen</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/404.html"><i class="fa fa-circle-o"></i> 404 Error</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/500.html"><i class="fa fa-circle-o"></i> 500 Error</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/blank.html"><i class="fa fa-circle-o"></i> Blank Page</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/pace.html"><i class="fa fa-circle-o"></i> Pace Page</a></li>-->
-            <#--<li><a target="navTab" href="/include/examples/datatable.html"><i class="fa fa-circle-o"></i>表格实例</a></li>-->
-          <#--</ul>-->
-        <#--</li>-->
-
-        <#--<li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>文档</span></a></li>-->
-        <#--<li class="header">标签</li>-->
-        <#--<li><a href="javascript:void(0);"><i class="fa fa-circle-o text-red"></i> <span>重要</span></a></li>-->
-        <#--<li><a href="javascript:void(0);"><i class="fa fa-circle-o text-yellow"></i> <span>警告</span></a></li>-->
-        <#--<li><a href="javascript:void(0);"><i class="fa fa-circle-o text-aqua"></i> <span>消息</span></a></li>-->
       </ul>
     </section>
     <!-- /.sidebar -->
@@ -433,212 +276,27 @@ ifm.height = subWeb.body.scrollHeight;
     </section>
     <!-- /.content -->
   </div>
-  <!-- /.content-wrapper -->
-  <footer class="main-footer">
-    <div class="pull-right hidden-xs">
-      <b>Version</b> 2.3.6
-    </div>
-    <strong>Copyright &copy; 2014-2016 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights
-    reserved.
-  </footer>
-
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
     <!-- Create the tabs -->
     <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-      <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
-      <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
       <!-- Home tab content -->
       <div class="tab-pane" id="control-sidebar-home-tab">
-        <h3 class="control-sidebar-heading">最近的活动</h3>
-        <ul class="control-sidebar-menu">
-          <li>
-            <a href="javascript:void(0)">
-              <i class="menu-icon fa fa-birthday-cake bg-red"></i>
-
-              <div class="menu-info">
-                <h4 class="control-sidebar-subheading">我的生日</h4>
-
-                <p>四月二十四</p>
-              </div>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)">
-              <i class="menu-icon fa fa-user bg-yellow"></i>
-
-              <div class="menu-info">
-                <h4 class="control-sidebar-subheading">更新我的资料</h4>
-
-                <p>新手机号码 (+86)1234567890</p>
-              </div>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)">
-              <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
-
-              <div class="menu-info">
-                <h4 class="control-sidebar-subheading">添加邮箱地址</h4>
-
-                <p>abc@roncoo.com</p>
-              </div>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)">
-              <i class="menu-icon fa fa-file-code-o bg-green"></i>
-
-              <div class="menu-info">
-                <h4 class="control-sidebar-subheading">写个256字的描述</h4>
-
-                <p>执行时间5秒</p>
-              </div>
-            </a>
-          </li>
-        </ul>
-        <!-- /.control-sidebar-menu -->
-
-        <h3 class="control-sidebar-heading">任务进度</h3>
-        <ul class="control-sidebar-menu">
-          <li>
-            <a href="javascript:void(0)">
-              <h4 class="control-sidebar-subheading">
-                自定义模板的设计
-                <span class="label label-danger pull-right">70%</span>
-              </h4>
-
-              <div class="progress progress-xxs">
-                <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
-              </div>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)">
-              <h4 class="control-sidebar-subheading">
-                更新简历
-                <span class="label label-success pull-right">95%</span>
-              </h4>
-
-              <div class="progress progress-xxs">
-                <div class="progress-bar progress-bar-success" style="width: 95%"></div>
-              </div>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)">
-              <h4 class="control-sidebar-subheading">
-                获取积分
-                <span class="label label-warning pull-right">50%</span>
-              </h4>
-
-              <div class="progress progress-xxs">
-                <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
-              </div>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)">
-              <h4 class="control-sidebar-subheading">
-                后端框架
-                <span class="label label-primary pull-right">68%</span>
-              </h4>
-
-              <div class="progress progress-xxs">
-                <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
-              </div>
-            </a>
-          </li>
-        </ul>
-        <!-- /.control-sidebar-menu -->
-
       </div>
-      <!-- /.tab-pane -->
-
-      <!-- Settings tab content -->
       <div class="tab-pane" id="control-sidebar-settings-tab">
-        <form method="post">
-          <h3 class="control-sidebar-heading">一般设置</h3>
-
-          <div class="form-group">
-            <label class="control-sidebar-subheading">
-              面板的使用报告
-              <input type="checkbox" class="pull-right" checked>
-            </label>
-
-            <p>
-              有关此常规设置选项的一些信息
-            </p>
-          </div>
-          <!-- /.form-group -->
-
-          <div class="form-group">
-            <label class="control-sidebar-subheading">
-              允许邮件重定向
-              <input type="checkbox" class="pull-right" checked>
-            </label>
-
-            <p>
-              其他可用的选项集
-            </p>
-          </div>
-          <!-- /.form-group -->
-
-          <div class="form-group">
-            <label class="control-sidebar-subheading">
-              在帖子中公开作者姓名
-              <input type="checkbox" class="pull-right" checked>
-            </label>
-
-            <p>
-              允许用户在博客帖子中显示自己的名字
-            </p>
-          </div>
-          <!-- /.form-group -->
-
-          <h3 class="control-sidebar-heading">聊天设置</h3>
-
-          <div class="form-group">
-            <label class="control-sidebar-subheading">
-              显示我是否在线
-              <input type="checkbox" class="pull-right" checked>
-            </label>
-          </div>
-          <!-- /.form-group -->
-
-          <div class="form-group">
-            <label class="control-sidebar-subheading">
-              关闭通知
-              <input type="checkbox" class="pull-right">
-            </label>
-          </div>
-          <!-- /.form-group -->
-
-          <div class="form-group">
-            <label class="control-sidebar-subheading">
-              删除的聊天记录
-              <a href="javascript:void(0)" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
-            </label>
-          </div>
-          <!-- /.form-group -->
-        </form>
       </div>
-      <!-- /.tab-pane -->
     </div>
   </aside>
-  <!-- /.control-sidebar -->
-  <!-- Add the sidebar's background. This div must be placed
-       immediately after the control sidebar -->
   <div class="control-sidebar-bg"></div>
 </div>
 <div id="loading" class="loading-panel">
   <div class="box">
     <i class="fa fa-refresh fa-spin"></i>
     <span class="tip">
-       正在加载 · · ·    
+       正在加载 · · ·
     </span>
   </div>
 </div>
@@ -650,14 +308,13 @@ ifm.height = subWeb.body.scrollHeight;
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">提示</h4>
+        <h4 class="modal-title">确认</h4>
       </div>
       <div class="modal-body">
-        <p>确认删除？</p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">确认</button>
+      <div class="modal-footer text-center">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary btn-confirm">确认</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -665,18 +322,17 @@ ifm.height = subWeb.body.scrollHeight;
   <!-- /.modal-dialog -->
 </div>
 <div class="modal fade" id="lgModal">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title">提示</h4>
       </div>
       <div class="modal-body">
-        <p>确认删除？</p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <!-- <button type="button" class="btn btn-primary">确认</button> -->
+      <div class="modal-footer text-center">
+        <button type="button" class="btn btn-primary center-block" data-dismiss="modal">确认</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -684,6 +340,7 @@ ifm.height = subWeb.body.scrollHeight;
   <!-- /.modal-dialog -->
 </div>
 <!-- ./wrapper -->
+<script src="http://www.jq22.com/demo/jQuerySweetAlert220160627/dist/sweetalert2.min.js"></script>
 
 <!-- jQuery 2.2.3 -->
 <script src="plugins/jQuery/jquery-2.2.3.min.js"></script>
@@ -692,6 +349,7 @@ ifm.height = subWeb.body.scrollHeight;
 <script src="plugins/fastclick/fastclick.js"></script>
 <!-- Slimscroll -->
 <script src="plugins/slimScroll/jquery.slimscroll.min.js"></script>
+
 <!-- AdminLTE App -->
 <script src="dist/js/app.js"></script>
 <!-- 以上JS为页面必须 -->

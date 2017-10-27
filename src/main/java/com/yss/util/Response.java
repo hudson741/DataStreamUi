@@ -8,10 +8,6 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class Response {
 
-    public static void main(String[] args) {
-        System.out.println(Response.getInstance(false,"hello").toString());
-
-    }
 
     public static final String RESPONSE = "response";
 

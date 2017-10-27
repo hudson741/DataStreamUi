@@ -955,13 +955,6 @@ public class DateUtil {
 
     }
 
-    public static void main(String[] args) throws Exception {
 
-        Date date = new Date(Long.parseLong("1505285705248"));
-
-        System.out.println(DateUtil.format(date));
-
-
-    }
 
 }

@@ -10,15 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yss.Expansion.pool.JschPool;
+import com.yss.Expansion.pool.JschPoolKey;
+import com.yss.Expansion.pool.JschProxy;
 import org.apache.commons.collections.CollectionUtils;
 
-import org.assertj.core.util.Lists;
 import org.slf4j.*;
 
 import com.jcraft.jsch.*;
 
 import com.yss.util.FileUtil;
 import com.yss.Expansion.Exception.*;
+import org.slf4j.Logger;
 
 /**
  * @Description
@@ -26,7 +29,7 @@ import com.yss.Expansion.Exception.*;
  * @Date: 2017/7/25
  */
 public class JschService {
-    private static org.slf4j.Logger logger = LoggerFactory.getLogger(JschService.class);
+    private static Logger logger = LoggerFactory.getLogger(JschService.class);
 
 
     /**
@@ -161,14 +164,13 @@ public class JschService {
 
             // Delete the original file
             if (!file.delete()) {
-                System.out.println("Could not delete file");
-
+                logger.info("Could not delete file: {}", fileStr);
                 return;
             }
 
             // Rename the new file to the filename the original file had.
             if (!tempFile.renameTo(file)) {
-                System.out.println("Could not rename file");
+                logger.info("Could not rename file: {}", fileStr);
             }
 
             logger.info("删除文件" + fileStr + " 配置" + lineToRemove + "的行");
@@ -341,7 +343,6 @@ public class JschService {
 
                 while ((s = br.readLine()) != null) {                             // 使用readLine方法，一次读一行
                     result.add(System.lineSeparator() + s);
-                    System.out.println(System.lineSeparator() + s);
                 }
 
                 br.close();
@@ -361,7 +362,6 @@ public class JschService {
             bufferWritter.write("\n");
 
             for (String data : result) {
-                System.out.println(data);
                 bufferWritter.write(data);
             }
 
@@ -429,7 +429,7 @@ public class JschService {
         Channel     channel     = null;
 
         try {
-            session = JschProxy.getSession(jschPoolKey);
+            session = JschPool.getSession(jschPoolKey);
             channel = session.openChannel("exec");
 
             String cmd = "sh /home/hadoop/expand/env.sh";
@@ -447,24 +447,23 @@ public class JschService {
 
             String      logFile     = (logPath + "/" + id + ".log").replace("file:", "");
             FileWriter  fileWritter = new FileWriter(logFile, true);
-            PrintWriter pw          = new PrintWriter(fileWritter);
+            PrintWriter pw          = new PrintWriter(fileWritter, true);
             String      line;
 
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
                 pw.println(line);
-                pw.flush();
 
                 if (line.contains("envEnd")) {
-                    System.out.println("ALL DONE");
-
                     return true;
                 }
             }
         } catch (Exception e) {
             logger.error("error ", e);
-            JschProxy.returnSession(jschPoolKey, session);
-            channel.disconnect();
+            if ((channel != null) && channel.isConnected()) {
+                channel.disconnect();
+            }
+
+            JschPool.returnSession(jschPoolKey.Obj2Key(), session);
         }
 
         return false;
@@ -480,7 +479,7 @@ public class JschService {
             String localHostName = InetAddress.getLocalHost().getHostName();
 
             jschPoolKey = new JschPoolKey(luser, password, localHostName);
-            session     = JschProxy.getSession(jschPoolKey);
+            session     = JschPool.getSession(jschPoolKey);
             channel     = session.openChannel("exec");
             ((ChannelExec) channel).setCommand(cmd);
             channel.connect();
@@ -512,7 +511,7 @@ public class JschService {
             }
         } catch (Exception e) {
             logger.error("error ", e);
-            JschProxy.returnSession(jschPoolKey, session);
+            JschPool.returnSession(jschPoolKey.Obj2Key(), session);
             channel.disconnect();
         }
 
@@ -754,7 +753,7 @@ public class JschService {
 
         @Override
         public void showMessage(String s) {
-            System.out.println(s);
+
         }
 
         @Override

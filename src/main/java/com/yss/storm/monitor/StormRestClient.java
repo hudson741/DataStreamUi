@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.yss.yarn.discovery.YarnThriftClient;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import com.yss.util.HttpUtilManager;
 public class StormRestClient implements InitializingBean {
 
     private Logger logger            = LoggerFactory.getLogger(StormRestClient.class);
+
+    private volatile String stormUi = "";
 
     @Autowired
     private YarnThriftClient yarnThriftClient;
@@ -84,10 +87,11 @@ public class StormRestClient implements InitializingBean {
 
 
     public String getApiBase() {
-        if(getUIHttp() == null){
+        String uiHttp = getUIHttpByThrift();
+        if(uiHttp == null){
             return  null;
         }
-        return "http://" + getUIHttp() + "/api/v1/";
+        return "http://" + uiHttp + "/api/v1/";
     }
 
     /**
@@ -96,11 +100,20 @@ public class StormRestClient implements InitializingBean {
      * @return
      */
     private String getApiData(String url) {
-        if(getApiBase() == null){
-            return null;
+        String apiUrl = null;
+        if(StringUtils.isNotEmpty(this.stormUi)){
+            apiUrl = this.stormUi+url;
+        }else{
+            String stormUi = getApiBase();
+            if(StringUtils.isEmpty(stormUi)){
+                return null;
+            }
+            apiUrl = stormUi +url;
+            this.stormUi = stormUi;
         }
+
         try {
-            return HttpUtilManager.getInstance().httpGet(getApiBase()+url);
+            return HttpUtilManager.getInstance().httpGet(apiUrl);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (HttpException e) {
@@ -108,6 +121,8 @@ public class StormRestClient implements InitializingBean {
         } catch (Throwable e){
             e.printStackTrace();
         }
+
+        this.stormUi = null;
 
         return null;
     }
@@ -227,7 +242,7 @@ public class StormRestClient implements InitializingBean {
         return getApiData(url);
     }
 
-    private String getUIHttp() {
+    private String getUIHttpByThrift() {
         try {
             logger.info("getUIHttp .... ");
             String ui = yarnThriftClient.getStormUi();

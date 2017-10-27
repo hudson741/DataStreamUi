@@ -25,9 +25,9 @@
             <td>${topo.status}</td>
             <td>${topo.uptime}</td>
             <td>
-                <input id = "a1" <#if (topo.showa)!?boolean> disabled="disabled" </#if> onclick="activeTopo('${topo.id}')"  type="button" value="Activate" class="btn btn-default">
-                <input id = "a2"  <#if (topo.showd)!?boolean> disabled="disabled" </#if> onclick="deactiveTopo('${topo.id}')" type="button" value="Deactive" class="btn btn-default">
-                <input id = "a3" type="button" value="Kill" onclick="killTopo('${topo.id}')" class="btn btn-default">
+                <input id = "a1" <#if (topo.showa)!?boolean> disabled="disabled" </#if> onclick="activeTopo('${topo.id}')"  type="button" value="Activate" class="btn btn-info">
+                <input id = "a2"  <#if (topo.showd)!?boolean> disabled="disabled" </#if> onclick="deactiveTopo('${topo.id}')" type="button" value="Deactive" class="btn btn-info">
+                <input id = "a3" type="button" value="Kill" onclick="killTopo('${topo.id}')" class="btn btn-info">
 
             </td>
         </tr>

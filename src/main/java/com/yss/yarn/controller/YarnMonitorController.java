@@ -2,6 +2,7 @@ package com.yss.yarn.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yss.auth.AuthConfig;
 import com.yss.config.Conf;
 import com.yss.yarn.model.DockerJob;
 import com.yss.yarn.monitor.YarnMonitorService;
@@ -76,7 +77,7 @@ public class YarnMonitorController {
             value  = "/dockerindexftl",
             method = RequestMethod.GET
     )
-    public ModelAndView dockerindexftl(ModelMap model, HttpServletRequest httpServletRequest) {
+    public ModelAndView dockerindexftl(ModelMap model) {
         //index.html全局首页
 
         List<DockerJob> jobs = yarnMonitorService.getDockerJobs();
@@ -97,7 +98,7 @@ public class YarnMonitorController {
             value  = "/yarnindexftl",
             method = RequestMethod.GET
     )
-    public ModelAndView yarnIndexftl() throws Exception {
+    public ModelAndView yarnIndexftl(HttpServletRequest httpServletRequest) throws Exception {
         ModelAndView modelAndView = new ModelAndView("/yarn/yindex");
 
         JSONObject yarnCluster = yarnMonitorService.getCluster();
@@ -127,8 +128,15 @@ public class YarnMonitorController {
             modelAndView.addObject("ag2tg",ag2tg);
         }
 
-
         modelAndView.addObject("yarn",yarn);
+
+        AuthConfig.Auth auth = AuthConfig.getUser(httpServletRequest);
+        if(auth!=null && auth == AuthConfig.Auth.SUPER){
+            modelAndView.addObject("auth",1);
+        }else{
+            modelAndView.addObject("auth",0);
+        }
+
         return modelAndView;
     }
 
@@ -170,7 +178,7 @@ public class YarnMonitorController {
         try {
             return yarnMonitorService.killApp(appId);
         }catch(Throwable e){
-            return "done";
+            return "已操作，请刷新界面";
         }
     }
 

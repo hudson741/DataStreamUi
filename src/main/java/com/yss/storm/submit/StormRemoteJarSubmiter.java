@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
 import com.yss.config.Conf;
 import com.yss.storm.exception.StormRmoteSubException;
 import com.yss.storm.exception.ZKConfException;
@@ -72,43 +73,54 @@ public class StormRemoteJarSubmiter implements StormSubmiter {
 
         Config           config      = new Config();
         List<NimbusNode> nimbusNodes = stormNodesService.getNimbusNodeList();
-
-        if (CollectionUtils.isEmpty(nimbusNodes)) {
-            throw new RuntimeException("storm集群出了问题，请联系管理员");
-        }
-
+        int nimbusPort = 0;
         List<String> nimbusHosts = Lists.newArrayList();
 
-        List<String> list       = stormNodesService.getNimbusHosts();
+        if (CollectionUtils.isEmpty(nimbusNodes)) {
+//            throw new RuntimeException("storm集群出了问题，请联系管理员");
+        }else {
+            Lists.newArrayList();
 
-        if(CollectionUtils.isEmpty(list)){
+            List<String> list = stormNodesService.getNimbusHosts();
+
+            if (CollectionUtils.isEmpty(list)) {
+                throw new ZKConfException("请刷新zk地址");
+            }
+
+
+            for (NimbusNode nimbusNode : nimbusNodes) {
+                InetAddress ip = InetAddress.getByName(nimbusNode.getHost());
+                String nimbusAddr = ip.getHostAddress();
+                String dockerHost = nimbusNode.getDockerHost();
+
+                for (String nimbusHost : list) {
+                    if (nimbusHost.contains(dockerHost)) {
+                        logger.info("nimbus to dockerHosts " + nimbusHost + "  " + dockerHost);
+                        dockerHost = nimbusHost;
+                        break;
+                    }
+                }
+                nimbusPort = nimbusNode.getPort();
+                logger.info("set dns " + dockerHost + " " + nimbusAddr);
+                DnsCacheManipulator.setDnsCache(dockerHost, nimbusAddr);
+                nimbusHosts.add(dockerHost);
+            }
+        }
+        if(org.apache.commons.collections.CollectionUtils.isEmpty(nimbusHosts)){
             throw new ZKConfException("请刷新zk地址");
         }
-
-        int nimbusPort = 0;
-
-        for (NimbusNode nimbusNode : nimbusNodes) {
-            InetAddress  ip         = InetAddress.getByName(nimbusNode.getHost());
-            String       nimbusAddr = ip.getHostAddress();
-            String       dockerHost = nimbusNode.getDockerHost();
-
-            for (String nimbusHost : list) {
-                if (nimbusHost.contains(dockerHost)) {
-                    logger.info("nimbus to dockerHosts " + nimbusHost + "  " + dockerHost);
-                    dockerHost = nimbusHost;
-                    break;
-                }
-            }
-            nimbusPort = nimbusNode.getPort();
-            logger.info("set dns " + dockerHost + " " + nimbusAddr);
-            DnsCacheManipulator.setDnsCache(dockerHost, nimbusAddr);
-            nimbusHosts.add(dockerHost);
+        if(nimbusPort ==0){
+            nimbusPort=9005;
         }
-
         config.put(Config.NIMBUS_SEEDS, nimbusHosts);
         config.put(Config.NIMBUS_THRIFT_PORT, nimbusPort);
         config.put(Config.STORM_ZOOKEEPER_SERVERS,  Arrays.asList(Conf.getSTORM_ZK().split(",")));
         config.put(Config.STORM_ZOOKEEPER_PORT, Conf.getStormZkPort());
+        config.put(Config.TOPOLOGY_WORKER_MAX_HEAP_SIZE_MB,2000.0);
+        config.put(Config.TOPOLOGY_COMPONENT_RESOURCES_ONHEAP_MEMORY_MB,1000.0);
+        config.setNumAckers(0);
+
+//        config.put(Config.TOPOLOGY_WORKER_LOGWRITER_CHILDOPTS,list1);
 
 //      Map<String, Object> hbConf = new HashMap<String, Object>();
 

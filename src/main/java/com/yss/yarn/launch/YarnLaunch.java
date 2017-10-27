@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.*;
 
 import com.floodCtr.generate.FloodJob;
-import com.yss.ftp.FtpConnectionFactory;
 import com.yss.storm.controller.StormDockerController;
 import com.yss.storm.node.DrpcNode;
 import com.yss.util.PropertiesUtil;
@@ -45,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.collect.Lists;
 
 import com.yss.config.Conf;
-import com.yss.ftp.FtpService;
 import com.yss.storm.StormNodesService;
 import com.yss.storm.node.NimbusNode;
 import com.yss.util.FileUtil;
@@ -71,8 +69,6 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
     private YarnThriftClient  yarnThriftClient;
     @Autowired
     private StormNodesService stormNodesService;
-    @Autowired
-    private FtpService        ftpService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -239,12 +235,12 @@ public class YarnLaunch implements YarnLaunchService, InitializingBean {
              localResource = writeReturnHDFSLocalResources(appHome,file);
              fs = "hdfs";
         }else if(FS_SYSTEM.startsWith("ftp")){
-             localResource = writeReturnFTPLocalResources(appHome,file);
-             fs="ftp";
-             env.put("ftpAddr",FtpConnectionFactory.getAddr());
-             env.put("ftpPort",FtpConnectionFactory.getPort());
-             env.put("ftpUserName",FtpConnectionFactory.getUserName());
-             env.put("ftpPassword",FtpConnectionFactory.getPassword());
+//             localResource = writeReturnFTPLocalResources(appHome,file);
+//             fs="ftp";
+//             env.put("ftpAddr",FtpConnectionFactory.getAddr());
+//             env.put("ftpPort",FtpConnectionFactory.getPort());
+//             env.put("ftpUserName",FtpConnectionFactory.getUserName());
+//             env.put("ftpPassword",FtpConnectionFactory.getPassword());
         }
 
         localResources.put(file.getName(), localResource);

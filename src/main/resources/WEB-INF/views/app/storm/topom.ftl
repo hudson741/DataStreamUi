@@ -29,8 +29,8 @@
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li onclick="topoWorkNumModifyftl('${topo.id}',1)"><a href="#">worker+1</a></li>
-                        <li onclick="topoWorkNumModifyftl('${topo.id}',-1)"><a href="#">worker-1</a></li>
+                        <li onclick="topoWorkNumModifyftl('${topo.id}','${topo.workersTotal}',1)"><a href="#">worker+1</a></li>
+                        <li onclick="topoWorkNumModifyftl('${topo.id}','${topo.workersTotal}',-1)"><a href="#">worker-1</a></li>
                     </ul>
                 </div>
             </td>
@@ -80,8 +80,8 @@
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li onclick="topoCExeModifyftl('${topo.id}','${spout.spoutId}',1)"><a href="#">executors+1</a></li>
-                        <li onclick="topoCExeModifyftl('${topo.id}','${spout.spoutId}',-1)"><a href="#">executors-1</a></li>
+                        <li onclick="topoCExeModifyftl('${topo.id}','${spout.spoutId}','${spout.executors}',1)"><a href="#">executors+1</a></li>
+                        <li onclick="topoCExeModifyftl('${topo.id}','${spout.spoutId}','${spout.executors}',-1)"><a href="#">executors-1</a></li>
                     </ul>
                 </div>
             </td>
@@ -132,8 +132,8 @@
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li onclick="topoCExeModifyftl('${topo.id}','${bolt.boltId}',1)"><a href="#">executors+1</a></li>
-                        <li onclick="topoCExeModifyftl('${topo.id}','${bolt.boltId}',-1)"><a href="#">executors-1</a></li>
+                        <li onclick="topoCExeModifyftl('${topo.id}','${bolt.boltId}','${bolt.executors}',1)"><a href="#">executors+1</a></li>
+                        <li onclick="topoCExeModifyftl('${topo.id}','${bolt.boltId}','${bolt.executors}',-1)"><a href="#">executors-1</a></li>
                     </ul>
                 </div>
             </td>
@@ -149,12 +149,13 @@
     </div>
 </div>
 <script type="text/javascript">
-    function topoWorkNumModifyftl(topId,num){
+    function topoWorkNumModifyftl(topId,has,num){
         $.ajax({
             url: '/topoWorkNumModifyftl',
             type: 'post',
             data : {
                 topoid:topId,
+                has:has,
                 num:num
 
             },
@@ -167,13 +168,14 @@
         });
     };
 
-    function topoCExeModifyftl(topId,cid,num){
+    function topoCExeModifyftl(topId,cid,has,num){
         $.ajax({
             url: '/topoCExeModifyftl',
             type: 'post',
             data : {
                 topoid:topId,
                 cid:cid,
+                has:has,
                 num:num
             },
             success: function (data) {

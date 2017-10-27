@@ -30,7 +30,6 @@ public class PropertiesUtil {
     public static String getProperty(String key){
 
         String v = properties.getProperty(key,"");
-        System.out.println(v);
         return v;
 
     }

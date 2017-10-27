@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.yss.yarn.discovery.YarnThriftClient;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -97,10 +98,16 @@ public class StormUIViewController {
             method = RequestMethod.POST
     )
     public String topoCExeModify(@RequestParam("topoid") String topoid, @RequestParam("cid") String cid,
-                                 @RequestParam("num") int num)
+                                 @RequestParam("has") String has, @RequestParam("num") int num)
             throws Exception {
         Map<String, Integer> map = new HashMap<>();
 
+        int hasI = 0;
+        if(StringUtils.isNotEmpty(has)){
+            hasI = Integer.parseInt(has);
+        }
+
+        num = hasI+num;
         map.put(cid, num);
 
         Map<String, Object> data = stormMonitorRestApiService.modufyTopoComponentExecutors(topoid, map);
@@ -125,8 +132,13 @@ public class StormUIViewController {
             value  = "/topoWorkNumModifyftl",
             method = RequestMethod.POST
     )
-    public String topoWorkNumModify(@RequestParam("topoid") String topoid, @RequestParam("num") int num)
+    public String topoWorkNumModify(@RequestParam("topoid") String topoid,@RequestParam("has") String has, @RequestParam("num") int num)
             throws Exception {
+
+        if(StringUtils.isNotEmpty(has)){
+            num = num+Integer.parseInt(has);
+        }
+
         Map<String, Object> data = stormMonitorRestApiService.modifyTopoWorkerNum(topoid, num);
 
         return JSON.toJSONString(data);

@@ -34,7 +34,6 @@ public class StormSDKDownloadController {
 
             /* String realPath = request.getServletContext().getRealPath(source_directory); */
             File file = new File(source_directory, "execute.sh");
-            System.out.println(file.length());
 
             if (file.exists()) {
                 response.setContentType("application/force-download");

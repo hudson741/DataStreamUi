@@ -84,6 +84,8 @@ public class YarnMasterServerDiscovery implements ServerAddressDiscovery {
             masterServer = "zhangc4";
         } else if (masterServer.equals("10.104.254.122")) {
             masterServer = "zhangc5";
+        } else if(masterServer.equals("10.104.133.159")) {
+            masterServer = "zhangc6";
         }
 
         logger.info("found appMaster " + masterServer + "  " + port);

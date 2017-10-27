@@ -156,7 +156,7 @@ public class StormNodesService {
                 list.add(nimbusNode1);
             }
 
-        } catch (TException e) {
+        } catch (Throwable e) {
           logger.error("error ",e);
         }
         return list;

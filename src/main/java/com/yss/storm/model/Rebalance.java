@@ -16,14 +16,6 @@ public class Rebalance {
     private RebalanceOptions rebalanceOptions;
     private String           callback;
 
-    public static void main(String[] args) {
-        Map<String, Integer> map = new HashMap<>();
-
-        map.put("spout", 2);
-        map.put("count", 3);
-        System.out.println(Rebalance.getRebalanceInstanceJSONStr(null, map, null));
-
-    }
 
     public String getCallback() {
         return callback;

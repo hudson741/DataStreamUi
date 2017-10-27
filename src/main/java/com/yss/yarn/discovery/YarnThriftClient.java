@@ -5,12 +5,7 @@ import com.floodCtr.generate.FloodJobRunningState;
 import com.floodCtr.generate.StormThriftService;
 import com.yss.yarn.model.DockerJob;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +103,6 @@ public class YarnThriftClient implements StormThriftService.Iface{
 
     public List<DockerJob> getDockerJobs(){
             String json = getAllDockerJob();
-            System.out.println(json);
 
             List<DockerJob> result = Lists.newArrayList();
 
@@ -124,10 +118,5 @@ public class YarnThriftClient implements StormThriftService.Iface{
             return result;
     }
 
-    public static void main(String[] args) throws TException, InterruptedException {
-        final YarnThriftClient yarnThriftClient = new YarnThriftClient();
-        List<DockerJob> a = yarnThriftClient.getDockerJobs();
-        System.out.println(a.get(0).getBusinessTag());
-    }
 
 }

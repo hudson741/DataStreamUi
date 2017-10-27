@@ -12,11 +12,6 @@
 
 <import resource="classpath:conf/act-properties.xml" />
 
-    <bean id="testHandler" class="com.yss.TestHandler"/>
-
-    <!--ftp  -->
-    <bean id="ftpService" class = "com.yss.ftp.FtpService"/>
-
     <!-- storm相关                 -->
 
     <bean id="stormSubmiter" class="com.yss.storm.submit.StormRemoteJarSubmiter">

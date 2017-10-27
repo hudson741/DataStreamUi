@@ -1,5 +1,6 @@
 package com.yss.auth;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -28,64 +29,25 @@ public class LoginInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exc)
             throws Exception {}
 
-    /**
-     * Handler执行之后，ModelAndView返回之前调用这个方法
-     */
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
                            ModelAndView modelAndView)
             throws Exception {}
 
-    /**
-     * Handler执行之前调用这个方法
-     */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
         // 获取请求的URL
         String url = request.getRequestURI();
 
-        // URL:login.jsp是公开的;这个demo是除了login.jsp是可以公开访问的，其它的URL都进行拦截控制
-        System.out.println("url  " + url);
-
-        if ((url.indexOf("logind") >= 0)
-                || url.equals("/")
-                || (url.indexOf("css") >= 0)
-                || (url.indexOf("js") >= 0)
-                || (url.indexOf(".woff") >=0)
-                || (url.indexOf(".ico") >=0)
-                || (url.indexOf("error") >=0)
-                || (url.indexOf("gif") >= 0)
-                || (url.indexOf("jpg") >= 0)
-                || (url.indexOf("png") >=0)
-                ) {
+        //如果不是权限需要的url，那么就直接鉴权成功
+        if(!AuthConfig.isAuthUrl(url)){
             return true;
         }
 
-        int s=9;
-        if(s>7){
-            return true;
-        }
-
-        String sessionId = null;
-        String token = null;
-
-        Cookie[] cookies = request.getCookies();
-        if(ArrayUtils.isNotEmpty(cookies)) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("sessionId")) {
-                    token = cookie.getValue();
-                }
+        if(AuthConfig.hasAuth(request,url)){
+            for (Cookie cookie : request.getCookies()){
+                request.setAttribute("cookies."+cookie.getName() , cookie.getValue());
             }
-        }
-        logger.info("url  " + url);
-        if(StringUtils.isEmpty(token)){
-            return false;
-        }
-
-        Map<String,Object> map = JwtUtil.verify(token);
-        sessionId = (String)map.get("sessionId");
-
-        if(AuthConfig.hasAuth(sessionId,url)){
             return true;
         }
         // 不符合条件的，跳转到登录界面

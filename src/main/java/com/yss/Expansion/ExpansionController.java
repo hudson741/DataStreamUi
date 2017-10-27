@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.yss.Expansion.pool.JschPool;
+import com.yss.Expansion.pool.JschPoolKey;
+import com.yss.Expansion.pool.JschProxy;
 import com.yss.auth.JwtUtil;
+import com.yss.util.R;
 import org.apache.commons.lang.StringUtils;
 
 import org.assertj.core.util.Lists;
@@ -18,7 +22,6 @@ import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 
 import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 
 import com.yss.util.FileUtil;
 import com.yss.util.PropertiesUtil;
@@ -130,7 +132,7 @@ public class ExpansionController {
         value  = "/delPNodes",
         method = RequestMethod.GET
     )
-    public String delPhysicalNodes(@RequestParam("key") String key) throws IOException {
+    public R delPhysicalNodes(@RequestParam("key") String key) throws IOException {
         LinkedHashMap<String, ExpYamlDataBase.PhysicalNode> map          = ExpYamlDataBase.getNodes();
         ExpYamlDataBase.PhysicalNode                        physicalNode = map.get(key);
         String                                              hadoopUser   = PropertiesUtil.getProperty("hadoopUser");
@@ -143,20 +145,22 @@ public class ExpansionController {
                     " echo '" + physicalNode.getPassword() + "' |sudo -S sh hadoop.sh  nstop " + path};
 
             JschProxy.execmd(physicalNode.getAdmin(), physicalNode.getAdminPassWord(), physicalNode.getHost(), cmds);
+
+
+            // 清理已建立的ssd连接
+            JschPoolKey jschPoolKey = new JschPoolKey();
+
+            jschPoolKey.setHost(physicalNode.getHost());
+            jschPoolKey.setPassword(physicalNode.getPassword());
+            jschPoolKey.setUser(physicalNode.getUser());
+            JschPool.clear(jschPoolKey.Obj2Key());
+            ExpYamlDataBase.removeNode(key);
+            return R.ok();
         } catch (Exception e) {
             logger.error("error ", e);
+            return R.error(200, "服务器产生异常，请查看日志");
         }
 
-        // 清理已建立的ssd连接
-        JschPoolKey jschPoolKey = new JschPoolKey();
-
-        jschPoolKey.setHost(physicalNode.getHost());
-        jschPoolKey.setPassword(physicalNode.getPassword());
-        jschPoolKey.setUser(physicalNode.getUser());
-        JschProxy.clear(jschPoolKey);
-        ExpYamlDataBase.removeNode(key);
-
-        return "已删除";
     }
 
     /**
@@ -172,6 +176,8 @@ public class ExpansionController {
     )
     public String expand(@RequestParam("rAdmin") String rAdmin, @RequestParam("password") String password,
                          @RequestParam("IP") String ip, @RequestParam("host") String host) {
+
+        logger.info("here is "+Thread.currentThread().getName());
 
         boolean exists = false;
 
@@ -218,7 +224,7 @@ public class ExpansionController {
 
             FileWriter fileWritter = new FileWriter(logFile, true);
 
-            pw = new PrintWriter(fileWritter);
+            pw = new PrintWriter(fileWritter, true);
         } catch (IOException e) {
             return "创建本地log文件失败，请查看系统错误日志并重试";
         }
@@ -232,21 +238,16 @@ public class ExpansionController {
             // 3，清除/etc/hosts旧的匹配
             JschService.delFileMatch("/etc/hosts", " " + host);
             pw.println("已清除 /etc/hosts 关于" + host + "的旧匹配行");
-            pw.flush();
 
             // 4,更新本地/etc/hosts 加入扩展节点的hosts 和 ip映射
             JschService.localWriteFileAppend(data, "/etc/hosts");
             pw.println("更新本地/etc/hosts 加入扩展节点" + host + " " + ip + "的映射");
-            pw.flush();
 
 
             //先看远程服务器是否有安装docker daemon
             if(!JschService.checkIsDockerInstalled(rAdmin,password,host)){
                 return "请预先安装docker运行环境,并创建好overlay网络环境";
             }
-
-
-
 
             String localHostName = getLocalHostName();
 
@@ -255,14 +256,12 @@ public class ExpansionController {
             boolean isRemoteUserExsits = JschService.checkRemoteUserExsits(rAdmin, password, host, hadoopUser);
 
             pw.println("查看远程hadoop用户是否存在");
-            pw.flush();
 
             if (!isRemoteUserExsits) {
 
                 // 安全起见，先创建/home目录，已存在则忽略
                 logger.info("开始创建远程hadoop用户");
                 pw.println("开始创建远程hadoop用户");
-                pw.flush();
 
                 boolean result = JschService.remoteAddUser(rAdmin, password, host, "hadoop", hadoopUserPd);
 
@@ -274,7 +273,6 @@ public class ExpansionController {
                 boolean isPasswd = JschService.remoteUserPasswd(rAdmin, password, host, hadoopUser, hadoopUserPd);
 
                 pw.println("修改远程hadoop用户密码");
-                pw.flush();
 
                 if (!isPasswd) {
                     return "修改远程hadoop密码失败，请查看系统日志并重试";
@@ -284,37 +282,30 @@ public class ExpansionController {
             // 添加远程hadoop用户sudo权限
             JschService.sudoRemoteHadoop(rAdmin, password, host, hadoopUser);
             pw.println("为远程hadoop用户添加sudo权限");
-            pw.flush();
 
             // 6,设置远程hosts加入本机信任列表
             JschService.setRemoteKnownHosts(hadoopUser, hadoopUserPd, host);
             pw.println("设置远程hosts加入本机信任列表");
-            pw.flush();
 
             // 7,清空远程ssh目录,连接到远程机器，生成秘钥串
             JschService.generateRemoteSshKeygen(hadoopUser, hadoopUserPd, host);
             pw.println("清空远程/home/hadoop/.ssh目录");
             pw.println("生成远程hadoop秘钥");
-            pw.flush();
 
             // 9,将远程生成的公钥传入到本地
             String lfile = JschProxy.scpRemoteIdRsaPub(hadoopUser, hadoopUserPd, host);
 
             pw.println("传输远程hadoop秘钥至本地");
-            pw.flush();
 
             // 10,清除旧的匹配
             JschService.delFileMatch("/home/hadoop/.ssh/authorized_keys", hadoopUser + "@" + host);
             pw.println("清除本地authorized关于远程hadoop的旧匹配行");
-            pw.flush();
             JschService.localWriteFileAppend(lfile, "/home/" + hadoopUser + "/.ssh/authorized_keys");
             pw.println("覆盖远程hadoop的authorized_keys");
-            pw.flush();
 
             // 11,将本机hosts覆盖至远程hosts                              //需做分发
             JschService.updateRemoteHosts(rAdmin, password, host);
             pw.println("覆盖远程hosts文件");
-            pw.flush();
 
             // 12,将本地的机器信任列表传输至远程机器上
             JschService.updateRemoteKnownHosts(hadoopUser, hadoopUserPd, host);    // 需做分发
@@ -338,12 +329,12 @@ public class ExpansionController {
             }
 
             pw.println("已更新其他注册的物理节点机器");
-            pw.flush();
+
 
             // 8,将本地hadoop,jdk,安装脚本传输至远程服务器
             logger.info("开始传输hadoop压缩包，jdk压缩包至 " + host + " 此过程相对时间较长");
             pw.println("开始传输hadoop压缩包，jdk压缩包至 " + host + " 此过程相对时间较长");
-            pw.flush();
+
 
             String expandDirectory = null;
 
@@ -367,7 +358,7 @@ public class ExpansionController {
 
             // 添加至已注册物理节点信息
             pw.println("远程安装hadoop,jdk,此过程相对时间较长");
-            pw.flush();
+
 
             boolean isUntar = JschService.remoteInstallHadoop(hadoopUser, hadoopUserPd, host, id);
 
@@ -376,7 +367,7 @@ public class ExpansionController {
             }
 
             pw.println("设置远程机器环境变量");
-            pw.flush();
+
 
             logger.info("开始设置远程机器环境变量");
 
@@ -388,19 +379,17 @@ public class ExpansionController {
 
             logger.info("落地存储新增节点");
             pw.println("落地存储新增节点");
-            pw.flush();
+
             ExpYamlDataBase.addNode(host, ip, hadoopUser, hadoopUserPd, rAdmin, password, id);
 
             try {
 
                 logger.info("程执行 source /etc/profile ,使得环境变量立即生效");
                 pw.println("远程执行 source /etc/profile ,使得环境变量立即生效");
-                pw.flush();
                 JschProxy.execmd(rAdmin, password, host, new String[] { "source /etc/profile" });
             } catch (Exception e) {
                 logger.error("error :", e);
             }
-
 
 
             // 执行配置同步
@@ -417,7 +406,6 @@ public class ExpansionController {
                                                 "/home/"+hadoopUser+"/hadoop-2.7.4/etc/",
                                                 confDir);
                 pw.println("执行hadoop配置同步");
-                pw.flush();
             } catch (IOException e) {
                 logger.error("error ", e);
 
@@ -450,6 +438,9 @@ public class ExpansionController {
             return "本地yaml存储失败,请删除yaml文件并重试";
         } catch (RemoteConnectionException e) {
             return "连接远程"+host+"失败，请确认超管用户名密码正确，并查看系统日志";
+        } catch (Exception e) {
+            logger.error("error ",e);
+            return "扩建失败";
         }
 
         return "扩建完成";
@@ -840,6 +831,7 @@ public class ExpansionController {
 
             nodes.add(physicalNode);
         }
+
         ModelAndView modelAndView = new ModelAndView("/nodes/nodeM");
         modelAndView.addObject("nodes",nodes);
 

@@ -3,6 +3,7 @@ package com.yss.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.yss.auth.AuthConfig;
 import com.yss.yarn.discovery.ServerAddressDiscovery;
 import com.yss.yarn.launch.YarnLaunchService;
 
@@ -18,6 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.yss.storm.StormNodesService;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -55,10 +57,9 @@ public class SettingsController {
             value  = "/confView",
             method = RequestMethod.GET
     )
-    public ModelAndView confView(ModelMap modelMap) throws Exception {
+    public ModelAndView confView(HttpServletRequest request,ModelMap modelMap) throws Exception {
         Map<String, String> data = new HashMap();
 
-        data.put("test","this is test");
         data.put("stormZk", Conf.getSTORM_ZK());
         data.put("hdfs", Conf.getFS_DEFAULT_FS());
         data.put("yarn", Conf.getYARN_RESOURCEMANAGER_ADDREES());
@@ -67,8 +68,14 @@ public class SettingsController {
         data.put("yarnJavaHome", Conf.getYarnJavaHome());
         data.put("yarnHadoopHome",Conf.getYarnHadoopHome());
         ModelAndView modelAndView = new ModelAndView("/settings/conf");
-        modelAndView.addObject("time","2018");
-        modelMap.put("time","2018");
+
+        AuthConfig.Auth auth = AuthConfig.getUser(request);
+        if(auth!=null && auth == AuthConfig.Auth.SUPER){
+            modelAndView.addObject("auth",1);
+        }else{
+            modelAndView.addObject("auth",0);
+        }
+
         modelAndView.addAllObjects(data);
         return modelAndView;
     }
@@ -83,6 +90,8 @@ public class SettingsController {
                               @RequestParam("yarns") String yarns,
                               @RequestParam("yarnui") String yarnui)
             throws Exception {
+
+
         Conf.setFS_DEFAULT_FS(hdfs);
         Conf.setSTORM_ZK(stormZk);
         Conf.setYARN_RESOURCEMANAGER_ADDREES(yarn);

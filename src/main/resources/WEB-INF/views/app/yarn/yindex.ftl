@@ -61,86 +61,250 @@
             </div>
 
 
-        <div class="box">
             <div class="box-header">
                 <h3 class="box-title">物理节点</h3>
             </div>
-            <div class="box-body">
-                <table class="table table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th>address</th>
-                    <th>state</th>
-                    <th>containers</th>
-                    <th>memoryUsed(MB)</th>
-                    <th>memoryAvail(MB)</th>
-                    <th>vCoresUsed</th>
-                    <th>vCoresAvailable</th>
-                </tr>
-                </thead>
-                <tbody>
 
+            <div id="cvmList" class="tc-table-grid tc-table-grid-cvm"><div data-role="grid-view" style="">
+                <div data-grid-panel="" class="tc-15-table-panel">
+                    <div data-grid-head="" class="tc-15-table-fixed-head" style="width:auto;padding-right: 0px; display: block; ">
+                        <table class="tc-15-table-box" style="min-width: 100%">
+                        <#--<colgroup>-->
+                        <#--<!--if start&ndash;&gt;<col style="width: 26px; "><!--if end&ndash;&gt;-->
+                        <#--<!--repeat start&ndash;&gt;<col style="width: auto; min-width: 94px; " class="col-svrid"><col style="width: 44px; min-width: 44px; " class=""><col style="width: 100px; min-width: 100px; " class=""><col style="width: 92px; min-width: 92px; " class=""><col style="width: 94px; min-width: 94px; " class=""><col style="width: 116px; " class=""><col style="width: 172px; " class=""><col style="width: 114px; " class=""><col style="width: 136px; " class=""><!--repeat end&ndash;&gt;-->
+                        <#--</colgroup>-->
+                            <thead>
+                            <tr>
+                                </th><!--if end-->
+                                <!--repeat start--><th class="text-left">
+                                <div>
+                                    <!--if start--><span class="text-overflow" title="address">address</span><!--if end--><!--content end-->
+                                </div>
+                                <!--if start--><!--if end-->
+                            </th><th  class="text-left">
+                                <div>
+                                    <!--if start--><span class="text-overflow" title="state">state</span><!--if end--><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--if start--><span class="text-overflow" title="containers">containers</span><!--if end--><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                    <div>
+                                        <!--content start--><span class="text-overflow" id="zoneIdSelector">memoryUsed(MB)</span><!--content end-->
+                                    </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">memoryAvail(MB)</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="deviceClassSelector">vCoresUsed</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                    <div>
+                                        <!--content start--><span class="text-overflow" id="deviceClassSelector">vCoresAvailable</span><!--content end-->
+                                    </div>
+                                </th><!--repeat end-->
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div data-grid-body="" class="tc-15-table-fixed-body" style="min-height: 200px; height: auto; max-height: auto; ">
+                        <table style="min-width:100%" class="tc-15-table-box tc-15-table-rowhover">
+                        <#--<colgroup>-->
+                        <#--<!--if start&ndash;&gt;<col style="width: 26px; "><!--if end&ndash;&gt;-->
+                        <#--<!--repeat start&ndash;&gt;<col style="width: auto; " class="col-svrid"><col style="width: 44px; " class=""><col style="width: 100px; " class=""><col style="width: 92px; " class=""><col style="width: 94px; " class=""><col style="width: 116px; " class=""><col style="width: 172px; " class=""><col style="width: 114px; " class=""><col style="width: 136px; " class=""><!--repeat end&ndash;&gt;-->
+                        <#--</colgroup>-->
+                            <tbody>
 
-                <#if yarn.nodes.nodes.node??>
-                <#list yarn.nodes.nodes.node as node>
-                <tr class="active">
-                    <td>${node.nodeHTTPAddress}</td>
-                    <td>${node.state}</td>
-                    <td>${node.numContainers}</td>
-                    <td>${node.usedMemoryMB}</td>
-                    <td>${node.availMemoryMB}</td>
-                    <td>${node.usedVirtualCores}</td>
-                    <td>${node.availableVirtualCores}</td>
-                </tr>
-                </#list>
-                </#if>
-                </tbody>
-            </table>
+                            <#if yarn.nodes.nodes.node??>
+                                <#list yarn.nodes.nodes.node as node>
+                                <tr class="item-row
+               " data-uinstanceid="ins-6qaa9ksm" data-role="cvm_row" data-devicelanip="10.104.133.159" data-uuid="a155d137-dbf6-4fcd-b8fe-afe8db36d3eb" data-index="0">
+                                    <!--if start--><td class="text-left">
+                                    <div>
+                                        <!--content start--><div><span class="status-col"><span class="text-overflow text-success">${node.nodeHTTPAddress!}</span></span></div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${node.state!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${node.numContainers!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <div>
+                                            <!--content start--><div>${node.usedMemoryMB!}</div><!--content end-->
+                                        </div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${node.availMemoryMB!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${node.usedVirtualCores!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${node.availableVirtualCores!}</div><!--content end-->
+                                    </div>
+                                </td><!--repeat end-->
+                                </tr>
+                                </#list>
+                            </#if>
+                            <!--repeat end-->
+                            <!--if start--><!--if end-->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 固定列 -->
+                    <!--if start--><!--if end-->
+                </div>
+
             </div>
+
+
+
+
+
         </div>
 
-        <div class="box">
             <div class="box-header">
                 <h3 class="box-title">已发布应用</h3>
             </div>
-            <div class="box-body">
-                <table class="table table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th>id</th>
-                    <th>type</th>
-                    <th>User</th>
-                    <th>State</th>
-                    <th>Containers</th>
-                    <th>VCPUs</th>
-                    <th>Memory(GB)</th>
-                    <th>Queue</th>
-                    <th>amAddress</th>
-                    <th>StartTime</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                <#if yarn.apps??>
-                <#list yarn.apps as app>
-                <tr  class="active">
-                    <td>${app.id!}</td>
-                    <td>${app.name!}</td>
-                    <td>${app.user!}</td>
-                    <td>${app.state!}</td>
-                    <th>${app.runningContainers!}</th>
-                    <td>${app.allocatedVCores!}</td>
-                    <td>${app.allocatedMB!}</td>
-                    <td>${app.queue!}</td>
-                    <td>${app.amHostHttpAddress!}</td>
-                    <td>${app.startedTime!}</td>
-                    <td><input type="button" value="kill" onclick="yarnKillApp('${app.id!}')"></td>
-                </tr>
-                </#list>
-                </#if>
-                </tbody>
-            </table>
+
+
+            <div id="cvmList" class="tc-table-grid tc-table-grid-cvm"><div data-role="grid-view" style="">
+                <div data-grid-panel="" class="tc-15-table-panel">
+                    <div data-grid-head="" class="tc-15-table-fixed-head" style="width:auto;padding-right: 0px; display: block; ">
+                        <table class="tc-15-table-box" style="min-width: 100%">
+                        <#--<colgroup>-->
+                        <#--<!--if start&ndash;&gt;<col style="width: 26px; "><!--if end&ndash;&gt;-->
+                        <#--<!--repeat start&ndash;&gt;<col style="width: auto; min-width: 94px; " class="col-svrid"><col style="width: 44px; min-width: 44px; " class=""><col style="width: 100px; min-width: 100px; " class=""><col style="width: 92px; min-width: 92px; " class=""><col style="width: 94px; min-width: 94px; " class=""><col style="width: 116px; " class=""><col style="width: 172px; " class=""><col style="width: 114px; " class=""><col style="width: 136px; " class=""><!--repeat end&ndash;&gt;-->
+                        <#--</colgroup>-->
+                            <thead>
+                            <tr>
+                              <th  class="text-left">
+                                <div>
+                                    <!--if start--><span class="text-overflow" >type</span><!--if end--><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--if start--><span class="text-overflow" >user</span><!--if end--><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">State</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">Containers</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">VCPUs</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">Memory(GB)</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">Queue</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">amAddress</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="zoneIdSelector">StartTime</span><!--content end-->
+                                </div>
+                            </th><th class="text-left">
+                                <div>
+                                    <!--content start--><span class="text-overflow" id="deviceClassSelector">操作</span><!--content end-->
+                                </div>
+                            </th><!--repeat end-->
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div data-grid-body="" class="tc-15-table-fixed-body" style="min-height: 350px; height: auto; max-height: auto; ">
+                        <table style="min-width:100%" class="tc-15-table-box tc-15-table-rowhover">
+                        <#--<colgroup>-->
+                        <#--<!--if start&ndash;&gt;<col style="width: 26px; "><!--if end&ndash;&gt;-->
+                        <#--<!--repeat start&ndash;&gt;<col style="width: auto; " class="col-svrid"><col style="width: 44px; " class=""><col style="width: 100px; " class=""><col style="width: 92px; " class=""><col style="width: 94px; " class=""><col style="width: 116px; " class=""><col style="width: 172px; " class=""><col style="width: 114px; " class=""><col style="width: 136px; " class=""><!--repeat end&ndash;&gt;-->
+                        <#--</colgroup>-->
+                            <tbody>
+
+                            <#if yarn.apps??>
+                                <#list yarn.apps as app>
+                                <tr class="item-row
+               " data-uinstanceid="ins-6qaa9ksm" data-role="cvm_row" data-devicelanip="10.104.133.159" data-uuid="a155d137-dbf6-4fcd-b8fe-afe8db36d3eb" data-index="0">
+                                    <td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.name!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.user!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.state!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.runningContainers!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.allocatedVCores!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.allocatedMB!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.queue!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.amHostHttpAddress!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+                                    <div>
+                                        <!--content start--><div>${app.startedTime!}</div><!--content end-->
+                                    </div>
+                                </td><td class="text-left">
+
+                                    <div>
+                                     <input type="button" value="kill" onclick="yarnKillApp('${app.id!}')" <#if auth!=1> disabled="disabled"</#if>>
+                                    </div>
+
+                                </td>
+
+                                </tr>
+                                </#list>
+                            </#if>
+                            <!--repeat end-->
+                            <!--if start--><!--if end-->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 固定列 -->
+                    <!--if start--><!--if end-->
+                </div>
+
             </div>
+
         </div>
 
         </div>

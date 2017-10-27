@@ -60,12 +60,5 @@ public class JwtUtil {
     }
 
 
-    public static void main(String[] args) {
-        System.out.println(signPassWord("Tudou=123"));
-        String token = signPassWord("Tudou=123");
-        System.out.println(getPassWord(token));
-    }
-
-
 
 }
