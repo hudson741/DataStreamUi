@@ -339,7 +339,7 @@ ifm.height = subWeb.body.scrollHeight;
   <!-- /.modal-dialog -->
 </div>
 <!-- ./wrapper -->
-<script src="http://www.jq22.com/demo/jQuerySweetAlert220160627/dist/sweetalert2.min.js"></script>
+<#--<script src="http://www.jq22.com/demo/jQuerySweetAlert220160627/dist/sweetalert2.min.js"></script>-->
 
 <!-- jQuery 2.2.3 -->
 <script src="plugins/jQuery/jquery-2.2.3.min.js"></script>

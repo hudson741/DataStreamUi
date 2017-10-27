@@ -123,7 +123,7 @@
 </div>
 
 </body>
-<script src="dist/js/app.js"></script>
+<#--<script src="dist/js/app.js"></script>-->
 <script type="text/javascript">
 
     $(document).ready(function () {
