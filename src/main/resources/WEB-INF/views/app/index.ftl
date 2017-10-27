@@ -104,7 +104,6 @@ ifm.height = subWeb.body.scrollHeight;
     </nav>
   </header>
 
-<#assign auth>${Request["cookies.auth"]?default("-1")}</#assign>
   <!-- Left side column. contains the logo and sidebar -->
   <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
@@ -119,7 +118,7 @@ ifm.height = subWeb.body.scrollHeight;
           </a>
         </li>
 
-      <#if auth=="1">
+      <#if auth=1>
           <li>
               <a target="navTab" href="/hrc?">
                   <i class="fa fa-th"></i>
@@ -151,7 +150,7 @@ ifm.height = subWeb.body.scrollHeight;
           </li>
 
 
-      <#if auth=="1">
+      <#if auth=1>
           <li class="treeview">
               <a href="javascript:void(0);">
                   <i class="fa fa-share"></i> <span>storm发布</span>

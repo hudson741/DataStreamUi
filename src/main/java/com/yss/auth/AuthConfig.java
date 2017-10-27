@@ -62,7 +62,6 @@ public class AuthConfig {
         superUrlAuth.add("/delPNodes");
         superUrlAuth.add("/confSyn");
         superUrlAuth.add("/checkConnect");
-        superUrlAuth.add("/index");
 
         stormUrlAuth.add("/activeTopo");
 

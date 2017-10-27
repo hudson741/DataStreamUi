@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.yss.auth.AuthConfig.getUser;
+
 
 /**
  * @Description
@@ -76,19 +78,20 @@ public class LoginController {
         if(auth == AuthConfig.Auth.NULL){
             return R.error(200, "用户名或密码错误");
         }
-
-        if(auth == AuthConfig.Auth.SUPER){
-            response.addCookie(new Cookie("auth", ""+1));
-        }else{
-            response.addCookie(new Cookie("auth", ""+0));
-        }
         return R.ok();
 
     }
 
     @RequestMapping(value = "/index")
-    public ModelAndView index(){
-        return new ModelAndView("index");
+    public ModelAndView index(HttpServletResponse response,HttpServletRequest request){
+        ModelAndView modelAndView = new ModelAndView();
+        AuthConfig.Auth auth = getUser(request);
+        if(auth == AuthConfig.Auth.SUPER){
+            modelAndView.addObject("auth",1);
+        }else if(auth == AuthConfig.Auth.STORM){
+            modelAndView.addObject("auth",0);
+        }
+        return modelAndView;
     }
 
 
